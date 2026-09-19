@@ -1,0 +1,22 @@
+[
+    "WPFInstallvc2015_64",
+    "WPFInstallvc2015_32",
+    "WPFInstallchrome",
+    "WPFInstall7zip",
+    "WPFTweaksRestorePoint",
+    "WPFTweaksTelemetry",
+    "WPFTweaksActivity",
+    "WPFTweaksLocation",
+    "WPFTweaksHiber",
+    "WPFTweaksDeliveryOptimization",
+    "WPFTweaksDisableExplorerAutoDiscovery",
+    "WPFTweaksDisableStoreSearch",
+    "WPFTweaksDiskCleanup",
+    "WPFTweaksDeleteTempFiles",
+    "WPFTweaksServices",
+    "WPFTweaksReservedStorage",
+    "WPFTweaksWindowsAI",
+    "WPFTweaksRazerBlock",
+    "WPFToggleDetailedBSoD",
+    "WPFToggleTaskbarAlignment"
+]
