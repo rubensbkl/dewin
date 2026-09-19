@@ -53,8 +53,11 @@ Configurações exportadas para o utilitário **Chris Titus Tech Windows Utility
 
 ## 4. Como Executar
 
-### Via Script de Automação (Recomendado)
-Execute no PowerShell como Administrador:
+### Via Inicializador One-Click (Recomendado)
+Dê dois cliques no arquivo `iniciar.bat` na raiz do repositório.
+
+### Via Terminal
+Execute no PowerShell como Administrador dentro da pasta do repositório:
 ```powershell
 .\scripts\apply-dewin.ps1
 ```

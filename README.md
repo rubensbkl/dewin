@@ -56,6 +56,7 @@ dewin/
 │   └── README.md           # Guia de integração WinUtil
 ├── scripts/
 │   └── apply-dewin.ps1     # Script de automação pós-instalação (Camada 2)
+├── iniciar.bat             # Inicializador rápido (elevação e execução com 2 cliques)
 ├── docs/
 │   ├── architecture.md     # Arquitetura e fluxo de instalação
 │   ├── optimizations.md    # Matriz técnica de alterações
@@ -84,10 +85,11 @@ dewin/
 
 ### Etapa 2: Pós-Instalação
 1. Conecte o computador à internet.
-2. Abra o PowerShell como Administrador e execute:
-   ```powershell
-   .\scripts\apply-dewin.ps1
-   ```
+2. Dê **dois cliques** no arquivo [`iniciar.bat`](iniciar.bat) na raiz da pasta (ele solicita elevação de Administrador e configura as permissões automaticamente).
+   * *Alternativa via terminal*: abra o PowerShell na pasta do projeto e execute:
+     ```powershell
+     .\scripts\apply-dewin.ps1
+     ```
 3. Selecione o perfil desejado:
    * `[1]` para **Full** (com WSL2 e Hyper-V).
    * `[2]` para **Creator & Gamer** (sem virtualização).

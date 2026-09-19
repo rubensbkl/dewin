@@ -59,6 +59,15 @@ winget install "MSN Weather"
 winget install "Windows Notepad"
 ```
 
+### F. Desativar Recursos de Virtualização e Dev (WSL2, Hyper-V e Sandbox)
+Caso tenha aplicado o perfil Full e queira liberar espaço desativando a virtualização:
+```powershell
+Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
+Disable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart
+Disable-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM -NoRestart
+```
+
 ---
 
 ## 3. Verificação e Reparo de Integridade do Windows
