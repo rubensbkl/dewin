@@ -41,6 +41,7 @@ Estes pacotes são desprovisionados para todos os usuários durante a fase *Spec
 | `Microsoft.BingWeather` | Clima | Previsão do tempo com telemetria e feeds. |
 | `Microsoft.YourPhone` | Vincular ao Celular | Sincronização constante com smartphone em segundo plano. |
 | `Microsoft.ZuneMusic` | Media Player moderno | Player básico substituível por players dedicados (VLC, etc.). |
+| `Microsoft.OneDrive` | Microsoft OneDrive | Desinstalado completamente; desativa interceptação das pastas de usuário (`Desktop`, `Documents`, `Pictures`) e serviço `OneSyncSvc`. |
 
 ---
 
