@@ -9,7 +9,10 @@ Este documento detalha cada modificação implementada no projeto **DEWIN**, as 
 | Otimização | Mecanismo / Chave de Registro | Benefício Real | Workload / Hardware |
 | :--- | :--- | :--- | :--- |
 | **Desativação de Fast Startup** | `HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power\HiberbootEnabled = 0` | Elimina a hibernação híbrida do kernel ao desligar. Garante inicialização limpa sem acúmulo de bugs de drivers NVIDIA/USB. | Estabilidade geral e drivers NVIDIA |
-| **Desativação de Hibernação** | `powercfg.exe /hibernate off` | Libera de 16 a 24 GB de espaço em SSD NVMe (tamanho correspondente à RAM) e reduz ciclos de gravação no SSD. | SSD NVMe (Armazenamento) |
+| **Desativação de Hibernação** | `powercfg.exe /hibernate off` | Libera de 16 a 24 GB de espaço em SSD NVMe (tamanho correspondente à RAM) e reduz ciclos de gravação no SSD. | Desktops (Armazenamento) |
+| **Hibernação Segura Compacta** | `powercfg /h /type reduced` | Mantém `hiberfil.sys` reduzido (~3 GB) para segurança em bateria crítica (< 3%) e suspensão segura na mochila. | Notebooks (Acer Nitro, ASUS VivoBook, etc.) |
+| **Preservação de Teclas Fn & Bateria ASUS** | Serviços `AsusSysCap` e `ASUSOptimization` ativos | Assegura funcionamento de teclas Fn (brilho, volume, atalhos) e limite de carga a 80% do MyASUS. | ASUS VivoBook |
+| **Preservação Térmica Acer Nitro** | Serviços Acer / Nitro ativos | Garante funcionamento pleno do NitroSense (curvas de ventoinha e modos térmicos). | Acer Nitro V 15 |
 | **Desativação de Armazenamento Reservado** | `DISM.exe /Online /Set-ReservedStorageState /State:Disabled` | Devolve ~7 GB de espaço em disco que ficava retido exclusivamente para atualizações. | SSD NVMe (Armazenamento) |
 | **Habilitação de Caminhos Longos** | `HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled = 1` | Remove a barreira de 260 caracteres do `MAX_PATH`. Impede falhas de compilação em árvores profundas. | **Unreal Engine 5**, C++, Git, npm |
 | **Bloqueio WPBT (Asus Armoury Crate)** | `HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\DisableWpbtExecution = 1` | Impede que a BIOS da placa-mãe ASUS TUF B550M injete instaladores e serviços em background no Windows. | **ASUS TUF B550M-PLUS** |

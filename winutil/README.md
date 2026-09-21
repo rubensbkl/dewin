@@ -6,15 +6,20 @@ Configurações exportadas para o utilitário **Chris Titus Tech Windows Utility
 
 ## 1. Matriz de Perfis Disponíveis
 
-| Hardware | Finalidade Dev / Workstation | Finalidade Geral / Produtividade |
+| Hardware | Finalidade Dev / Workstation | Finalidade Geral / Produtividade / Jogos |
 | :--- | :--- | :--- |
 | **Desktop** | **[`dewin-desktop-dev.json`](dewin-desktop-dev.json)**<br>WSL2 + Hyper-V + Sandbox + Sem Hibernação | **[`dewin-desktop-geral.json`](dewin-desktop-geral.json)**<br>Máxima leveza + Sem Virtualização + Sem Hibernação |
-| **Notebook** | **[`dewin-laptop-dev.json`](dewin-laptop-dev.json)**<br>*(ex: Acer Nitro V 15)*<br>WSL2 + Hyper-V + **Hibernação Segura (Bateria)** | **[`dewin-laptop-geral.json`](dewin-laptop-geral.json)**<br>*(ex: ASUS VivoBook 14/15)*<br>Autonomia máxima + Sem Virtualização + **Hibernação Segura** |
+| **Notebook**<br>*(Nitro V 15, VivoBook, etc.)* | **[`dewin-laptop-dev.json`](dewin-laptop-dev.json)**<br>WSL2 + Hyper-V + Sandbox + **Hibernação Segura** | **[`dewin-laptop-geral.json`](dewin-laptop-geral.json)**<br>Autonomia máxima + Sem Virtualização + **Hibernação Segura** |
 
 ---
 
 ## 2. Diferenças Chave entre Perfis
 
+* **Independência de Hardware**:
+  * A escolha do perfil é guiada exclusivamente pela **finalidade de trabalho** (necessidade de virtualização/Docker/Linux vs. economia de RAM e autonomia), e **não** pela marca ou modelo do notebook.
+  * O **Acer Nitro V 15** pode rodar o perfil **Dev** (para programação e compilação com dGPU) ou o perfil **Geral** (para foco puro em jogos e multitarefa leve).
+  * O **ASUS VivoBook** pode rodar o perfil **Dev** (para desenvolvimento web, backend ou Docker) ou o perfil **Geral** (para máxima autonomia de bateria e produtividade diária).
+  * Recursos específicos de fabricante (teclas Fn e saúde de bateria da ASUS, controle térmico NitroSense da Acer, etc.) são preservados e compatibilizados pelo orquestrador em qualquer perfil.
 * **Desktops (`dewin-desktop-*.json`)**:
   * Incluem `WPFTweaksHiber`: Desativa a hibernação para liberar de 16 a 24 GB de espaço em SSD NVMe.
 * **Notebooks (`dewin-laptop-*.json`)**:

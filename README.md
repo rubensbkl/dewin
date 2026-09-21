@@ -20,7 +20,7 @@ Foco em desempenho, baixa latência e redução de processos em segundo plano pa
 | **Placas de Vídeo AMD** | **Radeon RX 5000 em diante**. Suporte a Smart Access Memory (SAM). |
 | **Placas-mãe** | **ASUS, MSI, Gigabyte, ASRock**. Bloqueio de injeção de bloatware via firmware WPBT (ex: ASUS Armoury Crate). |
 | **Armazenamento** | **SSDs NVMe e SATA**. Recupera ~31 GB ao desativar hibernação e armazenamento reservado. |
-| **Notebooks Homologados** | **Acer Nitro V 15** (RTX dGPU + hibernação segura) e **ASUS VivoBook 14/15** (Autonomia, iGPU e bateria otimizada). |
+| **Notebooks Homologados** | **Acer Nitro V 15** (calibração dGPU/Optimus, NitroSense e hibernação segura) e **ASUS VivoBook 14/15** (preservação de teclas Fn, limite de bateria MyASUS 80% e hibernação segura). Compatíveis com ambos os perfis (Dev ou Geral). |
 
 ---
 
@@ -37,10 +37,12 @@ Foco em desempenho, baixa latência e redução de processos em segundo plano pa
 
 ## 🎛️ Perfis Disponíveis (Matriz 2x2)
 
-| Hardware | Finalidade Dev / Workstation | Finalidade Geral / Produtividade |
+A escolha do perfil é orientada pela **sua carga de trabalho** (necessidade de virtualização/Docker vs. economia de recursos), e não pelo modelo do computador. Ambos os notebooks homologados (**Acer Nitro V 15** e **ASUS VivoBook**) e desktops suportam qualquer perfil:
+
+| Hardware | Finalidade Dev / Workstation | Finalidade Geral, Jogos & Produtividade |
 | :--- | :--- | :--- |
 | **Desktop** | **`[1] Desktop Dev`**: WSL2, Hyper-V, Sandbox, liberação máxima de SSD (sem hibernação). | **`[2] Desktop Geral & Jogos`**: Máxima leveza, FPS e SSD liberado, sem virtualização. |
-| **Notebook** | **`[3] Notebook Dev (Nitro V 15)`**: WSL2, Hyper-V, GPU dedicada calibrada e **hibernação segura**. | **`[4] Notebook Geral (VivoBook)`**: Autonomia máxima de bateria, leveza e **hibernação segura**. |
+| **Notebook**<br>*(Nitro V 15, VivoBook, etc.)* | **`[3] Notebook Dev`**: WSL2, Hyper-V, Sandbox, ferramentas Dev, hibernação segura compacta (~3 GB). | **`[4] Notebook Geral & Jogos`**: Máxima autonomia de bateria, leveza, sem virtualização, hibernação segura compacta (~3 GB). |
 
 ---
 
@@ -53,8 +55,8 @@ dewin/
 ├── winutil/
 │   ├── dewin-desktop-dev.json    # Desktop Dev & Workstation
 │   ├── dewin-desktop-geral.json  # Desktop Geral & Jogos
-│   ├── dewin-laptop-dev.json     # Notebook Dev & Performance (Acer Nitro V 15)
-│   ├── dewin-laptop-geral.json   # Notebook Geral & Produtividade (ASUS VivoBook)
+│   ├── dewin-laptop-dev.json     # Notebook Dev & Workstation (Nitro V 15, VivoBook, etc.)
+│   ├── dewin-laptop-geral.json   # Notebook Geral & Produtividade / Jogos (Nitro V 15, VivoBook, etc.)
 │   └── README.md                 # Guia de integração WinUtil e inventário
 ├── scripts/
 │   └── apply-dewin.ps1     # Script de automação e Booster do sistema
@@ -96,7 +98,7 @@ O DEWIN foi projetado com suporte para dois perfis de uso:
    * **Calibração de GPU**: `TdrDelay = 8s`, `TdrDdiDelay = 8s` e HAGS para estabilidade em DaVinci Resolve, Unreal Engine e jogos.
    * **Debloat Cirúrgico**: Remoção de 28 pacotes nativos de bloatware e telemetria.
    * **Tweaks do WinUtil**: Hibernação, Armazenamento Reservado, menu clássico, extensões de arquivos, serviços e runtimes.
-4. Selecione o perfil desejado (`[1] Full` ou `[2] Creator & Gamer`) e reinicie o computador ao finalizar.
+4. Selecione o perfil desejado (`[1]` a `[4]` de acordo com seu dispositivo e necessidade de trabalho) e reinicie o computador ao finalizar.
 
 ---
 

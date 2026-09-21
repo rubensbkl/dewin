@@ -5,9 +5,9 @@
     Script orquestrador pós-instalação e booster do projeto DEWIN.
     Suporte unificado para Desktops e Notebooks através da matriz 2x2:
     - [1] Desktop Dev & Workstation (WSL2, Hyper-V, sem hibernação, foco em SSD e CPU)
-    - [2] Desktop Geral & Jogos (Criador / Gamer, sem virtualização, sem hibernação)
-    - [3] Notebook Dev & Performance (Acer Nitro V 15 / dGPU, hibernação segura)
-    - [4] Notebook Geral & Produtividade (ASUS VivoBook / Bateria, hibernação segura)
+    - [2] Desktop Geral, Jogos & Produtividade (Criador / Gamer, sem virtualização, sem hibernação)
+    - [3] Notebook Dev & Workstation (Compatível com Nitro V 15, VivoBook e outros / hibernação segura)
+    - [4] Notebook Geral, Jogos & Produtividade (Compatível com Nitro V 15, VivoBook e outros / bateria e hibernação segura)
     - [5] Interface Gráfica do WinUtil (Ajuste Manual)
 .NOTES
     Projeto: DEWIN (Windows 11 Pro 25H2)
@@ -35,45 +35,86 @@ Write-Host '         Universal Open-Source Edition | Windows 11 Pro           ' 
 Write-Host '==================================================================' -ForegroundColor Cyan
 Write-Host ''
 
-# 2. Selecao de Perfil de Uso (Matriz 2x2)
-$isLaptop = $false
+# 2. Deteccao de Hardware e Perfil de Uso
+$isDetectedLaptop = $false
+try {
+    $enclosure = Get-CimInstance Win32_SystemEnclosure -ErrorAction SilentlyContinue | Select-Object -First 1
+    $chassisTypes = @($enclosure.ChassisTypes)
+    $hasBattery = [bool](Get-CimInstance Win32_Battery -ErrorAction SilentlyContinue)
+    $isDetectedLaptop = ($chassisTypes | Where-Object { $_ -in @(8, 9, 10, 11, 12, 14, 18, 21, 31, 32) }) -or $hasBattery
+} catch {
+    $isDetectedLaptop = $false
+}
+
+$cs = Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue
+$manufacturer = if ($cs.Manufacturer) { $cs.Manufacturer.Trim() } else { 'Desconhecido' }
+$model = if ($cs.Model) { $cs.Model.Trim() } else { 'Desconhecido' }
+
+$gpus = @(Get-CimInstance Win32_VideoController -ErrorAction SilentlyContinue)
+$gpuNames = ($gpus | ForEach-Object { $_.Name }) -join ' | '
+if (-not $gpuNames) { $gpuNames = 'Nao detectada' }
+
+$hasNvidia = ($gpuNames -like '*NVIDIA*')
+$isAcerNitro = ($model -like '*Nitro*' -or $model -like '*AN515*' -or $model -like '*ANV15*')
+$isAsusVivoBook = ($model -like '*VivoBook*' -or $model -like '*X14*' -or $model -like '*X15*' -or $model -like '*K15*')
+$isAsusLaptop = ($isDetectedLaptop -and ($manufacturer -like '*ASUS*' -or $model -like '*ASUS*'))
+
+Write-Host '[*] Dispositivo Detectado: ' -NoNewline -ForegroundColor Cyan
+Write-Host "$manufacturer $model " -NoNewline -ForegroundColor White
+if ($isDetectedLaptop) {
+    Write-Host '(Notebook / Portatil)' -ForegroundColor Green
+} else {
+    Write-Host '(Desktop / Estacao)' -ForegroundColor Green
+}
+Write-Host ('[*] GPU(s): ' + $gpuNames) -ForegroundColor Gray
+Write-Host ''
+
+$isLaptop = $isDetectedLaptop
 
 if ($Profile -eq 'Prompt') {
-    Write-Host 'Escolha o perfil para esta maquina:' -ForegroundColor Yellow
+    Write-Host 'Escolha o perfil desejado para esta maquina:' -ForegroundColor Yellow
+    if ($isDetectedLaptop) {
+        Write-Host '  [i] Hardware movel identificado! Recomendado: [3] para perfil Dev ou [4] para uso Geral/Jogos.' -ForegroundColor Magenta
+    } else {
+        Write-Host '  [i] Desktop identificado! Recomendado: [1] para perfil Dev ou [2] para uso Geral/Jogos.' -ForegroundColor Magenta
+    }
     Write-Host ''
     Write-Host '  --- DESKTOPS ---' -ForegroundColor DarkGray
     Write-Host '  [1] Desktop — Dev & Workstation' -ForegroundColor Green
-    Write-Host '      -> WSL2, Hyper-V, Sandbox, VC++, Chrome, 7-Zip, .NET, sem hibernacao.' -ForegroundColor Gray
-    Write-Host '  [2] Desktop — Geral & Jogos (Criador / Gamer)' -ForegroundColor Cyan
+    Write-Host '      -> WSL2, Hyper-V, Sandbox, VC++, Chrome, 7-Zip, .NET, sem hibernacao (libera SSD).' -ForegroundColor Gray
+    Write-Host '  [2] Desktop — Geral, Jogos & Produtividade' -ForegroundColor Cyan
     Write-Host '      -> Maxima leveza e FPS, sem virtualizacao, sem hibernacao (libera SSD).' -ForegroundColor Gray
     Write-Host ''
-    Write-Host '  --- NOTEBOOKS ---' -ForegroundColor DarkGray
-    Write-Host '  [3] Notebook — Dev & Performance (ex: Acer Nitro V 15 / dGPU)' -ForegroundColor Green
-    Write-Host '      -> WSL2, Hyper-V, GPU calibrada, bateria com hibernacao segura compacta.' -ForegroundColor Gray
-    Write-Host '  [4] Notebook — Geral & Produtividade (ex: ASUS VivoBook / Bateria)' -ForegroundColor Cyan
-    Write-Host '      -> Maxima autonomia de bateria, sem virtualizacao, hibernacao segura.' -ForegroundColor Gray
+    Write-Host '  --- NOTEBOOKS (Acer Nitro V 15, ASUS VivoBook, etc.) ---' -ForegroundColor DarkGray
+    Write-Host '  [3] Notebook — Dev & Workstation' -ForegroundColor Green
+    Write-Host '      -> WSL2, Hyper-V, Sandbox, ferramentas Dev, hibernacao segura compacta.' -ForegroundColor Gray
+    Write-Host '  [4] Notebook — Geral, Jogos & Produtividade' -ForegroundColor Cyan
+    Write-Host '      -> Maxima autonomia de bateria e FPS, sem virtualizacao, hibernacao segura compacta.' -ForegroundColor Gray
     Write-Host ''
     Write-Host '  [5] Abrir Interface Visual do WinUtil (Ajuste Manual)' -ForegroundColor Magenta
     Write-Host '      -> Abre a tela grafica do WinUtil para inspecionar ou marcar manualmente.' -ForegroundColor Gray
     Write-Host ''
     
-    $selection = Read-Host 'Digite a opcao desejada [1 a 5] (Padrao: 1)'
+    $defaultOpt = if ($isDetectedLaptop) { '3' } else { '1' }
+    $selection = Read-Host "Digite a opcao desejada [1 a 5] (Padrao: $defaultOpt)"
+    if ([string]::IsNullOrWhiteSpace($selection)) { $selection = $defaultOpt }
+
     switch ($selection) {
         '2' {
             $chosenProfile = 'dewin-desktop-geral.json'
-            $profileName = 'Desktop — Geral & Jogos'
+            $profileName = 'Desktop — Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $false
         }
         '3' {
             $chosenProfile = 'dewin-laptop-dev.json'
-            $profileName = 'Notebook — Dev & Performance (Nitro V 15)'
+            $profileName = 'Notebook — Dev & Workstation'
             $runMode = 'Auto'
             $isLaptop = $true
         }
         '4' {
             $chosenProfile = 'dewin-laptop-geral.json'
-            $profileName = 'Notebook — Geral & Produtividade (VivoBook)'
+            $profileName = 'Notebook — Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $true
         }
@@ -81,7 +122,7 @@ if ($Profile -eq 'Prompt') {
             $chosenProfile = $null
             $profileName = 'Interface Grafica Manual'
             $runMode = 'GUI'
-            $isLaptop = $false
+            $isLaptop = $isDetectedLaptop
         }
         Default {
             $chosenProfile = 'dewin-desktop-dev.json'
@@ -94,19 +135,19 @@ if ($Profile -eq 'Prompt') {
     switch ($Profile) {
         'DesktopGeral' {
             $chosenProfile = 'dewin-desktop-geral.json'
-            $profileName = 'Desktop — Geral & Jogos'
+            $profileName = 'Desktop — Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $false
         }
         'LaptopDev' {
             $chosenProfile = 'dewin-laptop-dev.json'
-            $profileName = 'Notebook — Dev & Performance (Nitro V 15)'
+            $profileName = 'Notebook — Dev & Workstation'
             $runMode = 'Auto'
             $isLaptop = $true
         }
         'LaptopGeral' {
             $chosenProfile = 'dewin-laptop-geral.json'
-            $profileName = 'Notebook — Geral & Produtividade (VivoBook)'
+            $profileName = 'Notebook — Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $true
         }
@@ -114,7 +155,7 @@ if ($Profile -eq 'Prompt') {
             $chosenProfile = $null
             $profileName = 'Interface Grafica Manual'
             $runMode = 'GUI'
-            $isLaptop = $false
+            $isLaptop = $isDetectedLaptop
         }
         Default {
             $chosenProfile = 'dewin-desktop-dev.json'
@@ -176,9 +217,9 @@ if ($runMode -eq 'Auto') {
     Write-Host ''
 }
 
-# 4. Calibracao de Hardware & Bateria (Desktop vs. Notebook)
+# 4. Calibracao Modular de Hardware, Energia & Compatibilidade
 Write-Host ''
-Write-Host '[*] Calibrando parametros de hardware e energia...' -ForegroundColor Cyan
+Write-Host '[*] Aplicando calibracao de hardware e compatibilidade...' -ForegroundColor Cyan
 
 # 4.1. Calibracao GPU para DaVinci Resolve, Unreal Engine e Jogos
 try {
@@ -187,19 +228,47 @@ try {
     Set-ItemProperty -Path $gpuPath -Name 'TdrDelay' -Value 8 -Type DWord -Force -ErrorAction SilentlyContinue
     Set-ItemProperty -Path $gpuPath -Name 'TdrDdiDelay' -Value 8 -Type DWord -Force -ErrorAction SilentlyContinue
     Set-ItemProperty -Path $gpuPath -Name 'HwSchMode' -Value 2 -Type DWord -Force -ErrorAction SilentlyContinue
+    Write-Host '  [+] GPU & Render: TdrDelay=8s, TdrDdiDelay=8s e HAGS calibrados.' -ForegroundColor Green
 } catch {}
 
-# 4.2. Gerenciamento de Energia e Bateria
+# 4.2. Gerenciamento de Energia e Bateria (Desktop vs. Notebook)
 try {
-    if ($isLaptop) {
+    if ($isLaptop -or $isDetectedLaptop) {
         # Notebook: Garante hibernacao compacta para seguranca de bateria critica (< 3%) e sono na mochila
         powercfg /h on 2>$null
         powercfg /h /type reduced 2>$null
         Write-Host '  [+] Notebook: Hibernacao segura configurada em modo reduzido (type reduced ~3GB).' -ForegroundColor Green
+
+        # Ativa porcentagem de bateria na barra de tarefas do Windows 11
+        $taskbarPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Control Center'
+        if (-not (Test-Path $taskbarPath)) { New-Item -Path $taskbarPath -Force | Out-Null }
+        Set-ItemProperty -Path $taskbarPath -Name 'IsBatteryPercentageEnabled' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
     } else {
         # Desktop: Desativa hibernacao para liberar 16 a 24 GB de SSD
         powercfg /h off 2>$null
         Write-Host '  [+] Desktop: Hibernacao desativada para recuperar espaco em SSD.' -ForegroundColor Green
+    }
+} catch {}
+
+# 4.3. Compatibilidade para Hardwares Especificos (Acer Nitro, ASUS VivoBook, etc.)
+try {
+    # Suporte para Acer Nitro V 15 / Laptops Acer (preserva NitroSense e perfis dGPU)
+    if ($isAcerNitro -or ($manufacturer -like '*Acer*' -and ($isLaptop -or $isDetectedLaptop))) {
+        Write-Host '  [+] Acer Nitro / Laptop detectado: Preservando servicos termicos (NitroSense / Acer Care Center).' -ForegroundColor Green
+        Get-Service -Name '*Acer*', '*Nitro*' -ErrorAction SilentlyContinue | Set-Service -StartupType Automatic -ErrorAction SilentlyContinue
+    }
+
+    # Suporte para ASUS VivoBook / Laptops ASUS (preserva teclas Fn de atalho e protecao de bateria 80%)
+    if ($isAsusVivoBook -or $isAsusLaptop) {
+        Write-Host '  [+] ASUS VivoBook / Laptop detectado: Preservando ASUS System Control Interface (teclas Fn e protecao de bateria 80%).' -ForegroundColor Green
+        Get-Service -Name 'AsusSysCap', 'ASUSLinkNear', 'ASUSOptimization', 'ASUSSoftwareManager' -ErrorAction SilentlyContinue | Set-Service -StartupType Automatic -ErrorAction SilentlyContinue
+    }
+
+    # Suporte para Desktop ASUS (ex: TUF B550M-PLUS)
+    if (-not ($isLaptop -or $isDetectedLaptop) -and ($manufacturer -like '*ASUS*' -or $model -like '*TUF*')) {
+        $smPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
+        Set-ItemProperty -Path $smPath -Name 'DisableWpbtExecution' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
+        Write-Host '  [+] ASUS Desktop: Bloqueio de injecao WPBT da BIOS (Armoury Crate) ativo.' -ForegroundColor Green
     }
 } catch {}
 

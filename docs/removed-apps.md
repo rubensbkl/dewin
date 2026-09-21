@@ -75,3 +75,5 @@ A integridade do DEWIN depende da presença intocada destes componentes:
 | **SmartScreen** | Mantido ativo contra malwares e instaladores desconhecidos da internet. |
 | **Edge WebView2 Runtime** | Preservado obrigatoriamente. O inicializador da **Epic Games / Unreal Engine** e o instalador da **Adobe Creative Cloud** exigem o WebView2 para telas de login. |
 | **Xbox Services & Game Bar** | Preservados para total compatibilidade com jogos do Xbox App / Game Pass e controles Bluetooth/USB. |
+| **ASUS System Control Interface** | Preservado para funcionamento pleno das teclas Fn (brilho, volume, atalhos) e limite de carga de bateria a 80% no **ASUS VivoBook**. |
+| **Acer NitroSense / Care Center** | Preservado para controle de curvas térmicas, ventoinhas e alternância de modos de energia no **Acer Nitro V 15**. |

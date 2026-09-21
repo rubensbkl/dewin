@@ -97,10 +97,21 @@ flowchart TD
 * **Bloqueio WPBT**: Desativa a injeção automática de firmware do instalador do Asus Armoury Crate (`DisableWpbtExecution = 1`), impedindo serviços desnecessários da Asus em background.
 * **Rede Realtek 2.5GbE**: Preservada para máxima vazão em transferências locais e builds.
 
-### Notebook: Acer Nitro V 15 (Gaming & Workstation Móvel)
-* **Gráficos Híbridos & HAGS**: HAGS ativo (`HwSchMode = 2`) para suporte a DLSS 3 e baixa latência. Gerenciamento NVIDIA Optimus preservado para desligar a GPU dedicada quando o notebook opera em bateria.
-* **Hibernação Segura**: Hibernação compacta (`powercfg /h /type reduced`) preservada para proteção contra perda de dados em bateria crítica (< 3%) e sono seguro na mochila (Modern Standby S0ix).
+### Notebooks Homologados: Acer Nitro V 15 & ASUS VivoBook 14/15
+Ambos os notebooks foram homologados no DEWIN e **suportam integralmente tanto o perfil Dev quanto o perfil Geral**, conforme a finalidade desejada pelo usuário:
 
-### Notebook: ASUS VivoBook 14/15 (Ultrabook Corporativo)
-* **Autonomia de Bateria**: Sem sobrecarga de serviços de virtualização Hyper-V em background, reduzindo o consumo de energia em idle e mantendo as temperaturas baixas.
-* **Hardware de Teclado & Fn**: Preservados os canais de controle para teclas Fn (brilho, volume, atalho de microfone) e controle de vida útil da bateria.
+* **Acer Nitro V 15 (Gaming & Workstation Móvel)**:
+  * **Gráficos Híbridos & HAGS**: HAGS ativo (`HwSchMode = 2`) para suporte a DLSS 3 e baixa latência. Gerenciamento NVIDIA Optimus / Advanced Optimus preservado para desligar a GPU dedicada quando o notebook opera em bateria.
+  * **TdrDelay & Estabilidade**: Tolerância de TDR expandida (`TdrDelay = 8s`, `TdrDdiDelay = 8s`) para renderização pesada e estabilidade gráfica.
+  * **Controle Térmico Acer**: Preservação dos serviços e canais do **NitroSense** e **Acer Care Center** para alternância de curvas de ventoinha (Quiet / Default / Performance).
+  * **Hibernação Segura**: Hibernação compacta (`powercfg /h /type reduced`, ~3 GB) para proteção contra perda de dados em bateria crítica (< 3%) e sono seguro na mochila (Modern Standby S0ix).
+  * *No Perfil Dev*: Habilita WSL2, Hyper-V e aceleração CUDA/dGPU no subsistema Linux.
+  * *No Perfil Geral*: Foco máximo em jogos e multitarefa leve, sem alocação de memória RAM para hipervisores em background.
+
+* **ASUS VivoBook 14/15 (Ultrabook Portátil)**:
+  * **Teclas de Atalho Fn & Hardware**: Preservados os serviços do **ASUS System Control Interface** (`AsusSysCap`, `ASUSOptimization`), garantindo funcionamento pleno das teclas Fn (brilho de tela, volume, mudo de microfone e touchpad).
+  * **Proteção de Bateria (MyASUS Battery Health Charging)**: Suporte preservado para limitação de carga a 80%, aumentando a longevidade da bateria.
+  * **Otimização de Vídeo Integrado (iGPU)**: Suporte balanceado para gráficos Intel Iris Xe / AMD Radeon com exibição da porcentagem de bateria na barra.
+  * **Hibernação Segura**: Hibernação compacta (`powercfg /h /type reduced`) para proteção contra desligamento súbito em bateria crítica (< 3%).
+  * *No Perfil Dev*: Permite desenvolvimento portátil leve com WSL2, Docker e VS Code.
+  * *No Perfil Geral*: Máxima autonomia de bateria longe da tomada e temperaturas amenas em repouso.
