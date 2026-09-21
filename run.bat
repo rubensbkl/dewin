@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal
 title DEWIN - Otimizador Pos-Instalacao
 cd /d "%~dp0"

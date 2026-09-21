@@ -1,14 +1,14 @@
-<#
+﻿<#
 .SYNOPSIS
     DEWIN Post-Install Runner & System Booster (Universal Edition)
 .DESCRIPTION
-    Script orquestrador pós-instalação e booster do projeto DEWIN.
-    Suporte unificado para Desktops e Notebooks através da matriz 2x2:
-    - [1] Desktop Dev & Workstation (WSL2, Hyper-V, sem hibernação, foco em SSD e CPU)
-    - [2] Desktop Geral, Jogos & Produtividade (Criador / Gamer, sem virtualização, sem hibernação)
-    - [3] Notebook Dev & Workstation (Compatível com Nitro V 15, VivoBook e outros / hibernação segura)
-    - [4] Notebook Geral, Jogos & Produtividade (Compatível com Nitro V 15, VivoBook e outros / bateria e hibernação segura)
-    - [5] Interface Gráfica do WinUtil (Ajuste Manual)
+    Script orquestrador pos-instalacao e booster do projeto DEWIN.
+    Suporte unificado para Desktops e Notebooks atraves da matriz 2x2:
+    - [1] Desktop Dev & Workstation (WSL2, Hyper-V, sem hibernacao, foco em SSD e CPU)
+    - [2] Desktop Geral, Jogos & Produtividade (Criador / Gamer, sem virtualizacao, sem hibernacao)
+    - [3] Notebook Dev & Workstation (Compativel com Nitro V 15, VivoBook e outros / hibernacao segura)
+    - [4] Notebook Geral, Jogos & Produtividade (Compativel com Nitro V 15, VivoBook e outros / bateria e hibernacao segura)
+    - [5] Interface Grafica do WinUtil (Ajuste Manual)
 .NOTES
     Projeto: DEWIN (Windows 11 Pro 25H2)
 #>
@@ -19,6 +19,12 @@ param(
     [string]$Profile = 'Prompt',
     [switch]$NoRestart
 )
+
+# 0. Configuracao de Codificacao UTF-8 para Console
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    $OutputEncoding = [System.Text.Encoding]::UTF8
+} catch {}
 
 # 1. Elevacao Administrativa
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -80,15 +86,15 @@ if ($Profile -eq 'Prompt') {
     }
     Write-Host ''
     Write-Host '  --- DESKTOPS ---' -ForegroundColor DarkGray
-    Write-Host '  [1] Desktop — Dev & Workstation' -ForegroundColor Green
+    Write-Host '  [1] Desktop - Dev & Workstation' -ForegroundColor Green
     Write-Host '      -> WSL2, Hyper-V, Sandbox, VC++, Chrome, 7-Zip, .NET, sem hibernacao (libera SSD).' -ForegroundColor Gray
-    Write-Host '  [2] Desktop — Geral, Jogos & Produtividade' -ForegroundColor Cyan
+    Write-Host '  [2] Desktop - Geral, Jogos & Produtividade' -ForegroundColor Cyan
     Write-Host '      -> Maxima leveza e FPS, sem virtualizacao, sem hibernacao (libera SSD).' -ForegroundColor Gray
     Write-Host ''
     Write-Host '  --- NOTEBOOKS (Acer Nitro V 15, ASUS VivoBook, etc.) ---' -ForegroundColor DarkGray
-    Write-Host '  [3] Notebook — Dev & Workstation' -ForegroundColor Green
+    Write-Host '  [3] Notebook - Dev & Workstation' -ForegroundColor Green
     Write-Host '      -> WSL2, Hyper-V, Sandbox, ferramentas Dev, hibernacao segura compacta.' -ForegroundColor Gray
-    Write-Host '  [4] Notebook — Geral, Jogos & Produtividade' -ForegroundColor Cyan
+    Write-Host '  [4] Notebook - Geral, Jogos & Produtividade' -ForegroundColor Cyan
     Write-Host '      -> Maxima autonomia de bateria e FPS, sem virtualizacao, hibernacao segura compacta.' -ForegroundColor Gray
     Write-Host ''
     Write-Host '  [5] Abrir Interface Visual do WinUtil (Ajuste Manual)' -ForegroundColor Magenta
@@ -102,19 +108,19 @@ if ($Profile -eq 'Prompt') {
     switch ($selection) {
         '2' {
             $chosenProfile = 'dewin-desktop-geral.json'
-            $profileName = 'Desktop — Geral, Jogos & Produtividade'
+            $profileName = 'Desktop - Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $false
         }
         '3' {
             $chosenProfile = 'dewin-laptop-dev.json'
-            $profileName = 'Notebook — Dev & Workstation'
+            $profileName = 'Notebook - Dev & Workstation'
             $runMode = 'Auto'
             $isLaptop = $true
         }
         '4' {
             $chosenProfile = 'dewin-laptop-geral.json'
-            $profileName = 'Notebook — Geral, Jogos & Produtividade'
+            $profileName = 'Notebook - Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $true
         }
@@ -126,7 +132,7 @@ if ($Profile -eq 'Prompt') {
         }
         Default {
             $chosenProfile = 'dewin-desktop-dev.json'
-            $profileName = 'Desktop — Dev & Workstation'
+            $profileName = 'Desktop - Dev & Workstation'
             $runMode = 'Auto'
             $isLaptop = $false
         }
@@ -135,19 +141,19 @@ if ($Profile -eq 'Prompt') {
     switch ($Profile) {
         'DesktopGeral' {
             $chosenProfile = 'dewin-desktop-geral.json'
-            $profileName = 'Desktop — Geral, Jogos & Produtividade'
+            $profileName = 'Desktop - Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $false
         }
         'LaptopDev' {
             $chosenProfile = 'dewin-laptop-dev.json'
-            $profileName = 'Notebook — Dev & Workstation'
+            $profileName = 'Notebook - Dev & Workstation'
             $runMode = 'Auto'
             $isLaptop = $true
         }
         'LaptopGeral' {
             $chosenProfile = 'dewin-laptop-geral.json'
-            $profileName = 'Notebook — Geral, Jogos & Produtividade'
+            $profileName = 'Notebook - Geral, Jogos & Produtividade'
             $runMode = 'Auto'
             $isLaptop = $true
         }
@@ -159,7 +165,7 @@ if ($Profile -eq 'Prompt') {
         }
         Default {
             $chosenProfile = 'dewin-desktop-dev.json'
-            $profileName = 'Desktop — Dev & Workstation'
+            $profileName = 'Desktop - Dev & Workstation'
             $runMode = 'Auto'
             $isLaptop = $false
         }
@@ -207,7 +213,7 @@ if ($runMode -eq 'Auto') {
 
     # Gera arquivo temporario com o perfil
     $tempProfilePath = Join-Path -Path $env:TEMP -ChildPath ("dewin-run-" + [System.Guid]::NewGuid().ToString().Substring(0,8) + ".json")
-    $profileData | ConvertTo-Json | Set-Content -Path $tempProfilePath
+    $profileData | ConvertTo-Json | Set-Content -Path $tempProfilePath -Encoding UTF8
     $resolvedProfile = $tempProfilePath
 } else {
     $resolvedProfile = $null
@@ -250,7 +256,25 @@ try {
     }
 } catch {}
 
-# 4.3. Compatibilidade para Hardwares Especificos (Acer Nitro, ASUS VivoBook, etc.)
+# 4.3. Bloqueio Nativo de Bloatware de Perifericos (Logitech Assistant)
+try {
+    Stop-Process -Name 'logi_download_assistant' -Force -ErrorAction SilentlyContinue
+    $programFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }
+    $logiPath = Join-Path $programFiles64 'LogiDownloadAssistant'
+    if (-not (Test-Path $logiPath)) { New-Item -Path $logiPath -ItemType Directory -Force | Out-Null }
+    icacls $logiPath /deny "*S-1-1-0:(W)" | Out-Null
+    Write-Host '  [+] Perifericos: Bloqueio do Logi Download Assistant ativo.' -ForegroundColor Green
+} catch {}
+
+# 4.4. Otimizacao de Login (Pular Tela de Bloqueio Estatica)
+try {
+    $personalizationPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization'
+    if (-not (Test-Path $personalizationPath)) { New-Item -Path $personalizationPath -Force | Out-Null }
+    Set-ItemProperty -Path $personalizationPath -Name 'NoLockScreen' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
+    Write-Host '  [+] Interface: Tela de bloqueio desativada (login direto).' -ForegroundColor Green
+} catch {}
+
+# 4.5. Compatibilidade para Hardwares Especificos (Acer Nitro, ASUS VivoBook, etc.)
 try {
     # Suporte para Acer Nitro V 15 / Laptops Acer (preserva NitroSense e perfis dGPU)
     if ($isAcerNitro -or ($manufacturer -like '*Acer*' -and ($isLaptop -or $isDetectedLaptop))) {
@@ -307,7 +331,18 @@ try {
         $ProgressPreference = 'SilentlyContinue'
         $winutilScript = Invoke-RestMethod -Uri 'https://christitus.com/win'
         $scriptBlock = [ScriptBlock]::Create($winutilScript)
-        if ($isAuto -and $profileToLoad) {
+        if ($isAuto -and $profileToLoad -and (Test-Path -Path $profileToLoad)) {
+            # Sanitizacao defensiva contra diferencas de versao do catalogo WinUtil
+            $rawKeys = Get-Content -Path $profileToLoad -Raw | ConvertFrom-Json
+            $validKeys = @()
+            foreach ($k in $rawKeys) {
+                if ($winutilScript -match ('"' + [regex]::Escape($k) + '"')) {
+                    $validKeys += $k
+                } else {
+                    Write-Host "  [!] Chave ignorada por nao existir nesta versao do WinUtil: $k" -ForegroundColor Yellow
+                }
+            }
+            $validKeys | ConvertTo-Json | Set-Content -Path $profileToLoad -Encoding UTF8
             Write-Host '[*] Aplicando configuracoes, servicos e pacotes via WinUtil...' -ForegroundColor Green
             & $scriptBlock -Config $profileToLoad
         } else {

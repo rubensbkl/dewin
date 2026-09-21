@@ -56,7 +56,6 @@ Configurações exportadas para o utilitário **Chris Titus Tech Windows Utility
 | `WPFTweaksWidget` | Remove Widgets do Windows | Elimina feeds de notícias e consumo de RAM do `Widgets.exe`. |
 | `WPFTweaksRightClickMenu` | Restaura Menu de Contexto Clássico | Menu estilo Windows 10 sem cliques extras no Windows 11. |
 | `WPFTweaksRemoveOneDrive` | Remove Microsoft OneDrive | Desinstalação completa do OneDrive e desativação do serviço de sincronização `OneSyncSvc`. |
-| `WPFTweaksLogiBlock` | Bloqueia Logi Download Assistant | Previne injeção automática de software da Logitech via Windows Update. |
 | `WPFTweaksRemoveHomeAndGallery` | Remove Início e Galeria do Explorer | Abre o Explorer diretamente em "Este Computador" (`LaunchTo = 1`) e limpa o painel lateral. |
 | `WPFTweaksEdgeDebloat` | Debloat do Microsoft Edge | Desativa telemetria, popups promocionais, cupons e assistentes do Edge (mantém o WebView2). |
 | `WPFTweaksDisableWarningForUnsignedRdp` | Desativa aviso em conexões RDP | *(Apenas Dev)* Elimina avisos repetitivos ao abrir arquivos `.rdp` locais de conexão remota. |
