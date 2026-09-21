@@ -17,6 +17,16 @@
     "WPFTweaksReservedStorage",
     "WPFTweaksWindowsAI",
     "WPFTweaksRazerBlock",
+    "WPFTweaksWPBT",
+    "WPFTweaksEndTaskOnTaskbar",
+    "WPFTweaksConsumerFeatures",
+    "WPFTweaksPreventDeviceMetadataFromNetwork",
+    "WPFTweaksWidget",
+    "WPFTweaksRightClickMenu",
     "WPFToggleDetailedBSoD",
-    "WPFToggleTaskbarAlignment"
+    "WPFToggleTaskbarAlignment",
+    "WPFToggleLongPaths",
+    "WPFToggleShowExt",
+    "WPFToggleHiddenFiles",
+    "WPFFeaturesdotnet"
 ]

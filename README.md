@@ -20,6 +20,7 @@ Foco em desempenho, baixa latência e redução de processos em segundo plano pa
 | **Placas de Vídeo AMD** | **Radeon RX 5000 em diante**. Suporte a Smart Access Memory (SAM). |
 | **Placas-mãe** | **ASUS, MSI, Gigabyte, ASRock**. Bloqueio de injeção de bloatware via firmware WPBT (ex: ASUS Armoury Crate). |
 | **Armazenamento** | **SSDs NVMe e SATA**. Recupera ~31 GB ao desativar hibernação e armazenamento reservado. |
+| **Notebooks Homologados** | **Acer Nitro V 15** (RTX dGPU + hibernação segura) e **ASUS VivoBook 14/15** (Autonomia, iGPU e bateria otimizada). |
 
 ---
 
@@ -34,12 +35,12 @@ Foco em desempenho, baixa latência e redução de processos em segundo plano pa
 
 ---
 
-## 🎛️ Perfis Disponíveis
+## 🎛️ Perfis Disponíveis (Matriz 2x2)
 
-* **`[1] Full (Dev + Criador + Jogos)`**:
-  * Inclui WSL2, Hyper-V, Windows Sandbox, Runtimes VC++ All-in-One, Chrome, 7-Zip e tweaks de sistema.
-* **`[2] Creator & Gamer (Edição 3D + Vídeo + Jogos)`**:
-  * Focado em DaVinci Resolve, Premiere, Blender e jogos. Aplica tweaks de SSD, GPU e runtimes, sem ativar virtualização Linux/Hyper-V.
+| Hardware | Finalidade Dev / Workstation | Finalidade Geral / Produtividade |
+| :--- | :--- | :--- |
+| **Desktop** | **`[1] Desktop Dev`**: WSL2, Hyper-V, Sandbox, liberação máxima de SSD (sem hibernação). | **`[2] Desktop Geral & Jogos`**: Máxima leveza, FPS e SSD liberado, sem virtualização. |
+| **Notebook** | **`[3] Notebook Dev (Nitro V 15)`**: WSL2, Hyper-V, GPU dedicada calibrada e **hibernação segura**. | **`[4] Notebook Geral (VivoBook)`**: Autonomia máxima de bateria, leveza e **hibernação segura**. |
 
 ---
 
@@ -50,15 +51,16 @@ dewin/
 ├── unattend/
 │   └── autounattend.xml    # Instalação autônoma limpa (Camada 1)
 ├── winutil/
-│   ├── dewin-full.json     # Perfil completo (Dev + Criador + Gamer)
-│   ├── dewin-creator.json  # Perfil Criador & Gamer (Sem WSL/Hyper-V)
-│   ├── dewin.json          # Perfil padrão
-│   └── README.md           # Guia de integração WinUtil
+│   ├── dewin-desktop-dev.json    # Desktop Dev & Workstation
+│   ├── dewin-desktop-geral.json  # Desktop Geral & Jogos
+│   ├── dewin-laptop-dev.json     # Notebook Dev & Performance (Acer Nitro V 15)
+│   ├── dewin-laptop-geral.json   # Notebook Geral & Produtividade (ASUS VivoBook)
+│   └── README.md                 # Guia de integração WinUtil e inventário
 ├── scripts/
-│   └── apply-dewin.ps1     # Script de automação pós-instalação (Camada 2)
-├── iniciar.bat             # Inicializador rápido (elevação e execução com 2 cliques)
+│   └── apply-dewin.ps1     # Script de automação e Booster do sistema
+├── run.bat                 # Inicializador rápido (elevação e execução com 2 cliques)
 ├── docs/
-│   ├── architecture.md     # Arquitetura e fluxo de instalação
+│   ├── architecture.md     # Arquitetura e fluxos de uso
 │   ├── optimizations.md    # Matriz técnica de alterações
 │   ├── removed-apps.md     # Inventário de apps removidos e preservados
 │   └── rollback.md         # Guia de reversão e restauração
@@ -74,7 +76,9 @@ dewin/
 
 ## 🚀 Como Usar
 
-### Etapa 1: Instalação Limpa via Pendrive
+O DEWIN foi projetado com suporte para dois perfis de uso:
+
+### 🔹 Fluxo A: Instalação Limpa via Pendrive (Setup Novo)
 1. Grave a ISO oficial (`Win11_25H2_BrazilianPortuguese_x64_v2.iso`) em um pendrive com o Rufus (particionamento GPT / UEFI).
 2. Copie o arquivo [`unattend/autounattend.xml`](unattend/autounattend.xml) para a raiz do pendrive (`D:\autounattend.xml`).
 3. Inicialize o computador pelo pendrive:
@@ -82,18 +86,17 @@ dewin/
    * Bypass preventivo de TPM/RAM aplicado.
    * Bloatware UWP removido e GPU configurada com `TdrDelay = 8s`.
    * Microsoft Store, OpenSSH Client e .NET 3.5 offline preservados.
+4. Após o primeiro boot, execute o `run.bat` para aplicar os pacotes e runtimes finais.
 
-### Etapa 2: Pós-Instalação
-1. Conecte o computador à internet.
-2. Dê **dois cliques** no arquivo [`iniciar.bat`](iniciar.bat) na raiz da pasta (ele solicita elevação de Administrador e configura as permissões automaticamente).
-   * *Alternativa via terminal*: abra o PowerShell na pasta do projeto e execute:
-     ```powershell
-     .\scripts\apply-dewin.ps1
-     ```
-3. Selecione o perfil desejado:
-   * `[1]` para **Full** (com WSL2 e Hyper-V).
-   * `[2]` para **Creator & Gamer** (sem virtualização).
-4. Reinicie o computador após a conclusão.
+### 🔹 Fluxo B: Booster em Máquina Viva (Sem Formatar)
+*Se você já possui o Windows instalado e em produção, e quer apenas dar um boost máximo sem formatar:*
+1. Baixe ou clone a pasta do projeto.
+2. Dê **dois cliques** no arquivo [`run.bat`](run.bat) na raiz do repositório (ou execute `.\scripts\apply-dewin.ps1` no PowerShell como Administrador).
+3. O script aplicará automaticamente:
+   * **Calibração de GPU**: `TdrDelay = 8s`, `TdrDdiDelay = 8s` e HAGS para estabilidade em DaVinci Resolve, Unreal Engine e jogos.
+   * **Debloat Cirúrgico**: Remoção de 28 pacotes nativos de bloatware e telemetria.
+   * **Tweaks do WinUtil**: Hibernação, Armazenamento Reservado, menu clássico, extensões de arquivos, serviços e runtimes.
+4. Selecione o perfil desejado (`[1] Full` ou `[2] Creator & Gamer`) e reinicie o computador ao finalizar.
 
 ---
 

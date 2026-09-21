@@ -7,7 +7,6 @@
     "WPFTweaksTelemetry",
     "WPFTweaksActivity",
     "WPFTweaksLocation",
-    "WPFTweaksHiber",
     "WPFTweaksDeliveryOptimization",
     "WPFTweaksDisableExplorerAutoDiscovery",
     "WPFTweaksDisableStoreSearch",
@@ -17,9 +16,19 @@
     "WPFTweaksReservedStorage",
     "WPFTweaksWindowsAI",
     "WPFTweaksRazerBlock",
+    "WPFTweaksWPBT",
+    "WPFTweaksEndTaskOnTaskbar",
+    "WPFTweaksConsumerFeatures",
+    "WPFTweaksPreventDeviceMetadataFromNetwork",
+    "WPFTweaksWidget",
+    "WPFTweaksRightClickMenu",
     "WPFToggleDetailedBSoD",
     "WPFToggleTaskbarAlignment",
+    "WPFToggleLongPaths",
+    "WPFToggleShowExt",
+    "WPFToggleHiddenFiles",
     "WPFFeaturewsl",
     "WPFFeatureshyperv",
-    "WPFFeaturesSandbox"
+    "WPFFeaturesSandbox",
+    "WPFFeaturesdotnet"
 ]
