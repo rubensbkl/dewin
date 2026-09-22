@@ -40,7 +40,7 @@ function Enable-DewinFeatures {
             Enable-WindowsOptionalFeature -Online -FeatureName $feat -NoRestart -ErrorAction SilentlyContinue | Out-Null
             Write-DewinLog -Level SUCCESS -Message "  [+] Recurso $feat pronto."
         } catch {
-            Write-DewinLog -Level WARN -Message "  [!] Nao foi possivel habilitar ${feat}: $($_.Exception.Message)"
+            Write-DewinLog -Level WARN -Message "  [!] Não foi possível habilitar ${feat}: $($_.Exception.Message)"
         }
     }
 }

@@ -77,10 +77,10 @@ function Get-DewinPreset {
         Apps        = $apps
         Features    = $features
         Description = switch ($Name) {
-            'DesktopDev'   { 'Desktop Dev & Workstation: WSL2, Hyper-V, Sandbox, ferramentas Dev, sem hibernacao (recupera SSD).' }
-            'DesktopGeral' { 'Desktop Geral & Jogos: Maxima leveza, menor latencia de rede e entrada, SSD liberado, sem virtualizacao.' }
-            'LaptopDev'    { 'Notebook Dev & Workstation: WSL2, Hyper-V, Sandbox, ferramentas Dev, hibernacao segura compacta.' }
-            'LaptopGeral'  { 'Notebook Geral & Jogos: Maxima autonomia de bateria e FPS, sem virtualizacao, hibernacao compacta.' }
+            'DesktopDev'   { 'Desktop - Desenvolvimento: WSL2, Hyper-V, Sandbox, ferramentas essenciais, sem hibernação (liberação de espaço em SSD).' }
+            'DesktopGeral' { 'Desktop - Geral e Jogos: Otimização de desempenho, menor latência de rede e entrada, espaço em SSD liberado, sem virtualização ativa.' }
+            'LaptopDev'    { 'Notebook - Desenvolvimento: WSL2, Hyper-V, Sandbox, ferramentas essenciais, hibernação compacta com preservação de energia.' }
+            'LaptopGeral'  { 'Notebook - Geral e Autonomia: Eficiência energética aprimorada, maior autonomia de bateria, sem virtualização ativa, hibernação compacta.' }
         }
     }
 }

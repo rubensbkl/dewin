@@ -1,6 +1,6 @@
 # ==============================================================================
 # DEWIN Booster - Universal Windows Optimizer & Debloater (Single-Script Edition)
-# Execucao via terminal:
+# Execução via terminal:
 # irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex
 # ==============================================================================
 
@@ -12,16 +12,28 @@ param(
     [switch]$NoRestart
 )
 
-# 0. Codificacao UTF-8 para Console
+# 0. Auto-correção de codificação para execução direta via powershell.exe -File
+if ($PSCommandPath -and (Test-Path -LiteralPath $PSCommandPath)) {
+    if ('ç'.Length -ne 1) {
+        $scriptBytes = [System.IO.File]::ReadAllBytes($PSCommandPath)
+        $scriptText = [System.Text.Encoding]::UTF8.GetString($scriptBytes)
+        $scriptBlock = [ScriptBlock]::Create($scriptText)
+        $boundParams = $PSBoundParameters
+        & $scriptBlock @boundParams
+        return
+    }
+}
+
+# 1. Codificação UTF-8 para Console
 try {
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
     $OutputEncoding = [System.Text.Encoding]::UTF8
 } catch {}
 
-# 1. Auto-Elevacao Administrativa (UAC)
+# 2. Auto-Elevação Administrativa (UAC)
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Write-Host '[*] Privilegios de Administrador necessarios. Elevando via UAC...' -ForegroundColor Cyan
+    Write-Host '[*] Privilégios de Administrador necessários. Elevando via UAC...' -ForegroundColor Cyan
     $tempLauncher = Join-Path -Path $env:TEMP -ChildPath 'dewin-elevated.ps1'
     try {
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
@@ -48,9 +60,9 @@ if (-not $isAdmin) {
     } catch {
         Write-Host ''
         Write-Host '==================================================================' -ForegroundColor Yellow
-        Write-Host ' [!] PRIVILEGIOS DE ADMINISTRADOR NECESSARIOS' -ForegroundColor Yellow
-        Write-Host ' O DEWIN precisa ser executado em um terminal com privilÃ©gios de Administrador.' -ForegroundColor Yellow
-        Write-Host ' Clique com o botao direito no Iniciar -> Terminal (Administrador)' -ForegroundColor Cyan
+        Write-Host ' [!] PRIVILÉGIOS DE ADMINISTRADOR NECESSÁRIOS' -ForegroundColor Yellow
+        Write-Host ' O DEWIN precisa ser executado em um terminal com privilégios de Administrador.' -ForegroundColor Yellow
+        Write-Host ' Clique com o botão direito no Iniciar -> Terminal (Administrador)' -ForegroundColor Cyan
         Write-Host ' e execute novamente:' -ForegroundColor Cyan
         Write-Host ' irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex' -ForegroundColor White
         Write-Host '==================================================================' -ForegroundColor Yellow
@@ -58,7 +70,7 @@ if (-not $isAdmin) {
     }
 }
 
-# --- Modulo: src\core\Logger.ps1 ---
+# --- Módulo: src\core\Logger.ps1 ---
 # ==============================================================================
 # DEWIN Core: Sistema de Auditoria e Logs
 # ==============================================================================
@@ -151,7 +163,7 @@ function Write-DewinLog {
 }
 
 
-# --- Modulo: src\core\Registry.ps1 ---
+# --- Módulo: src\core\Registry.ps1 ---
 # ==============================================================================
 # DEWIN Core: Utilitários de Registro
 # ==============================================================================
@@ -195,7 +207,7 @@ function Remove-DewinReg {
 }
 
 
-# --- Modulo: src\core\Hardware.ps1 ---
+# --- Módulo: src\core\Hardware.ps1 ---
 # ==============================================================================
 # DEWIN Core: Detecção Inteligente de Hardware
 # ==============================================================================
@@ -210,7 +222,7 @@ function Get-DewinHardwareInfo {
         Model            = 'Desconhecido'
         Processor        = 'Processador'
         RamTotalGB       = 0
-        GpuNames         = 'Nao detectada'
+        GpuNames         = 'Não detectada'
         WinVersion       = 'Windows 11'
         WinBuild         = 0
         IsLaptop         = $false
@@ -264,7 +276,7 @@ function Get-DewinHardwareInfo {
 }
 
 
-# --- Modulo: src\tweaks\InterfaceTweaks.ps1 ---
+# --- Módulo: src\tweaks\InterfaceTweaks.ps1 ---
 # ==============================================================================
 # DEWIN Tweaks: Interface, Barra de Tarefas & Explorer
 # ==============================================================================
@@ -294,7 +306,7 @@ function Invoke-DewinInterfaceTweaks {
         [switch]$AlwaysShowScrollbars = $true
     )
 
-    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizacoes de interface e barra de tarefas...'
+    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizações de interface e barra de tarefas...'
     $advExplorer = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
 
     # Barra de tarefas: Ocultar caixa de pesquisa
@@ -346,7 +358,7 @@ function Invoke-DewinInterfaceTweaks {
 }
 
 
-# --- Modulo: src\tweaks\PerformanceTweaks.ps1 ---
+# --- Módulo: src\tweaks\PerformanceTweaks.ps1 ---
 # ==============================================================================
 # DEWIN Tweaks: Desempenho, Latência, Jogos e SSD
 # ==============================================================================
@@ -363,7 +375,7 @@ function Invoke-DewinPerformanceTweaks {
         [switch]$CleanTempFiles = $true
     )
 
-    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizacoes de desempenho, latencia e SSD...'
+    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizações de desempenho, latência e SSD...'
 
     # Latência de Rede e Priorização Multimídia/Jogos
     if ($OptimizeNetworkLatency) {
@@ -380,7 +392,7 @@ function Invoke-DewinPerformanceTweaks {
         Set-DewinReg -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Name 'HistoricalCaptureEnabled' -Value 0
     }
 
-    # Resposta Linear do Mouse (1:1 sem aceleracao)
+    # Resposta Linear do Mouse (1:1 sem aceleração)
     if ($LinearMouse) {
         Set-DewinReg -Path 'HKCU:\Control Panel\Mouse' -Name 'MouseSpeed' -Value '0' -Type 'String'
         Set-DewinReg -Path 'HKCU:\Control Panel\Mouse' -Name 'MouseThreshold1' -Value '0' -Type 'String'
@@ -410,11 +422,11 @@ function Invoke-DewinPerformanceTweaks {
         Remove-Item -Path "$Env:SystemRoot\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    Write-DewinLog -Level SUCCESS -Message '  [+] Desempenho, latencia de rede, GameDVR e SSD calibrados.'
+    Write-DewinLog -Level SUCCESS -Message '  [+] Desempenho, latência de rede, GameDVR e SSD calibrados.'
 }
 
 
-# --- Modulo: src\tweaks\PrivacyTweaks.ps1 ---
+# --- Módulo: src\tweaks\PrivacyTweaks.ps1 ---
 # ==============================================================================
 # DEWIN Tweaks: Privacidade, Telemetria & Debloat
 # ==============================================================================
@@ -519,11 +531,11 @@ function Invoke-DewinDebloat {
         } catch {}
     }
 
-    Write-DewinLog -Level SUCCESS -Message "  [+] Limpeza de $removedCount bloatwares concluida."
+    Write-DewinLog -Level SUCCESS -Message "  [+] Limpeza de $removedCount bloatwares concluída."
 }
 
 
-# --- Modulo: src\tweaks\SystemTweaks.ps1 ---
+# --- Módulo: src\tweaks\SystemTweaks.ps1 ---
 # ==============================================================================
 # DEWIN Tweaks: Sistema, GPU, Energia & Serviços
 # ==============================================================================
@@ -542,7 +554,7 @@ function Invoke-DewinSystemTweaks {
         [switch]$DisableLockScreen = $true
     )
 
-    Write-DewinLog -Level STEP -Message '[*] Aplicando calibracoes de sistema, GPU e energia...'
+    Write-DewinLog -Level STEP -Message '[*] Aplicando calibrações de sistema, GPU e energia...'
 
     # Calibração de GPU (TdrDelay = 8s, TdrDdiDelay = 8s, HAGS = 2)
     if ($CalibrateGpu) {
@@ -555,13 +567,13 @@ function Invoke-DewinSystemTweaks {
     # Gerenciamento Inteligente de Hibernação e Energia
     if ($SmartHibernation) {
         if ($IsLaptop) {
-            Write-DewinLog -Level STEP -Message '  [*] Configurando hibernacao segura compacta para Notebook...'
+            Write-DewinLog -Level STEP -Message '  [*] Configurando hibernação segura compacta para Notebook...'
             try {
                 powercfg.exe /hibernate on 2>$null | Out-Null
                 powercfg.exe /h /type reduced 2>$null | Out-Null
             } catch {}
         } else {
-            Write-DewinLog -Level STEP -Message '  [*] Desativando hibernacao para Desktop (recuperando espaco SSD)...'
+            Write-DewinLog -Level STEP -Message '  [*] Desativando hibernação para Desktop (recuperando espaço em disco SSD)...'
             try { powercfg.exe /hibernate off 2>$null | Out-Null } catch {}
         }
     }
@@ -600,11 +612,11 @@ function Invoke-DewinSystemTweaks {
         Set-DewinReg -Path 'HKCU:\SOFTWARE\Microsoft\Terminal Server Client' -Name 'RdpLaunchConsentAccepted' -Value 1
     }
 
-    Write-DewinLog -Level SUCCESS -Message '  [+] Calibracoes de sistema, GPU e energia aplicadas com sucesso.'
+    Write-DewinLog -Level SUCCESS -Message '  [+] Calibrações de sistema, GPU e energia aplicadas com sucesso.'
 }
 
 
-# --- Modulo: src\packages\SoftwareInstaller.ps1 ---
+# --- Módulo: src\packages\SoftwareInstaller.ps1 ---
 # ==============================================================================
 # DEWIN Packages: Instalador de Softwares via Winget
 # ==============================================================================
@@ -616,7 +628,7 @@ function Get-DewinSoftwareCatalog {
     return @(
         @{ Id = 'Microsoft.VCRedist.2015+.x64'; Name = 'Visual C++ 2015-2022 (x64)'; Category = 'Essenciais'; Default = $true },
         @{ Id = 'Microsoft.VCRedist.2015+.x86'; Name = 'Visual C++ 2015-2022 (x86)'; Category = 'Essenciais'; Default = $true },
-        @{ Id = '7zip.7zip';                   Name = '7-Zip (Compactador Ultra-Rápido)'; Category = 'Essenciais'; Default = $true },
+        @{ Id = '7zip.7zip';                   Name = '7-Zip (Compactador de Arquivos)'; Category = 'Essenciais'; Default = $true },
         @{ Id = 'Google.Chrome';               Name = 'Google Chrome'; Category = 'Navegadores'; Default = $true },
         @{ Id = 'Microsoft.VisualStudioCode';  Name = 'Visual Studio Code'; Category = 'Desenvolvimento'; Default = $false },
         @{ Id = 'Git.Git';                     Name = 'Git for Windows'; Category = 'Desenvolvimento'; Default = $false },
@@ -636,7 +648,7 @@ function Install-DewinSoftware {
 
     if (-not $AppIds -or $AppIds.Count -eq 0) { return }
 
-    Write-DewinLog -Level STEP -Message "[*] Iniciando instalacao de $($AppIds.Count) pacotes via Winget..."
+    Write-DewinLog -Level STEP -Message "[*] Iniciando instalação de $($AppIds.Count) pacotes via Winget..."
 
     $hasInternet = $false
     try {
@@ -644,7 +656,7 @@ function Install-DewinSoftware {
     } catch {}
 
     if (-not $hasInternet) {
-        Write-DewinLog -Level WARN -Message '  [!] Sem conexao com a internet. Instalacao de pacotes ignorada.'
+        Write-DewinLog -Level WARN -Message '  [!] Sem conexão com a internet. Instalação de pacotes ignorada.'
         return
     }
 
@@ -668,7 +680,7 @@ function Install-DewinSoftware {
             if ($wingetProc.ExitCode -eq 0) {
                 Write-DewinLog -Level SUCCESS -Message "  [+] $appName instalado com sucesso."
             } else {
-                Write-DewinLog -Level INFO -Message "  [i] Winget $appName finalizou com codigo $($wingetProc.ExitCode)" -NoConsole
+                Write-DewinLog -Level INFO -Message "  [i] Winget $appName finalizou com código $($wingetProc.ExitCode)" -NoConsole
             }
         } catch {
             Write-DewinLog -Level WARN -Message "  [!] Falha ao instalar ${appName}: $($_.Exception.Message)"
@@ -677,7 +689,7 @@ function Install-DewinSoftware {
 }
 
 
-# --- Modulo: src\packages\WindowsFeatures.ps1 ---
+# --- Módulo: src\packages\WindowsFeatures.ps1 ---
 # ==============================================================================
 # DEWIN Packages: Recursos Opcionais do Windows (DISM)
 # ==============================================================================
@@ -720,13 +732,13 @@ function Enable-DewinFeatures {
             Enable-WindowsOptionalFeature -Online -FeatureName $feat -NoRestart -ErrorAction SilentlyContinue | Out-Null
             Write-DewinLog -Level SUCCESS -Message "  [+] Recurso $feat pronto."
         } catch {
-            Write-DewinLog -Level WARN -Message "  [!] Nao foi possivel habilitar ${feat}: $($_.Exception.Message)"
+            Write-DewinLog -Level WARN -Message "  [!] Não foi possível habilitar ${feat}: $($_.Exception.Message)"
         }
     }
 }
 
 
-# --- Modulo: src\engine\Presets.ps1 ---
+# --- Módulo: src\engine\Presets.ps1 ---
 # ==============================================================================
 # DEWIN Engine: Mapeamento de Perfis de Otimização
 # ==============================================================================
@@ -806,16 +818,16 @@ function Get-DewinPreset {
         Apps        = $apps
         Features    = $features
         Description = switch ($Name) {
-            'DesktopDev'   { 'Desktop Dev & Workstation: WSL2, Hyper-V, Sandbox, ferramentas Dev, sem hibernacao (recupera SSD).' }
-            'DesktopGeral' { 'Desktop Geral & Jogos: Maxima leveza, menor latencia de rede e entrada, SSD liberado, sem virtualizacao.' }
-            'LaptopDev'    { 'Notebook Dev & Workstation: WSL2, Hyper-V, Sandbox, ferramentas Dev, hibernacao segura compacta.' }
-            'LaptopGeral'  { 'Notebook Geral & Jogos: Maxima autonomia de bateria e FPS, sem virtualizacao, hibernacao compacta.' }
+            'DesktopDev'   { 'Desktop - Desenvolvimento: WSL2, Hyper-V, Sandbox, ferramentas essenciais, sem hibernação (liberação de espaço em SSD).' }
+            'DesktopGeral' { 'Desktop - Geral e Jogos: Otimização de desempenho, menor latência de rede e entrada, espaço em SSD liberado, sem virtualização ativa.' }
+            'LaptopDev'    { 'Notebook - Desenvolvimento: WSL2, Hyper-V, Sandbox, ferramentas essenciais, hibernação compacta com preservação de energia.' }
+            'LaptopGeral'  { 'Notebook - Geral e Autonomia: Eficiência energética aprimorada, maior autonomia de bateria, sem virtualização ativa, hibernação compacta.' }
         }
     }
 }
 
 
-# --- Modulo: src\engine\Runner.ps1 ---
+# --- Módulo: src\engine\Runner.ps1 ---
 # ==============================================================================
 # DEWIN Engine: Orquestrador de Execução e Otimização
 # ==============================================================================
@@ -840,7 +852,7 @@ function Invoke-DewinTweaksOnly {
         if ($OnProgress) { try { & $OnProgress $Percent $Status } catch {} }
     }
 
-    & $updateProgress 5 "Inicializando auditoria e configuracoes de sistema..."
+    & $updateProgress 5 "Inicializando auditoria e configurações de sistema..."
 
     # 1. Cabecalho de Auditoria
     Write-DewinLog -Level RAW -Message '=================================================================='
@@ -848,13 +860,13 @@ function Invoke-DewinTweaksOnly {
     Write-DewinLog -Level RAW -Message "Data e Hora: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Write-DewinLog -Level RAW -Message "Sistema Operacional: $($Hardware.WinVersion) (Build $($Hardware.WinBuild))"
     Write-DewinLog -Level RAW -Message "Dispositivo: $($Hardware.Manufacturer) $($Hardware.Model) ($($Hardware.DeviceTypeStr))"
-    Write-DewinLog -Level RAW -Message "Memoria RAM: $($Hardware.RamTotalGB) GB"
+    Write-DewinLog -Level RAW -Message "Memória RAM: $($Hardware.RamTotalGB) GB"
     Write-DewinLog -Level RAW -Message "GPU(s): $($Hardware.GpuNames)"
-    Write-DewinLog -Level RAW -Message "Usuario Administrador: $($Hardware.IsAdmin)"
+    Write-DewinLog -Level RAW -Message "Usuário Administrador: $($Hardware.IsAdmin)"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
     # 2. Calibrações de Sistema, GPU e Energia
-    & $updateProgress 15 "Calibrando GPU, energia e servicos de sistema..."
+    & $updateProgress 15 "Configurando tolerâncias gráficas, energia e serviços..."
     Invoke-DewinSystemTweaks -IsLaptop ([bool]$Tweaks['IsLaptop']) `
                             -IsDev ([bool]$Tweaks['IsDev']) `
                             -RamGB ([int]$Hardware.RamTotalGB) `
@@ -874,12 +886,12 @@ function Invoke-DewinTweaksOnly {
                              -DebloatEdge:([bool]$Tweaks['DebloatEdge'])
 
     if ([bool]$Tweaks['RemoveUwpBloat']) {
-        & $updateProgress 50 "Removendo bloatwares UWP de terceiros..."
+        & $updateProgress 50 "Removendo aplicativos pré-instalados desnecessários..."
         Invoke-DewinDebloat
     }
 
     # 4. Interface e Barra de Tarefas
-    & $updateProgress 65 "Otimizando interface, barra de tarefas e Explorer..."
+    & $updateProgress 65 "Otimizando interface, barra de tarefas e Explorador de Arquivos..."
     Invoke-DewinInterfaceTweaks -HideSearch:([bool]$Tweaks['HideSearch']) `
                                -HideTaskView:([bool]$Tweaks['HideTaskView']) `
                                -CenterTaskbar:([bool]$Tweaks['CenterTaskbar']) `
@@ -890,7 +902,7 @@ function Invoke-DewinTweaksOnly {
                                -AlwaysShowScrollbars:([bool]$Tweaks['AlwaysShowScrollbars'])
 
     # 5. Desempenho e Latência
-    & $updateProgress 80 "Calibrando latencia de rede, GameDVR e SSD..."
+    & $updateProgress 80 "Otimizando latência de rede, gravação de jogos e SSD..."
     Invoke-DewinPerformanceTweaks -OptimizeNetworkLatency:([bool]$Tweaks['OptimizeNetworkLatency']) `
                                  -DisableGameDVR:([bool]$Tweaks['DisableGameDVR']) `
                                  -LinearMouse:([bool]$Tweaks['LinearMouse']) `
@@ -900,7 +912,7 @@ function Invoke-DewinTweaksOnly {
                                  -CleanTempFiles:([bool]$Tweaks['CleanTempFiles'])
 
     # 6. Reiniciar Explorer
-    & $updateProgress 95 "Atualizando o Windows Explorer..."
+    & $updateProgress 95 "Reiniciando o Windows Explorer..."
     Restart-DewinExplorer
 
     # 7. Conclusão e Sumário
@@ -908,14 +920,14 @@ function Invoke-DewinTweaksOnly {
     Write-DewinLog -Level RAW -Message '=================================================================='
     Write-DewinLog -Level RAW -Message "OTIMIZAÇÕES APLICADAS COM SUCESSO"
     Write-DewinLog -Level RAW -Message "Tempo Total: $elapsedSec segundos"
-    Write-DewinLog -Level RAW -Message "Estatisticas: Sucessos=$($global:DewinStats.Success), Avisos=$($global:DewinStats.Warnings), Erros=$($global:DewinStats.Errors)"
+    Write-DewinLog -Level RAW -Message "Estatísticas: Sucessos=$($global:DewinStats.Success), Avisos=$($global:DewinStats.Warnings), Erros=$($global:DewinStats.Errors)"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
     try {
         Copy-Item -Path $global:DewinLogPath -Destination $global:DewinLatestLog -Force -ErrorAction SilentlyContinue
     } catch {}
 
-    & $updateProgress 100 "Otimizações finalizadas com sucesso em $elapsedSec s!"
+    & $updateProgress 100 "Otimizações aplicadas com sucesso em $elapsedSec s."
 }
 
 function Invoke-DewinSoftwaresOnly {
@@ -937,12 +949,12 @@ function Invoke-DewinSoftwaresOnly {
 
     & $updateProgress 5 "Inicializando gerenciador de pacotes Winget..."
     Write-DewinLog -Level RAW -Message '=================================================================='
-    Write-DewinLog -Level RAW -Message "DEWIN BOOSTER - INSTALACAO DE SOFTWARES"
+    Write-DewinLog -Level RAW -Message "DEWIN BOOSTER - INSTALAÇÃO DE SOFTWARES"
     Write-DewinLog -Level RAW -Message "Data e Hora: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Write-DewinLog -Level RAW -Message "Quantidade de Softwares Selecionados: $($Apps.Count)"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
-    & $updateProgress 10 "Instalando $($Apps.Count) softwares selecionados via Winget..."
+    & $updateProgress 10 "Instalando $($Apps.Count) programas selecionados via Winget..."
     Install-DewinSoftware -AppIds $Apps -OnProgress {
         param($pct, $msg)
         & $updateProgress $pct $msg
@@ -950,7 +962,7 @@ function Invoke-DewinSoftwaresOnly {
 
     $elapsedSec = if ($global:DewinTimer) { [math]::Round($global:DewinTimer.Elapsed.TotalSeconds, 1) } else { 0 }
     Write-DewinLog -Level RAW -Message '=================================================================='
-    Write-DewinLog -Level RAW -Message "INSTALACAO DE SOFTWARES FINALIZADA"
+    Write-DewinLog -Level RAW -Message "INSTALAÇÃO DE SOFTWARES FINALIZADA"
     Write-DewinLog -Level RAW -Message "Tempo Total: $elapsedSec segundos"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
@@ -958,7 +970,7 @@ function Invoke-DewinSoftwaresOnly {
         Copy-Item -Path $global:DewinLogPath -Destination $global:DewinLatestLog -Force -ErrorAction SilentlyContinue
     } catch {}
 
-    & $updateProgress 100 "Instalação de programas finalizada em $elapsedSec s!"
+    & $updateProgress 100 "Instalação de programas finalizada em $elapsedSec s."
 }
 
 function Invoke-DewinFeaturesOnly {
@@ -978,7 +990,7 @@ function Invoke-DewinFeaturesOnly {
         if ($OnProgress) { try { & $OnProgress $Percent $Status } catch {} }
     }
 
-    & $updateProgress 5 "Inicializando modulo DISM do Windows..."
+    & $updateProgress 5 "Inicializando módulo DISM do Windows..."
     Write-DewinLog -Level RAW -Message '=================================================================='
     Write-DewinLog -Level RAW -Message "DEWIN BOOSTER - RECURSOS OPCIONAIS DO WINDOWS"
     Write-DewinLog -Level RAW -Message "Data e Hora: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -1000,7 +1012,7 @@ function Invoke-DewinFeaturesOnly {
         Copy-Item -Path $global:DewinLogPath -Destination $global:DewinLatestLog -Force -ErrorAction SilentlyContinue
     } catch {}
 
-    & $updateProgress 100 "Recursos do Windows configurados em $elapsedSec s!"
+    & $updateProgress 100 "Recursos opcionais configurados com sucesso em $elapsedSec s."
 }
 
 function Invoke-DewinExecution {
@@ -1027,7 +1039,7 @@ function Invoke-DewinExecution {
 }
 
 
-# --- Modulo: src\engine\Controller.ps1 ---
+# --- Módulo: src\engine\Controller.ps1 ---
 # ==============================================================================
 # DEWIN Engine: Controlador da Interface Gráfica (WPF)
 # ==============================================================================
@@ -1092,9 +1104,9 @@ function Start-DewinGui {
     $gui['txtDeviceType'].Text = "$($Hardware.DeviceTypeStr) Detectado"
 
     $recText = if ($Hardware.IsLaptop) {
-        "💡 Notebook identificado! Recomendamos o Perfil [3] Notebook Dev (se for programador) ou [4] Notebook Geral (para máxima autonomia de bateria e jogos)."
+        "Notebook identificado. Perfil recomendado: 'Notebook - Desenvolvimento' (para desenvolvedores) ou 'Notebook - Geral e Autonomia' (para máxima duração de bateria e jogos)."
     } else {
-        "💡 Desktop identificado! Recomendamos o Perfil [1] Desktop Dev (se for programador) ou [2] Desktop Geral / Jogos (para máxima taxa de FPS e menor latência)."
+        "Desktop identificado. Perfil recomendado: 'Desktop - Desenvolvimento' (para desenvolvedores) ou 'Desktop - Geral e Jogos' (para máxima taxa de FPS e menor latência)."
     }
     $gui['txtRecommendation'].Text = $recText
 
@@ -1331,7 +1343,7 @@ function Start-DewinGui {
             return
         }
 
-        $gui['btnInstallSoftwares'].Content = "⏳ INSTALANDO PROGRAMAS..."
+        $gui['btnInstallSoftwares'].Content = "Instalando programas..."
 
         & $runDewinAsync "Instalação de Softwares via Winget" {
             param($AppsArg)
@@ -1348,11 +1360,11 @@ function Start-DewinGui {
             }
         } @(,$selectedApps) {
             param($s)
-            $gui['btnInstallSoftwares'].Content = "$([char]::ConvertFromUtf32(0x1F4E5)) BAIXAR / INSTALAR PROGRAMAS SELECIONADOS"
+            $gui['btnInstallSoftwares'].Content = "Instalar Programas Selecionados"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "⚠️ Falha ao instalar softwares: $($s.Error)"
+                $gui['lblProgressStatus'].Text = "Falha na instalação de programas: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
-                    "Ocorreu um erro ao instalar os softwares:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro & Log.",
+                    "Ocorreu um erro ao instalar os programas selecionados:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
@@ -1360,9 +1372,9 @@ function Start-DewinGui {
             } else {
                 $gui['pbExecution'].Value = 100
                 $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Softwares instalados/atualizados com sucesso!"
+                $gui['lblProgressStatus'].Text = "Programas instalados e atualizados com sucesso."
                 [System.Windows.MessageBox]::Show(
-                    "Os softwares selecionados foram instalados ou atualizados com sucesso via Winget!",
+                    "Os programas selecionados foram instalados ou atualizados com sucesso via Winget.",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Information
@@ -1380,7 +1392,7 @@ function Start-DewinGui {
         }
         $selectedTweaks['IsLaptop'] = [bool]$Hardware.IsLaptop
 
-        $gui['btnApplyOptimizations'].Content = "⏳ APLICANDO OTIMIZAÇÕES..."
+        $gui['btnApplyOptimizations'].Content = "Aplicando otimizações..."
 
         & $runDewinAsync "Otimizações do Sistema" {
             param($TweaksArg, $HwArg)
@@ -1397,11 +1409,11 @@ function Start-DewinGui {
             }
         } @($selectedTweaks, $Hardware) {
             param($s)
-            $gui['btnApplyOptimizations'].Content = "⚡ APLICAR OTIMIZAÇÕES SELECIONADAS"
+            $gui['btnApplyOptimizations'].Content = "Aplicar Otimizações Selecionadas"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "⚠️ Falha nas otimizações: $($s.Error)"
+                $gui['lblProgressStatus'].Text = "Falha na aplicação de otimizações: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
-                    "Ocorreu um erro durante as otimizações:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro & Log.",
+                    "Ocorreu um erro durante as otimizações:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
@@ -1409,9 +1421,9 @@ function Start-DewinGui {
             } else {
                 $gui['pbExecution'].Value = 100
                 $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Otimizações finalizadas com sucesso!"
+                $gui['lblProgressStatus'].Text = "Otimizações aplicadas com sucesso."
                 $res = [System.Windows.MessageBox]::Show(
-                    "Otimizações aplicadas com sucesso!`r`n`r`nRecomenda-se reiniciar o computador para que todas as alterações de kernel e serviços entrem em vigor.`r`nDeseja reiniciar agora?",
+                    "Otimizações aplicadas com sucesso.`r`n`r`nRecomenda-se reiniciar o computador para que todas as alterações entrem em vigor.`r`nDeseja reiniciar agora?",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::YesNo,
                     [System.Windows.MessageBoxImage]::Information
@@ -1440,7 +1452,7 @@ function Start-DewinGui {
             return
         }
 
-        $gui['btnEnableFeatures'].Content = "⏳ HABILITANDO RECURSOS..."
+        $gui['btnEnableFeatures'].Content = "Habilitando recursos..."
 
         & $runDewinAsync "Recursos Opcionais do Windows (DISM)" {
             param($FeatsArg)
@@ -1457,11 +1469,11 @@ function Start-DewinGui {
             }
         } @(,$selectedFeats) {
             param($s)
-            $gui['btnEnableFeatures'].Content = "⚙️ HABILITAR RECURSOS SELECIONADOS"
+            $gui['btnEnableFeatures'].Content = "Habilitar Recursos Selecionados"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "⚠️ Falha nos recursos DISM: $($s.Error)"
+                $gui['lblProgressStatus'].Text = "Falha na habilitação de recursos DISM: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
-                    "Ocorreu um erro ao configurar os recursos:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro & Log.",
+                    "Ocorreu um erro ao configurar os recursos:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
@@ -1469,9 +1481,9 @@ function Start-DewinGui {
             } else {
                 $gui['pbExecution'].Value = 100
                 $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Recursos opcionais habilitados com sucesso!"
+                $gui['lblProgressStatus'].Text = "Recursos opcionais habilitados com sucesso."
                 [System.Windows.MessageBox]::Show(
-                    "Recursos opcionais habilitados com sucesso via DISM!",
+                    "Recursos opcionais habilitados com sucesso via DISM.",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Information
@@ -1485,471 +1497,10 @@ function Start-DewinGui {
 }
 
 
-# --- Interface Grafica XAML ---
-$global:DewinXaml = @'
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DEWIN Booster - Otimizador &amp; Debloater do Windows"
-        Height="800" Width="1100" MinHeight="700" MinWidth="980"
-        WindowStartupLocation="CenterScreen"
-        Background="#0F111A" Foreground="#C8D3F5"
-        FontFamily="Segoe UI, Segoe UI Variable, Arial">
-
-    <Window.Resources>
-        <!-- Paleta de Cores Moderna (DEWIN Dark Theme) -->
-        <SolidColorBrush x:Key="BgDark" Color="#0F111A" />
-        <SolidColorBrush x:Key="BgCard" Color="#1A1B26" />
-        <SolidColorBrush x:Key="BgCardAlt" Color="#24283B" />
-        <SolidColorBrush x:Key="BorderCard" Color="#2F354F" />
-        <SolidColorBrush x:Key="PrimaryCyan" Color="#7DCFFF" />
-        <SolidColorBrush x:Key="PrimaryBlue" Color="#7AA2F7" />
-        <SolidColorBrush x:Key="AccentGreen" Color="#9ECE6A" />
-        <SolidColorBrush x:Key="AccentYellow" Color="#E0AF68" />
-        <SolidColorBrush x:Key="TextPrimary" Color="#C8D3F5" />
-        <SolidColorBrush x:Key="TextMuted" Color="#7982A9" />
-
-        <!-- Estilo dos CheckBoxes Modernos -->
-        <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#C8D3F5" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="Margin" Value="0,5,0,5" />
-            <Setter Property="Cursor" Value="Hand" />
-        </Style>
-
-        <!-- Estilo dos Botoes Secundarios -->
-        <Style x:Key="SecondaryButton" TargetType="Button">
-            <Setter Property="Background" Value="#24283B" />
-            <Setter Property="Foreground" Value="#C8D3F5" />
-            <Setter Property="BorderBrush" Value="#414868" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="12,6" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-        </Style>
-
-        <!-- Estilo dos Cards de Perfil e Agrupamentos -->
-        <Style x:Key="ProfileCard" TargetType="Border">
-            <Setter Property="Background" Value="#1A1B26" />
-            <Setter Property="BorderBrush" Value="#2F354F" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Padding" Value="16" />
-            <Setter Property="Margin" Value="6" />
-        </Style>
-
-        <!-- Estilo Moderno da Barra de Progresso -->
-        <Style TargetType="ProgressBar">
-            <Setter Property="Background" Value="#24283B" />
-            <Setter Property="Foreground" Value="#7DCFFF" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ProgressBar">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="5" ClipToBounds="True">
-                            <Grid Name="PART_Track">
-                                <Border Name="PART_Indicator" Background="{TemplateBinding Foreground}" HorizontalAlignment="Left" CornerRadius="5" />
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> <!-- Cabecalho e Banner de Hardware -->
-            <RowDefinition Height="*" />    <!-- Area Principal com Abas -->
-            <RowDefinition Height="Auto" /> <!-- Rodape de Status e Progresso -->
-        </Grid.RowDefinitions>
-
-        <!-- 1. CABECALHO & BANNER DE HARDWARE -->
-        <Border Grid.Row="0" Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="10" Padding="16" Margin="0,0,0,12">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="⚡ DEWIN BOOSTER" FontSize="20" FontWeight="Bold" Foreground="#7DCFFF" VerticalAlignment="Center" />
-                        <Border Background="#24283B" CornerRadius="5" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="100% Nativo &amp; Open-Source" FontSize="11" Foreground="#9ECE6A" FontWeight="SemiBold" />
-                        </Border>
-                    </StackPanel>
-                    <TextBlock Name="txtHardwareBanner" Text="Detectando componentes de hardware..." FontSize="12" Foreground="#7982A9" Margin="0,5,0,0" />
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="#24283B" BorderBrush="#414868" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="4,0">
-                        <TextBlock Name="txtDeviceType" Text="Detectando..." FontSize="12" FontWeight="Bold" Foreground="#7AA2F7" />
-                    </Border>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- 2. ABAS PRINCIPAIS -->
-        <TabControl Name="mainTabControl" Grid.Row="1" Background="#13141F" BorderBrush="#2F354F">
-            
-            <!-- ======================================================== -->
-            <!-- ABA 1: PROGRAMAS & SOFTWARES (TELA INICIAL)             -->
-            <!-- ======================================================== -->
-            <TabItem Name="tabItemSoftwares" Header=" 📦 Programas &amp; Softwares ">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
-                    <StackPanel>
-                        <!-- Cabecalho e Acoes Rapidas -->
-                        <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="14" Margin="6,0,6,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock Text="Instalação e Atualização Oficial via Winget" FontSize="16" FontWeight="Bold" Foreground="#7DCFFF" />
-                                    <TextBlock Text="Selecione os softwares que deseja instalar silenciosamente no computador:" FontSize="12" Foreground="#7982A9" Margin="0,3,0,0" />
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button Name="btnSelectEssentialApps" Content="⭐ Essenciais" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" ToolTip="Seleciona VC++, 7-Zip e Chrome" />
-                                    <Button Name="btnSelectAllApps" Content="✓ Marcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
-                                    <Button Name="btnDeselectAllApps" Content="✗ Desmarcar Todos" Style="{StaticResource SecondaryButton}" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <!-- Catalogo de Softwares em Grid -->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Coluna 1: Runtimes e Navegadores -->
-                            <StackPanel Grid.Column="0">
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="🛠️ Runtimes &amp; Utilitários Essenciais" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                        <CheckBox Name="appVcRedist64" Content="Visual C++ 2015-2022 (x64) - Essencial para Jogos e Softwares" IsChecked="True" />
-                                        <CheckBox Name="appVcRedist86" Content="Visual C++ 2015-2022 (x86) - Compatibilidade de Jogos 32-bit" IsChecked="True" />
-                                        <CheckBox Name="app7zip" Content="7-Zip - Compactador e Descompactador Ultra-Rápido" IsChecked="True" />
-                                    </StackPanel>
-                                </Border>
-
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="🌐 Navegadores Web" FontSize="14" FontWeight="Bold" Foreground="#9ECE6A" Margin="0,0,0,8" />
-                                        <CheckBox Name="appChrome" Content="Google Chrome - Navegador Web Rápido e Seguro" IsChecked="True" />
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
-
-                            <!-- Coluna 2: Desenvolvimento e Multimidia/Jogos -->
-                            <StackPanel Grid.Column="1">
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="💻 Ferramentas de Desenvolvimento" FontSize="14" FontWeight="Bold" Foreground="#BB9AF7" Margin="0,0,0,8" />
-                                        <CheckBox Name="appVsCode" Content="Visual Studio Code - Editor de Código da Microsoft" IsChecked="False" />
-                                        <CheckBox Name="appGit" Content="Git for Windows - Sistema de Controle de Versão" IsChecked="False" />
-                                    </StackPanel>
-                                </Border>
-
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="🎮 Jogos, Áudio &amp; Comunicação" FontSize="14" FontWeight="Bold" Foreground="#E0AF68" Margin="0,0,0,8" />
-                                        <CheckBox Name="appDiscord" Content="Discord - Comunicação por Voz, Vídeo e Chat" IsChecked="False" />
-                                        <CheckBox Name="appSteam" Content="Steam - Plataforma de Jogos e Comunidade" IsChecked="False" />
-                                        <CheckBox Name="appVlc" Content="VLC Media Player - Reprodutor de Áudio e Vídeo Universal" IsChecked="False" />
-                                        <CheckBox Name="appSpotify" Content="Spotify - Música e Podcasts em Streaming" IsChecked="False" />
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
-                        </Grid>
-
-                        <!-- Botao Independente de Instalacao de Softwares -->
-                        <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="14" Margin="6,10,6,6">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="💡 A instalação é feita em segundo plano via Winget oficial sem interromper suas atividades." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
-                                
-                                <Button Name="btnInstallSoftwares" Grid.Column="1" Content="📥 BAIXAR / INSTALAR PROGRAMAS SELECIONADOS" Background="#2563EB" BorderBrush="#3B82F6" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
-                                    <Button.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius" Value="8" />
-                                        </Style>
-                                    </Button.Resources>
-                                </Button>
-                            </Grid>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <!-- ======================================================== -->
-            <!-- ABA 2: OTIMIZACOES, PERFIS & TWEAKS                      -->
-            <!-- ======================================================== -->
-            <TabItem Name="tabItemTweaks" Header=" ⚡ Otimizações &amp; Perfis ">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
-                    <StackPanel>
-                        <!-- Notificacao de Recomendacao de Hardware -->
-                        <Border Background="#1C2738" BorderBrush="#2563EB" BorderThickness="1" CornerRadius="8" Padding="12" Margin="6,0,6,10">
-                            <TextBlock Name="txtRecommendation" Text="Calculando melhor perfil para sua máquina..." FontSize="13" Foreground="#93C5FD" TextWrapping="Wrap" />
-                        </Border>
-
-                        <!-- Seção dos 4 Perfis Rápidos de 1 Clique -->
-                        <TextBlock Text="⚡ Perfis Rápidos Prontos (Clique para configurar automaticamente os tweaks):" FontSize="14" FontWeight="SemiBold" Foreground="#C8D3F5" Margin="8,4,8,8" />
-                        <UniformGrid Columns="2" Margin="0,0,0,10">
-                            <!-- Card Desktop Dev -->
-                            <Border Style="{StaticResource ProfileCard}">
-                                <StackPanel>
-                                    <TextBlock Text="🚀 Desktop - Dev &amp; Workstation" FontSize="15" FontWeight="Bold" Foreground="#7DCFFF" />
-                                    <TextBlock Text="Foco em desenvolvimento, compilação de código e máxima resposta do processador." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Sem hibernação (recupera espaço SSD igual à RAM)&#x0a;• Menor latência de rede e CPU sem amarras&#x0a;• Telemetria desativada e Explorer limpo" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetDesktopDev" Content="Selecionar Perfil Dev Desktop" Style="{StaticResource SecondaryButton}" Background="#2563EB" BorderBrush="#3B82F6" Foreground="White" />
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Card Desktop Geral -->
-                            <Border Style="{StaticResource ProfileCard}">
-                                <StackPanel>
-                                    <TextBlock Text="🎮 Desktop - Geral &amp; Jogos" FontSize="15" FontWeight="Bold" Foreground="#9ECE6A" />
-                                    <TextBlock Text="Foco em leveza extrema, menores latências de entrada (input lag) e mais FPS." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Máxima leveza (zero serviços pesados)&#x0a;• GameDVR e captura desativados&#x0a;• Resposta linear de mouse 1:1 e SSD calibrado" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetDesktopGeral" Content="Selecionar Perfil Jogos Desktop" Style="{StaticResource SecondaryButton}" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" />
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Card Notebook Dev -->
-                            <Border Style="{StaticResource ProfileCard}">
-                                <StackPanel>
-                                    <TextBlock Text="💻 Notebook - Dev &amp; Workstation" FontSize="15" FontWeight="Bold" Foreground="#BB9AF7" />
-                                    <TextBlock Text="Ambiente de desenvolvimento móvel sem esgotar o SSD e a bateria." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Hibernação segura compacta (~3 GB)&#x0a;• Sem perda de trabalho ao fechar a tampa&#x0a;• Proteção térmica e driver GPU calibrado" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetLaptopDev" Content="Selecionar Perfil Dev Notebook" Style="{StaticResource SecondaryButton}" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" />
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Card Notebook Geral -->
-                            <Border Style="{StaticResource ProfileCard}">
-                                <StackPanel>
-                                    <TextBlock Text="🔋 Notebook - Geral &amp; Autonomia" FontSize="15" FontWeight="Bold" Foreground="#E0AF68" />
-                                    <TextBlock Text="Máxima duração de bateria no uso diário, fluidez e alta performance em jogos." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Máxima autonomia de bateria&#x0a;• Hibernação segura compacta&#x0a;• Zero telemetria consumindo energia" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetLaptopGeral" Content="Selecionar Perfil Geral Notebook" Style="{StaticResource SecondaryButton}" Background="#D97706" BorderBrush="#F59E0B" Foreground="White" />
-                                </StackPanel>
-                            </Border>
-                        </UniformGrid>
-
-                        <!-- Barra de Ferramentas de Selecao dos Tweaks -->
-                        <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="12" Margin="6,0,6,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="Customização Fina das Otimizações do Sistema:" FontSize="14" FontWeight="Bold" Foreground="#C8D3F5" VerticalAlignment="Center" />
-
-                                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <Button Name="btnSelectAll" Content="✓ Marcar Todos os Tweaks" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
-                                    <Button Name="btnDeselectAll" Content="✗ Desmarcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
-                                    <Button Name="btnResetRecommended" Content="🔄 Restaurar Recomendados" Style="{StaticResource SecondaryButton}" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <!-- Grid de Tweaks por Categoria -->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Coluna 1: Interface e Desempenho -->
-                            <StackPanel Grid.Column="0">
-                                <!-- Card Interface -->
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="🖥️ Interface &amp; Barra de Tarefas" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkHideSearch" Content="Ocultar Caixa de Pesquisa na Barra" IsChecked="True" ToolTip="Remove o botão/caixa de busca; o Iniciar continua buscando ao digitar." />
-                                        <CheckBox Name="chkHideTaskView" Content="Ocultar Botão Multitarefa (Task View)" IsChecked="True" ToolTip="Remove o ícone da barra; o atalho Win+Tab continua ativo." />
-                                        <CheckBox Name="chkCenterTaskbar" Content="Barra de Tarefas Centralizada (Padrão Win 11)" IsChecked="True" ToolTip="Mantém o visual moderno centralizado do Windows 11." />
-                                        <CheckBox Name="chkTaskbarEndTask" Content="Ativar 'Finalizar Tarefa' no Botão Direito" IsChecked="True" ToolTip="Permite fechar apps travados direto na barra de tarefas." />
-                                        <CheckBox Name="chkClassicContextMenu" Content="Menu de Contexto Clássico (Windows 10)" IsChecked="True" ToolTip="Acesso direto a todas as opções sem submenus lentos." />
-                                        <CheckBox Name="chkLaunchToThisPC" Content="Abrir Explorer em 'Este Computador'" IsChecked="True" ToolTip="Abre os discos locais e remove Início e Galeria pesados." />
-                                        <CheckBox Name="chkShowExtensionsAndHidden" Content="Exibir Extensões e Arquivos Ocultos" IsChecked="True" ToolTip="Essencial para inspecionar .bat, .json, .ps1 e AppData." />
-                                        <CheckBox Name="chkAlwaysShowScrollbars" Content="Barras de Rolagem Sempre Visíveis" IsChecked="True" ToolTip="Evita barras de rolagem sumindo automaticamente." />
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Card Desempenho -->
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="⚡ Desempenho, Latência &amp; SSD" FontSize="14" FontWeight="Bold" Foreground="#9ECE6A" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkOptimizeNetworkLatency" Content="Otimizar Latência de Rede (NetworkThrottling)" IsChecked="True" ToolTip="Desativa a limitação de tráfego de rede para menor ping e latência." />
-                                        <CheckBox Name="chkDisableGameDVR" Content="Desativar GameDVR e Captura em Segundo Plano" IsChecked="True" ToolTip="Evita perda de FPS e uso de CPU em jogos gravando tela à toa." />
-                                        <CheckBox Name="chkLinearMouse" Content="Resposta Linear do Mouse 1:1" IsChecked="True" ToolTip="Desativa aceleração artificial de ponteiro do Windows." />
-                                        <CheckBox Name="chkDisableStickyKeys" Content="Desativar Popup Teclas de Aderência" IsChecked="True" ToolTip="Elimina o aviso irritante ao pressionar Shift repetidamente." />
-                                        <CheckBox Name="chkInstantMenuDelay" Content="Eliminar Atraso de Menus (Instantâneo 0ms)" IsChecked="True" ToolTip="Remove o atraso de 400ms na abertura de submenus." />
-                                        <CheckBox Name="chkOptimizeSsdAccess" Content="Otimizar Gravações SSD (DisableLastAccess)" IsChecked="True" ToolTip="Reduz gravações desnecessárias aumentando vida útil do SSD." />
-                                        <CheckBox Name="chkCleanTempFiles" Content="Limpar Arquivos Temporários de Sistema" IsChecked="True" ToolTip="Esvazia caches e arquivos temp desnecessários." />
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
-
-                            <!-- Coluna 2: Privacidade, Debloat e Sistema -->
-                            <StackPanel Grid.Column="1">
-                                <!-- Card Privacidade & Debloat -->
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="🛡️ Privacidade, Telemetria &amp; Debloat" FontSize="14" FontWeight="Bold" Foreground="#BB9AF7" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkDisableTelemetry" Content="Desativar Telemetria &amp; Serviços de Diagnóstico" IsChecked="True" ToolTip="Desativa DiagTrack e coleta invasiva de dados." />
-                                        <CheckBox Name="chkDisableCeipTasks" Content="Desativar Tarefas Agendadas Ociosas (CEIP)" IsChecked="True" ToolTip="Impede tarefas pesadas rodando quando o PC está ocioso." />
-                                        <CheckBox Name="chkDisableCopilotRecall" Content="Desativar Copilot &amp; IA Recall" IsChecked="True" ToolTip="Elimina botões e análises de IA em segundo plano." />
-                                        <CheckBox Name="chkDisableBingSearch" Content="Desativar Bing e Sugestões na Busca do Iniciar" IsChecked="True" ToolTip="Pesquisa local instantânea sem resultados lentos da web." />
-                                        <CheckBox Name="chkDebloatEdge" Content="Debloat do Microsoft Edge (Mantém WebView2)" IsChecked="True" ToolTip="Remove telemetria, assistentes e cupons mantendo compatibilidade." />
-                                        <CheckBox Name="chkRemoveUwpBloat" Content="Remover 28 Bloatwares UWP de Terceiros" IsChecked="True" ToolTip="Remove TikTok, Spotify, Jogos e feeds patrocinados." />
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Card Sistema & Energia -->
-                                <Border Style="{StaticResource ProfileCard}">
-                                    <StackPanel>
-                                        <TextBlock Text="⚙️ Sistema, GPU &amp; Energia" FontSize="14" FontWeight="Bold" Foreground="#E0AF68" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkCalibrateGpu" Content="Calibração de GPU (TdrDelay = 8s + HAGS)" IsChecked="True" ToolTip="Evita quedas de driver de vídeo em cargas pesadas." />
-                                        <CheckBox Name="chkSmartHibernation" Content="Hibernação Inteligente (Off Desktop / Compacta Laptop)" IsChecked="True" ToolTip="Recupera até 32 GB de SSD em desktops; mantém sono seguro em notebooks." />
-                                        <CheckBox Name="chkDisableReservedStorage" Content="Desativar Armazenamento Reservado (~7 GB)" IsChecked="True" ToolTip="Libera espaço em disco bloqueado pelo Windows." />
-                                        <CheckBox Name="chkOptimizeSvcHost" Content="Calibrar Memória de Serviços (SvcHost)" IsChecked="True" ToolTip="Ajusta limite de memória por processo de acordo com a RAM." />
-                                        <CheckBox Name="chkEnableLongPaths" Content="Habilitar Caminhos Longos no Sistema de Arquivos" IsChecked="True" ToolTip="Remove o limite de 260 caracteres em caminhos de arquivos." />
-                                        <CheckBox Name="chkDisableLockScreen" Content="Pular Tela de Bloqueio Estática" IsChecked="True" ToolTip="Vai direto para o campo de senha/PIN ao ligar o PC." />
-                                        <CheckBox Name="chkIsDev" Content="Configurações Dev (Relógio UTC, RDP e Boot Detalhado)" IsChecked="False" ToolTip="Otimizações adicionais para programadores e dual-boot Linux." />
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
-                        </Grid>
-
-                        <!-- Botao Independente de Aplicacao das Otimizacoes -->
-                        <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="14" Margin="6,10,6,6">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="💡 As otimizações são aplicadas cirurgicamente e o Windows Explorer é reiniciado de forma suave." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
-
-                                <Button Name="btnApplyOptimizations" Grid.Column="1" Content="⚡ APLICAR OTIMIZAÇÕES SELECIONADAS" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
-                                    <Button.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius" Value="8" />
-                                        </Style>
-                                    </Button.Resources>
-                                </Button>
-                            </Grid>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <!-- ======================================================== -->
-            <!-- ABA 3: RECURSOS DO WINDOWS (DISM)                       -->
-            <!-- ======================================================== -->
-            <TabItem Name="tabItemFeatures" Header=" 🧩 Recursos do Windows ">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
-                    <StackPanel>
-                        <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="14" Margin="6,0,6,10">
-                            <TextBlock Text="Recursos opcionais do Windows gerenciados nativamente via DISM:" FontSize="15" FontWeight="SemiBold" Foreground="#C8D3F5" />
-                        </Border>
-                        
-                        <Border Style="{StaticResource ProfileCard}">
-                            <StackPanel>
-                                <TextBlock Text="⚙️ Recursos de Compatibilidade e Virtualização" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                <CheckBox Name="featNetFx3" Content=".NET Framework 3.5 (.NET 2.0 e 3.0 para softwares legados)" IsChecked="True" />
-                                <CheckBox Name="featWsl" Content="Subsistema do Windows para Linux (WSL2)" IsChecked="False" />
-                                <CheckBox Name="featVmPlatform" Content="Plataforma de Máquina Virtual (Pré-requisito do WSL2)" IsChecked="False" />
-                                <CheckBox Name="featHyperV" Content="Hyper-V (Virtualização Nativa para VMs e Docker)" IsChecked="False" />
-                                <CheckBox Name="featSandbox" Content="Windows Sandbox (Área Restrita Segura e Descartável)" IsChecked="False" />
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Botao Independente de Recursos DISM -->
-                        <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="14" Margin="6,10,6,6">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="💡 Requer conexão com a internet para baixar arquivos de componentes adicionais da Microsoft." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
-
-                                <Button Name="btnEnableFeatures" Grid.Column="1" Content="⚙️ HABILITAR RECURSOS SELECIONADOS" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
-                                    <Button.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius" Value="8" />
-                                        </Style>
-                                    </Button.Resources>
-                                </Button>
-                            </Grid>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <!-- ======================================================== -->
-            <!-- ABA 4: LOG & AUDITORIA EM TEMPO REAL                     -->
-            <!-- ======================================================== -->
-            <TabItem Name="tabItemLog" Header=" 📜 Registro &amp; Log ">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="Acompanhamento em tempo real da execução e auditoria:" FontSize="13" Foreground="#7982A9" VerticalAlignment="Center" />
-                        <Button Name="btnOpenLogFolder" Content="📁 Abrir Pasta de Logs" Style="{StaticResource SecondaryButton}" Margin="12,0,0,0" Padding="8,3" FontSize="11" />
-                        <Button Name="btnClearLogConsole" Content="🧹 Limpar Console" Style="{StaticResource SecondaryButton}" Margin="8,0,0,0" Padding="8,3" FontSize="11" />
-                    </StackPanel>
-
-                    <Border Grid.Row="1" Background="#0A0B10" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="8">
-                        <TextBox Name="txtConsoleLog" Background="Transparent" Foreground="#9ECE6A" FontFamily="Consolas, Cascadia Code, Courier New" FontSize="12" IsReadOnly="True" BorderThickness="0" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="DEWIN Booster pronto. Selecione programas ou otimizações para começar." />
-                    </Border>
-                </Grid>
-            </TabItem>
-
-        </TabControl>
-
-        <!-- 3. RODAPE GLOBAL DE STATUS & PROGRESSO -->
-        <Border Grid.Row="2" Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="10" Padding="14,10" Margin="0,12,0,0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <!-- Barra de Progresso e Status -->
-                <Grid Grid.Row="0" Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Name="lblProgressStatus" Text="Pronto. Escolha uma ação nas abas acima." FontSize="13" FontWeight="SemiBold" Foreground="#C8D3F5" VerticalAlignment="Center" />
-                    <TextBlock Name="lblProgressPercent" Grid.Column="1" Text="0%" FontSize="13" FontWeight="Bold" Foreground="#7DCFFF" VerticalAlignment="Center" />
-                </Grid>
-                
-                <ProgressBar Name="pbExecution" Grid.Row="1" Height="10" Minimum="0" Maximum="100" Background="#24283B" Foreground="#7DCFFF" BorderThickness="0" Value="0" />
-            </Grid>
-        </Border>
-
-    </Grid>
-</Window>
-
-'@
+# --- Interface Gráfica XAML ---
+$global:DewinXaml = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(@'
+PFdpbmRvdyB4bWxucz0iaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93aW5meC8yMDA2L3hhbWwvcHJlc2VudGF0aW9uIgogICAgICAgIHhtbG5zOng9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd2luZngvMjAwNi94YW1sIgogICAgICAgIFRpdGxlPSJERVdJTiBCb29zdGVyIC0gT3RpbWl6YWRvciBlIEdlcmVuY2lhZG9yIGRvIFdpbmRvd3MiCiAgICAgICAgSGVpZ2h0PSI4MDAiIFdpZHRoPSIxMTAwIiBNaW5IZWlnaHQ9IjcwMCIgTWluV2lkdGg9Ijk4MCIKICAgICAgICBXaW5kb3dTdGFydHVwTG9jYXRpb249IkNlbnRlclNjcmVlbiIKICAgICAgICBCYWNrZ3JvdW5kPSIjMEYxMTFBIiBGb3JlZ3JvdW5kPSIjQzhEM0Y1IgogICAgICAgIEZvbnRGYW1pbHk9IlNlZ29lIFVJLCBTZWdvZSBVSSBWYXJpYWJsZSwgQXJpYWwiPgoKICAgIDxXaW5kb3cuUmVzb3VyY2VzPgogICAgICAgIDwhLS0gUGFsZXRhIGRlIENvcmVzIE1vZGVybmEgKERFV0lOIERhcmsgVGhlbWUpIC0tPgogICAgICAgIDxTb2xpZENvbG9yQnJ1c2ggeDpLZXk9IkJnRGFyayIgQ29sb3I9IiMwRjExMUEiIC8+CiAgICAgICAgPFNvbGlkQ29sb3JCcnVzaCB4OktleT0iQmdDYXJkIiBDb2xvcj0iIzFBMUIyNiIgLz4KICAgICAgICA8U29saWRDb2xvckJydXNoIHg6S2V5PSJCZ0NhcmRBbHQiIENvbG9yPSIjMjQyODNCIiAvPgogICAgICAgIDxTb2xpZENvbG9yQnJ1c2ggeDpLZXk9IkJvcmRlckNhcmQiIENvbG9yPSIjMkYzNTRGIiAvPgogICAgICAgIDxTb2xpZENvbG9yQnJ1c2ggeDpLZXk9IlByaW1hcnlDeWFuIiBDb2xvcj0iIzdEQ0ZGRiIgLz4KICAgICAgICA8U29saWRDb2xvckJydXNoIHg6S2V5PSJQcmltYXJ5Qmx1ZSIgQ29sb3I9IiM3QUEyRjciIC8+CiAgICAgICAgPFNvbGlkQ29sb3JCcnVzaCB4OktleT0iQWNjZW50R3JlZW4iIENvbG9yPSIjOUVDRTZBIiAvPgogICAgICAgIDxTb2xpZENvbG9yQnJ1c2ggeDpLZXk9IkFjY2VudFllbGxvdyIgQ29sb3I9IiNFMEFGNjgiIC8+CiAgICAgICAgPFNvbGlkQ29sb3JCcnVzaCB4OktleT0iVGV4dFByaW1hcnkiIENvbG9yPSIjQzhEM0Y1IiAvPgogICAgICAgIDxTb2xpZENvbG9yQnJ1c2ggeDpLZXk9IlRleHRNdXRlZCIgQ29sb3I9IiM3OTgyQTkiIC8+CgogICAgICAgIDwhLS0gRXN0aWxvIGRvcyBDaGVja0JveGVzIE1vZGVybm9zIC0tPgogICAgICAgIDxTdHlsZSBUYXJnZXRUeXBlPSJDaGVja0JveCI+CiAgICAgICAgICAgIDxTZXR0ZXIgUHJvcGVydHk9IkZvcmVncm91bmQiIFZhbHVlPSIjQzhEM0Y1IiAvPgogICAgICAgICAgICA8U2V0dGVyIFByb3BlcnR5PSJGb250U2l6ZSIgVmFsdWU9IjEzIiAvPgogICAgICAgICAgICA8U2V0dGVyIFByb3BlcnR5PSJNYXJnaW4iIFZhbHVlPSIwLDUsMCw1IiAvPgogICAgICAgICAgICA8U2V0dGVyIFByb3BlcnR5PSJDdXJzb3IiIFZhbHVlPSJIYW5kIiAvPgogICAgICAgIDwvU3R5bGU+CgogICAgICAgIDwhLS0gRXN0aWxvIGRvcyBCb3RvZXMgU2VjdW5kYXJpb3MgLS0+CiAgICAgICAgPFN0eWxlIHg6S2V5PSJTZWNvbmRhcnlCdXR0b24iIFRhcmdldFR5cGU9IkJ1dHRvbiI+CiAgICAgICAgICAgIDxTZXR0ZXIgUHJvcGVydHk9IkJhY2tncm91bmQiIFZhbHVlPSIjMjQyODNCIiAvPgogICAgICAgICAgICA8U2V0dGVyIFByb3BlcnR5PSJGb3JlZ3JvdW5kIiBWYWx1ZT0iI0M4RDNGNSIgLz4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iQm9yZGVyQnJ1c2giIFZhbHVlPSIjNDE0ODY4IiAvPgogICAgICAgICAgICA8U2V0dGVyIFByb3BlcnR5PSJCb3JkZXJUaGlja25lc3MiIFZhbHVlPSIxIiAvPgogICAgICAgICAgICA8U2V0dGVyIFByb3BlcnR5PSJQYWRkaW5nIiBWYWx1ZT0iMTIsNiIgLz4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iQ3Vyc29yIiBWYWx1ZT0iSGFuZCIgLz4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iRm9udFdlaWdodCIgVmFsdWU9IlNlbWlCb2xkIiAvPgogICAgICAgIDwvU3R5bGU+CgogICAgICAgIDwhLS0gRXN0aWxvIGRvcyBDYXJkcyBkZSBQZXJmaWwgZSBBZ3J1cGFtZW50b3MgLS0+CiAgICAgICAgPFN0eWxlIHg6S2V5PSJQcm9maWxlQ2FyZCIgVGFyZ2V0VHlwZT0iQm9yZGVyIj4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iQmFja2dyb3VuZCIgVmFsdWU9IiMxQTFCMjYiIC8+CiAgICAgICAgICAgIDxTZXR0ZXIgUHJvcGVydHk9IkJvcmRlckJydXNoIiBWYWx1ZT0iIzJGMzU0RiIgLz4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iQm9yZGVyVGhpY2tuZXNzIiBWYWx1ZT0iMSIgLz4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iQ29ybmVyUmFkaXVzIiBWYWx1ZT0iMTAiIC8+CiAgICAgICAgICAgIDxTZXR0ZXIgUHJvcGVydHk9IlBhZGRpbmciIFZhbHVlPSIxNiIgLz4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iTWFyZ2luIiBWYWx1ZT0iNiIgLz4KICAgICAgICA8L1N0eWxlPgoKICAgICAgICA8IS0tIEVzdGlsbyBNb2Rlcm5vIGRhIEJhcnJhIGRlIFByb2dyZXNzbyAtLT4KICAgICAgICA8U3R5bGUgVGFyZ2V0VHlwZT0iUHJvZ3Jlc3NCYXIiPgogICAgICAgICAgICA8U2V0dGVyIFByb3BlcnR5PSJCYWNrZ3JvdW5kIiBWYWx1ZT0iIzI0MjgzQiIgLz4KICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iRm9yZWdyb3VuZCIgVmFsdWU9IiM3RENGRkYiIC8+CiAgICAgICAgICAgIDxTZXR0ZXIgUHJvcGVydHk9IkJvcmRlclRoaWNrbmVzcyIgVmFsdWU9IjAiIC8+CiAgICAgICAgICAgIDxTZXR0ZXIgUHJvcGVydHk9IlRlbXBsYXRlIj4KICAgICAgICAgICAgICAgIDxTZXR0ZXIuVmFsdWU+CiAgICAgICAgICAgICAgICAgICAgPENvbnRyb2xUZW1wbGF0ZSBUYXJnZXRUeXBlPSJQcm9ncmVzc0JhciI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgQmFja2dyb3VuZD0ie1RlbXBsYXRlQmluZGluZyBCYWNrZ3JvdW5kfSIgQ29ybmVyUmFkaXVzPSI1IiBDbGlwVG9Cb3VuZHM9IlRydWUiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPEdyaWQgTmFtZT0iUEFSVF9UcmFjayI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBOYW1lPSJQQVJUX0luZGljYXRvciIgQmFja2dyb3VuZD0ie1RlbXBsYXRlQmluZGluZyBGb3JlZ3JvdW5kfSIgSG9yaXpvbnRhbEFsaWdubWVudD0iTGVmdCIgQ29ybmVyUmFkaXVzPSI1IiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9HcmlkPgogICAgICAgICAgICAgICAgICAgICAgICA8L0JvcmRlcj4KICAgICAgICAgICAgICAgICAgICA8L0NvbnRyb2xUZW1wbGF0ZT4KICAgICAgICAgICAgICAgIDwvU2V0dGVyLlZhbHVlPgogICAgICAgICAgICA8L1NldHRlcj4KICAgICAgICA8L1N0eWxlPgogICAgPC9XaW5kb3cuUmVzb3VyY2VzPgoKICAgIDxHcmlkIE1hcmdpbj0iMTYiPgogICAgICAgIDxHcmlkLlJvd0RlZmluaXRpb25zPgogICAgICAgICAgICA8Um93RGVmaW5pdGlvbiBIZWlnaHQ9IkF1dG8iIC8+IDwhLS0gQ2FiZWNhbGhvIGUgQmFubmVyIGRlIEhhcmR3YXJlIC0tPgogICAgICAgICAgICA8Um93RGVmaW5pdGlvbiBIZWlnaHQ9IioiIC8+ICAgIDwhLS0gQXJlYSBQcmluY2lwYWwgY29tIEFiYXMgLS0+CiAgICAgICAgICAgIDxSb3dEZWZpbml0aW9uIEhlaWdodD0iQXV0byIgLz4gPCEtLSBSb2RhcGUgZGUgU3RhdHVzIGUgUHJvZ3Jlc3NvIC0tPgogICAgICAgIDwvR3JpZC5Sb3dEZWZpbml0aW9ucz4KCiAgICAgICAgPCEtLSAxLiBDQUJFQ0FMSE8gJiBCQU5ORVIgREUgSEFSRFdBUkUgLS0+CiAgICAgICAgPEJvcmRlciBHcmlkLlJvdz0iMCIgQmFja2dyb3VuZD0iIzFBMUIyNiIgQm9yZGVyQnJ1c2g9IiMyRjM1NEYiIEJvcmRlclRoaWNrbmVzcz0iMSIgQ29ybmVyUmFkaXVzPSIxMCIgUGFkZGluZz0iMTYiIE1hcmdpbj0iMCwwLDAsMTIiPgogICAgICAgICAgICA8R3JpZD4KICAgICAgICAgICAgICAgIDxHcmlkLkNvbHVtbkRlZmluaXRpb25zPgogICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSIqIiAvPgogICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSJBdXRvIiAvPgogICAgICAgICAgICAgICAgPC9HcmlkLkNvbHVtbkRlZmluaXRpb25zPgoKICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsIEdyaWQuQ29sdW1uPSIwIj4KICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbCBPcmllbnRhdGlvbj0iSG9yaXpvbnRhbCI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgVGV4dD0iREVXSU4gQk9PU1RFUiIgRm9udFNpemU9IjIwIiBGb250V2VpZ2h0PSJCb2xkIiBGb3JlZ3JvdW5kPSIjN0RDRkZGIiBWZXJ0aWNhbEFsaWdubWVudD0iQ2VudGVyIiAvPgogICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIEJhY2tncm91bmQ9IiMyNDI4M0IiIENvcm5lclJhZGl1cz0iNSIgUGFkZGluZz0iNiwyIiBNYXJnaW49IjEwLDAsMCwwIiBWZXJ0aWNhbEFsaWdubWVudD0iQ2VudGVyIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgVGV4dD0iTmF0aXZvIGUgZGUgQ8OzZGlnbyBBYmVydG8iIEZvbnRTaXplPSIxMSIgRm9yZWdyb3VuZD0iIzlFQ0U2QSIgRm9udFdlaWdodD0iU2VtaUJvbGQiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgogICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIE5hbWU9InR4dEhhcmR3YXJlQmFubmVyIiBUZXh0PSJEZXRlY3RhbmRvIGNvbXBvbmVudGVzIGRlIGhhcmR3YXJlLi4uIiBGb250U2l6ZT0iMTIiIEZvcmVncm91bmQ9IiM3OTgyQTkiIE1hcmdpbj0iMCw1LDAsMCIgLz4KICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KCiAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbCBHcmlkLkNvbHVtbj0iMSIgT3JpZW50YXRpb249Ikhvcml6b250YWwiIFZlcnRpY2FsQWxpZ25tZW50PSJDZW50ZXIiPgogICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgQmFja2dyb3VuZD0iIzI0MjgzQiIgQm9yZGVyQnJ1c2g9IiM0MTQ4NjgiIEJvcmRlclRoaWNrbmVzcz0iMSIgQ29ybmVyUmFkaXVzPSI4IiBQYWRkaW5nPSIxMCw2IiBNYXJnaW49IjQsMCI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgTmFtZT0idHh0RGV2aWNlVHlwZSIgVGV4dD0iRGV0ZWN0YW5kby4uLiIgRm9udFNpemU9IjEyIiBGb250V2VpZ2h0PSJCb2xkIiBGb3JlZ3JvdW5kPSIjN0FBMkY3IiAvPgogICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgogICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICA8L0dyaWQ+CiAgICAgICAgPC9Cb3JkZXI+CgogICAgICAgIDwhLS0gMi4gQUJBUyBQUklOQ0lQQUlTIC0tPgogICAgICAgIDxUYWJDb250cm9sIE5hbWU9Im1haW5UYWJDb250cm9sIiBHcmlkLlJvdz0iMSIgQmFja2dyb3VuZD0iIzEzMTQxRiIgQm9yZGVyQnJ1c2g9IiMyRjM1NEYiPgogICAgICAgICAgICAKICAgICAgICAgICAgPCEtLSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSAtLT4KICAgICAgICAgICAgPCEtLSBBQkEgMTogUFJPR1JBTUFTICYgQVBMSUNBVElWT1MgKFRFTEEgSU5JQ0lBTCkgICAgICAgICAgICAtLT4KICAgICAgICAgICAgPCEtLSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSAtLT4KICAgICAgICAgICAgPFRhYkl0ZW0gTmFtZT0idGFiSXRlbVNvZnR3YXJlcyIgSGVhZGVyPSIgUHJvZ3JhbWFzIGUgQXBsaWNhdGl2b3MgIj4KICAgICAgICAgICAgICAgIDxTY3JvbGxWaWV3ZXIgVmVydGljYWxTY3JvbGxCYXJWaXNpYmlsaXR5PSJBdXRvIiBNYXJnaW49IjEwIj4KICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgPCEtLSBDYWJlY2FsaG8gZSBBY29lcyBSYXBpZGFzIC0tPgogICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIEJhY2tncm91bmQ9IiMxQTFCMjYiIEJvcmRlckJydXNoPSIjMkYzNTRGIiBCb3JkZXJUaGlja25lc3M9IjEiIENvcm5lclJhZGl1cz0iOCIgUGFkZGluZz0iMTQiIE1hcmdpbj0iNiwwLDYsMTAiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPEdyaWQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPEdyaWQuQ29sdW1uRGVmaW5pdGlvbnM+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSIqIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q29sdW1uRGVmaW5pdGlvbiBXaWR0aD0iQXV0byIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0dyaWQuQ29sdW1uRGVmaW5pdGlvbnM+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWwgR3JpZC5Db2x1bW49IjAiIFZlcnRpY2FsQWxpZ25tZW50PSJDZW50ZXIiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9Ikluc3RhbGHDp8OjbyBlIEF0dWFsaXphw6fDo28gZGUgU29mdHdhcmVzIHZpYSBXaW5nZXQiIEZvbnRTaXplPSIxNiIgRm9udFdlaWdodD0iQm9sZCIgRm9yZWdyb3VuZD0iIzdEQ0ZGRiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJTZWxlY2lvbmUgb3MgcHJvZ3JhbWFzIHF1ZSBkZXNlamEgaW5zdGFsYXIgc2lsZW5jaW9zYW1lbnRlIG5vIGNvbXB1dGFkb3I6IiBGb250U2l6ZT0iMTIiIEZvcmVncm91bmQ9IiM3OTgyQTkiIE1hcmdpbj0iMCwzLDAsMCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1N0YWNrUGFuZWw+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsIEdyaWQuQ29sdW1uPSIxIiBPcmllbnRhdGlvbj0iSG9yaXpvbnRhbCIgVmVydGljYWxBbGlnbm1lbnQ9IkNlbnRlciI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuU2VsZWN0RXNzZW50aWFsQXBwcyIgQ29udGVudD0iRXNzZW5jaWFpcyIgU3R5bGU9IntTdGF0aWNSZXNvdXJjZSBTZWNvbmRhcnlCdXR0b259IiBNYXJnaW49IjAsMCw2LDAiIFRvb2xUaXA9IlNlbGVjaW9uYSBWaXN1YWwgQysrLCA3LVppcCBlIEdvb2dsZSBDaHJvbWUiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuU2VsZWN0QWxsQXBwcyIgQ29udGVudD0iTWFyY2FyIFRvZG9zIiBTdHlsZT0ie1N0YXRpY1Jlc291cmNlIFNlY29uZGFyeUJ1dHRvbn0iIE1hcmdpbj0iMCwwLDYsMCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPEJ1dHRvbiBOYW1lPSJidG5EZXNlbGVjdEFsbEFwcHMiIENvbnRlbnQ9IkRlc21hcmNhciBUb2RvcyIgU3R5bGU9IntTdGF0aWNSZXNvdXJjZSBTZWNvbmRhcnlCdXR0b259IiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvR3JpZD4KICAgICAgICAgICAgICAgICAgICAgICAgPC9Cb3JkZXI+CgogICAgICAgICAgICAgICAgICAgICAgICA8IS0tIENhdGFsb2dvIGRlIFNvZnR3YXJlcyBlbSBHcmlkIC0tPgogICAgICAgICAgICAgICAgICAgICAgICA8R3JpZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxHcmlkLkNvbHVtbkRlZmluaXRpb25zPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSIqIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSIqIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9HcmlkLkNvbHVtbkRlZmluaXRpb25zPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQ29sdW5hIDE6IFJ1bnRpbWVzIGUgTmF2ZWdhZG9yZXMgLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbCBHcmlkLkNvbHVtbj0iMCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBTdHlsZT0ie1N0YXRpY1Jlc291cmNlIFByb2ZpbGVDYXJkfSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJSdW50aW1lcyBlIFV0aWxpdMOhcmlvcyBFc3NlbmNpYWlzIiBGb250U2l6ZT0iMTQiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvcmVncm91bmQ9IiM3RENGRkYiIE1hcmdpbj0iMCwwLDAsOCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJhcHBWY1JlZGlzdDY0IiBDb250ZW50PSJWaXN1YWwgQysrIDIwMTUtMjAyMiAoeDY0KSAtIFByw6ktcmVxdWlzaXRvIHBhcmEgam9nb3MgZSBwcm9ncmFtYXMiIElzQ2hlY2tlZD0iVHJ1ZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJhcHBWY1JlZGlzdDg2IiBDb250ZW50PSJWaXN1YWwgQysrIDIwMTUtMjAyMiAoeDg2KSAtIENvbXBhdGliaWxpZGFkZSBkZSBhcGxpY2F0aXZvcyAzMi1iaXQiIElzQ2hlY2tlZD0iVHJ1ZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJhcHA3emlwIiBDb250ZW50PSI3LVppcCAtIENvbXBhY3RhZG9yIGUgZGVzY29tcGFjdGFkb3IgZGUgYWx0YSBwZXJmb3JtYW5jZSIgSXNDaGVja2VkPSJUcnVlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1N0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9Cb3JkZXI+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgU3R5bGU9IntTdGF0aWNSZXNvdXJjZSBQcm9maWxlQ2FyZH0iPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgVGV4dD0iTmF2ZWdhZG9yZXMgV2ViIiBGb250U2l6ZT0iMTQiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvcmVncm91bmQ9IiM5RUNFNkEiIE1hcmdpbj0iMCwwLDAsOCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJhcHBDaHJvbWUiIENvbnRlbnQ9Ikdvb2dsZSBDaHJvbWUgLSBOYXZlZ2Fkb3Igd2ViIG1vZGVybm8gZSBzZWd1cm8iIElzQ2hlY2tlZD0iVHJ1ZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQ29sdW5hIDI6IERlc2Vudm9sdmltZW50byBlIE11bHRpbWlkaWEvSm9nb3MgLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbCBHcmlkLkNvbHVtbj0iMSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBTdHlsZT0ie1N0YXRpY1Jlc291cmNlIFByb2ZpbGVDYXJkfSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJGZXJyYW1lbnRhcyBkZSBEZXNlbnZvbHZpbWVudG8iIEZvbnRTaXplPSIxNCIgRm9udFdlaWdodD0iQm9sZCIgRm9yZWdyb3VuZD0iI0JCOUFGNyIgTWFyZ2luPSIwLDAsMCw4IiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImFwcFZzQ29kZSIgQ29udGVudD0iVmlzdWFsIFN0dWRpbyBDb2RlIC0gRWRpdG9yIGRlIGPDs2RpZ28gZGEgTWljcm9zb2Z0IiBJc0NoZWNrZWQ9IkZhbHNlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImFwcEdpdCIgQ29udGVudD0iR2l0IGZvciBXaW5kb3dzIC0gU2lzdGVtYSBkaXN0cmlidcOtZG8gZGUgY29udHJvbGUgZGUgdmVyc8OjbyIgSXNDaGVja2VkPSJGYWxzZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgUHJvZmlsZUNhcmR9Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IkNvbXVuaWNhw6fDo28sIE3DrWRpYSBlIEpvZ29zIiBGb250U2l6ZT0iMTQiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvcmVncm91bmQ9IiNFMEFGNjgiIE1hcmdpbj0iMCwwLDAsOCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJhcHBEaXNjb3JkIiBDb250ZW50PSJEaXNjb3JkIC0gQ29tdW5pY2HDp8OjbyBwb3Igdm96LCB2w61kZW8gZSB0ZXh0byIgSXNDaGVja2VkPSJGYWxzZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJhcHBTdGVhbSIgQ29udGVudD0iU3RlYW0gLSBQbGF0YWZvcm1hIGRlIGpvZ29zIGUgY29tdW5pZGFkZSBkaWdpdGFsIiBJc0NoZWNrZWQ9IkZhbHNlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImFwcFZsYyIgQ29udGVudD0iVkxDIE1lZGlhIFBsYXllciAtIFJlcHJvZHV0b3IgZGUgw6F1ZGlvIGUgdsOtZGVvIHVuaXZlcnNhbCIgSXNDaGVja2VkPSJGYWxzZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJhcHBTcG90aWZ5IiBDb250ZW50PSJTcG90aWZ5IC0gU3RyZWFtaW5nIGRlIG3DunNpY2EgZSBwb2RjYXN0cyIgSXNDaGVja2VkPSJGYWxzZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICA8L0dyaWQ+CgogICAgICAgICAgICAgICAgICAgICAgICA8IS0tIEJvdGFvIEluZGVwZW5kZW50ZSBkZSBJbnN0YWxhY2FvIGRlIFNvZnR3YXJlcyAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBCYWNrZ3JvdW5kPSIjMUExQjI2IiBCb3JkZXJCcnVzaD0iIzJGMzU0RiIgQm9yZGVyVGhpY2tuZXNzPSIxIiBDb3JuZXJSYWRpdXM9IjgiIFBhZGRpbmc9IjE0IiBNYXJnaW49IjYsMTAsNiw2Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxHcmlkPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxHcmlkLkNvbHVtbkRlZmluaXRpb25zPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q29sdW1uRGVmaW5pdGlvbiBXaWR0aD0iKiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENvbHVtbkRlZmluaXRpb24gV2lkdGg9IkF1dG8iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9HcmlkLkNvbHVtbkRlZmluaXRpb25zPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IkEgaW5zdGFsYcOnw6NvIMOpIHJlYWxpemFkYSBlbSBzZWd1bmRvIHBsYW5vIHZpYSBXaW5nZXQgb2ZpY2lhbCwgc2VtIGludGVycm9tcGVyIGFzIGF0aXZpZGFkZXMgZW0gZXhlY3XDp8Ojby4iIEZvbnRTaXplPSIxMiIgRm9yZWdyb3VuZD0iIzc5ODJBOSIgVmVydGljYWxBbGlnbm1lbnQ9IkNlbnRlciIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIE5hbWU9ImJ0bkluc3RhbGxTb2Z0d2FyZXMiIEdyaWQuQ29sdW1uPSIxIiBDb250ZW50PSJJbnN0YWxhciBQcm9ncmFtYXMgU2VsZWNpb25hZG9zIiBCYWNrZ3JvdW5kPSIjMjU2M0VCIiBCb3JkZXJCcnVzaD0iIzNCODJGNiIgRm9yZWdyb3VuZD0iV2hpdGUiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvbnRTaXplPSIxMyIgUGFkZGluZz0iMjAsMTAiIEN1cnNvcj0iSGFuZCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24uUmVzb3VyY2VzPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0eWxlIFRhcmdldFR5cGU9IkJvcmRlciI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iQ29ybmVyUmFkaXVzIiBWYWx1ZT0iOCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3R5bGU+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQnV0dG9uLlJlc291cmNlcz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvR3JpZD4KICAgICAgICAgICAgICAgICAgICAgICAgPC9Cb3JkZXI+CiAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgPC9TY3JvbGxWaWV3ZXI+CiAgICAgICAgICAgIDwvVGFiSXRlbT4KCiAgICAgICAgICAgIDwhLS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gLS0+CiAgICAgICAgICAgIDwhLS0gQUJBIDI6IE9USU1JWkFDT0VTIERPIFNJU1RFTUEgRSBQRVJGSVMgICAgICAgICAgICAgICAgICAgLS0+CiAgICAgICAgICAgIDwhLS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gLS0+CiAgICAgICAgICAgIDxUYWJJdGVtIE5hbWU9InRhYkl0ZW1Ud2Vha3MiIEhlYWRlcj0iIE90aW1pemHDp8O1ZXMgZG8gU2lzdGVtYSAiPgogICAgICAgICAgICAgICAgPFNjcm9sbFZpZXdlciBWZXJ0aWNhbFNjcm9sbEJhclZpc2liaWxpdHk9IkF1dG8iIE1hcmdpbj0iMTAiPgogICAgICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICA8IS0tIE5vdGlmaWNhY2FvIGRlIFJlY29tZW5kYWNhbyBkZSBIYXJkd2FyZSAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBCYWNrZ3JvdW5kPSIjMUMyNzM4IiBCb3JkZXJCcnVzaD0iIzI1NjNFQiIgQm9yZGVyVGhpY2tuZXNzPSIxIiBDb3JuZXJSYWRpdXM9IjgiIFBhZGRpbmc9IjEyIiBNYXJnaW49IjYsMCw2LDEwIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgTmFtZT0idHh0UmVjb21tZW5kYXRpb24iIFRleHQ9IkNhbGN1bGFuZG8gbWVsaG9yIHBlcmZpbCBwYXJhIHN1YSBtw6FxdWluYS4uLiIgRm9udFNpemU9IjEzIiBGb3JlZ3JvdW5kPSIjOTNDNUZEIiBUZXh0V3JhcHBpbmc9IldyYXAiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgoKICAgICAgICAgICAgICAgICAgICAgICAgPCEtLSBTZcOnw6NvIGRvcyA0IFBlcmZpcyBSw6FwaWRvcyBkZSAxIENsaXF1ZSAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJQZXJmaXMgUmVjb21lbmRhZG9zIGRlIENvbmZpZ3VyYcOnw6NvOiIgRm9udFNpemU9IjE0IiBGb250V2VpZ2h0PSJTZW1pQm9sZCIgRm9yZWdyb3VuZD0iI0M4RDNGNSIgTWFyZ2luPSI4LDQsOCw4IiAvPgogICAgICAgICAgICAgICAgICAgICAgICA8VW5pZm9ybUdyaWQgQ29sdW1ucz0iMiIgTWFyZ2luPSIwLDAsMCwxMCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8IS0tIENhcmQgRGVza3RvcCBEZXYgLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgUHJvZmlsZUNhcmR9Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJEZXNrdG9wIC0gRGVzZW52b2x2aW1lbnRvIiBGb250U2l6ZT0iMTUiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvcmVncm91bmQ9IiM3RENGRkYiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgVGV4dD0iT3RpbWl6YWRvIHBhcmEgY29tcGlsYcOnw6NvLCBjb250w6ppbmVyZXMgZSByZXNwb3N0YSDDoWdpbCBkZSBwcm9jZXNzYW1lbnRvLiIgRm9udFNpemU9IjEyIiBGb3JlZ3JvdW5kPSIjNzk4MkE5IiBNYXJnaW49IjAsMywwLDYiIFRleHRXcmFwcGluZz0iV3JhcCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSLigKIgU2VtIGhpYmVybmHDp8OjbyAocmVjdXBlcmEgZXNwYcOnbyBlbSBkaXNjbyBTU0QgaWd1YWwgw6AgUkFNKSYjeDBhO+KAoiBNZW5vciBsYXTDqm5jaWEgZGUgcmVkZSBlIHNlbSBsaW1pdGHDp8OjbyBkZSBwcm9jZXNzYWRvciYjeDBhO+KAoiBUZWxlbWV0cmlhIGRlc2F0aXZhZGEgZSBFeHBsb3JhZG9yIGRlIEFycXVpdm9zIGxpbXBvIiBGb250U2l6ZT0iMTEiIEZvcmVncm91bmQ9IiNDOEQzRjUiIE1hcmdpbj0iMCwyLDAsMTAiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuUHJlc2V0RGVza3RvcERldiIgQ29udGVudD0iU2VsZWNpb25hciBQZXJmaWwgRGVza3RvcCBEZXNlbnZvbHZpbWVudG8iIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgU2Vjb25kYXJ5QnV0dG9ufSIgQmFja2dyb3VuZD0iIzI1NjNFQiIgQm9yZGVyQnJ1c2g9IiMzQjgyRjYiIEZvcmVncm91bmQ9IldoaXRlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQ2FyZCBEZXNrdG9wIEdlcmFsIC0tPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBTdHlsZT0ie1N0YXRpY1Jlc291cmNlIFByb2ZpbGVDYXJkfSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgVGV4dD0iRGVza3RvcCAtIEdlcmFsIGUgSm9nb3MiIEZvbnRTaXplPSIxNSIgRm9udFdlaWdodD0iQm9sZCIgRm9yZWdyb3VuZD0iIzlFQ0U2QSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJGb2NvIGVtIHRheGEgZGUgcXVhZHJvcyAoRlBTKSwgbWVub3IgbGF0w6puY2lhIGRlIGVudHJhZGEgZSBtw6F4aW1hIHJlc3BvbnNpdmlkYWRlLiIgRm9udFNpemU9IjEyIiBGb3JlZ3JvdW5kPSIjNzk4MkE5IiBNYXJnaW49IjAsMywwLDYiIFRleHRXcmFwcGluZz0iV3JhcCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSLigKIgU2VydmnDp29zIHNlY3VuZMOhcmlvcyBkZXNuZWNlc3PDoXJpb3MgZGVzYXRpdmFkb3MmI3gwYTvigKIgR2FtZURWUiBlIGNhcHR1cmEgZGUgdGVsYSBkZXNhdGl2YWRvcyYjeDBhO+KAoiBSZXNwb3N0YSBkZSBtb3VzZSBsaW5lYXIgMToxIGUgZ3JhdmHDp8OjbyBTU0QgY2FsaWJyYWRhIiBGb250U2l6ZT0iMTEiIEZvcmVncm91bmQ9IiNDOEQzRjUiIE1hcmdpbj0iMCwyLDAsMTAiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuUHJlc2V0RGVza3RvcEdlcmFsIiBDb250ZW50PSJTZWxlY2lvbmFyIFBlcmZpbCBEZXNrdG9wIEdlcmFsIGUgSm9nb3MiIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgU2Vjb25kYXJ5QnV0dG9ufSIgQmFja2dyb3VuZD0iIzE2QTM0QSIgQm9yZGVyQnJ1c2g9IiMyMkM1NUUiIEZvcmVncm91bmQ9IldoaXRlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQ2FyZCBOb3RlYm9vayBEZXYgLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgUHJvZmlsZUNhcmR9Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJOb3RlYm9vayAtIERlc2Vudm9sdmltZW50byIgRm9udFNpemU9IjE1IiBGb250V2VpZ2h0PSJCb2xkIiBGb3JlZ3JvdW5kPSIjQkI5QUY3IiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IkFtYmllbnRlIGRlIGRlc2Vudm9sdmltZW50byBtw7N2ZWwgY29tIHByZXNlcnZhw6fDo28gZGUgYmF0ZXJpYSBlIGFybWF6ZW5hbWVudG8uIiBGb250U2l6ZT0iMTIiIEZvcmVncm91bmQ9IiM3OTgyQTkiIE1hcmdpbj0iMCwzLDAsNiIgVGV4dFdyYXBwaW5nPSJXcmFwIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IuKAoiBIaWJlcm5hw6fDo28gc2VndXJhIGNvbXBhY3RhIGNvbSBwcmVzZXJ2YcOnw6NvIGRlIGVzdGFkbyYjeDBhO+KAoiBQcmV2ZW7Dp8OjbyBjb250cmEgcGVyZGEgZGUgZGFkb3MgYW8gZmVjaGFyIGEgdGFtcGEmI3gwYTvigKIgQ2FsaWJyYcOnw6NvIGRlIHJlc3Bvc3RhIHTDqXJtaWNhIGUgZXN0YWJpbGlkYWRlIGdyw6FmaWNhIiBGb250U2l6ZT0iMTEiIEZvcmVncm91bmQ9IiNDOEQzRjUiIE1hcmdpbj0iMCwyLDAsMTAiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuUHJlc2V0TGFwdG9wRGV2IiBDb250ZW50PSJTZWxlY2lvbmFyIFBlcmZpbCBOb3RlYm9vayBEZXNlbnZvbHZpbWVudG8iIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgU2Vjb25kYXJ5QnV0dG9ufSIgQmFja2dyb3VuZD0iIzdDM0FFRCIgQm9yZGVyQnJ1c2g9IiM4QjVDRjYiIEZvcmVncm91bmQ9IldoaXRlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQ2FyZCBOb3RlYm9vayBHZXJhbCAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgU3R5bGU9IntTdGF0aWNSZXNvdXJjZSBQcm9maWxlQ2FyZH0iPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9Ik5vdGVib29rIC0gR2VyYWwgZSBBdXRvbm9taWEiIEZvbnRTaXplPSIxNSIgRm9udFdlaWdodD0iQm9sZCIgRm9yZWdyb3VuZD0iI0UwQUY2OCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJNw6F4aW1hIGVmaWNpw6puY2lhIGVuZXJnw6l0aWNhIG5vIHVzbyBkacOhcmlvLCBmbHVpZGV6IGUgZXN0YWJpbGlkYWRlIGVtIGpvZ29zLiIgRm9udFNpemU9IjEyIiBGb3JlZ3JvdW5kPSIjNzk4MkE5IiBNYXJnaW49IjAsMywwLDYiIFRleHRXcmFwcGluZz0iV3JhcCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSLigKIgT3RpbWl6YcOnw6NvIHBhcmEgbWFpb3IgYXV0b25vbWlhIGRhIGJhdGVyaWEmI3gwYTvigKIgSGliZXJuYcOnw6NvIGNvbXBhY3RhIGNvbSBiYWl4byBjb25zdW1vIGVtIHJlcG91c28mI3gwYTvigKIgRWxpbWluYcOnw6NvIGRlIHJvdGluYXMgZW0gc2VndW5kbyBwbGFubyBxdWUgY29uc29tZW0gZW5lcmdpYSIgRm9udFNpemU9IjExIiBGb3JlZ3JvdW5kPSIjQzhEM0Y1IiBNYXJnaW49IjAsMiwwLDEwIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIE5hbWU9ImJ0blByZXNldExhcHRvcEdlcmFsIiBDb250ZW50PSJTZWxlY2lvbmFyIFBlcmZpbCBOb3RlYm9vayBHZXJhbCBlIEF1dG9ub21pYSIgU3R5bGU9IntTdGF0aWNSZXNvdXJjZSBTZWNvbmRhcnlCdXR0b259IiBCYWNrZ3JvdW5kPSIjRDk3NzA2IiBCb3JkZXJCcnVzaD0iI0Y1OUUwQiIgRm9yZWdyb3VuZD0iV2hpdGUiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9Cb3JkZXI+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvVW5pZm9ybUdyaWQ+CgogICAgICAgICAgICAgICAgICAgICAgICA8IS0tIEJhcnJhIGRlIEZlcnJhbWVudGFzIGRlIFNlbGVjYW8gZG9zIFR3ZWFrcyAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBCYWNrZ3JvdW5kPSIjMUExQjI2IiBCb3JkZXJCcnVzaD0iIzJGMzU0RiIgQm9yZGVyVGhpY2tuZXNzPSIxIiBDb3JuZXJSYWRpdXM9IjgiIFBhZGRpbmc9IjEyIiBNYXJnaW49IjYsMCw2LDEwIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxHcmlkPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxHcmlkLkNvbHVtbkRlZmluaXRpb25zPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q29sdW1uRGVmaW5pdGlvbiBXaWR0aD0iKiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENvbHVtbkRlZmluaXRpb24gV2lkdGg9IkF1dG8iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9HcmlkLkNvbHVtbkRlZmluaXRpb25zPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IlNlbGXDp8OjbyBQZXJzb25hbGl6YWRhIGRlIE90aW1pemHDp8O1ZXM6IiBGb250U2l6ZT0iMTQiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvcmVncm91bmQ9IiNDOEQzRjUiIFZlcnRpY2FsQWxpZ25tZW50PSJDZW50ZXIiIC8+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsIEdyaWQuQ29sdW1uPSIxIiBPcmllbnRhdGlvbj0iSG9yaXpvbnRhbCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuU2VsZWN0QWxsIiBDb250ZW50PSJNYXJjYXIgVG9kb3MiIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgU2Vjb25kYXJ5QnV0dG9ufSIgTWFyZ2luPSIwLDAsNiwwIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIE5hbWU9ImJ0bkRlc2VsZWN0QWxsIiBDb250ZW50PSJEZXNtYXJjYXIgVG9kb3MiIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgU2Vjb25kYXJ5QnV0dG9ufSIgTWFyZ2luPSIwLDAsNiwwIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIE5hbWU9ImJ0blJlc2V0UmVjb21tZW5kZWQiIENvbnRlbnQ9IlJlc3RhdXJhciBSZWNvbWVuZGFkb3MiIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgU2Vjb25kYXJ5QnV0dG9ufSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1N0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0dyaWQ+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgoKICAgICAgICAgICAgICAgICAgICAgICAgPCEtLSBHcmlkIGRlIFR3ZWFrcyBwb3IgQ2F0ZWdvcmlhIC0tPgogICAgICAgICAgICAgICAgICAgICAgICA8R3JpZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxHcmlkLkNvbHVtbkRlZmluaXRpb25zPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSIqIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSIqIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9HcmlkLkNvbHVtbkRlZmluaXRpb25zPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQ29sdW5hIDE6IEludGVyZmFjZSBlIERlc2VtcGVuaG8gLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbCBHcmlkLkNvbHVtbj0iMCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPCEtLSBDYXJkIEludGVyZmFjZSAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgUHJvZmlsZUNhcmR9Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IkludGVyZmFjZSBlIEJhcnJhIGRlIFRhcmVmYXMiIEZvbnRTaXplPSIxNCIgRm9udFdlaWdodD0iQm9sZCIgRm9yZWdyb3VuZD0iIzdEQ0ZGRiIgTWFyZ2luPSIwLDAsMCw4IiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa0hpZGVTZWFyY2giIENvbnRlbnQ9Ik9jdWx0YXIgY2FpeGEgZGUgcGVzcXVpc2EgbmEgYmFycmEgZGUgdGFyZWZhcyIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJPY3VsdGEgYSBiYXJyYSBkZSBwZXNxdWlzYTsgYSBidXNjYSBkbyBtZW51IEluaWNpYXIgcGVybWFuZWNlIGRpc3BvbsOtdmVsIGFvIGRpZ2l0YXIuIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa0hpZGVUYXNrVmlldyIgQ29udGVudD0iT2N1bHRhciBib3TDo28gZGUgVmlzw6NvIGRlIFRhcmVmYXMgKFRhc2sgVmlldykiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iT2N1bHRhIG8gw61jb25lIGRhIGJhcnJhOyBvIGF0YWxobyBXaW4rVGFiIHBlcm1hbmVjZSB0b3RhbG1lbnRlIGZ1bmNpb25hbC4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrQ2VudGVyVGFza2JhciIgQ29udGVudD0iQWxpbmhhbWVudG8gY2VudHJhbGl6YWRvIGRhIGJhcnJhIGRlIHRhcmVmYXMiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iTWFudMOpbSBhIGJhcnJhIGRlIHRhcmVmYXMgY2VudHJhbGl6YWRhIG5vIHBhZHLDo28gbW9kZXJubyBkbyBXaW5kb3dzIDExLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtUYXNrYmFyRW5kVGFzayIgQ29udGVudD0iQXRpdmFyIG9ww6fDo28gJ0ZpbmFsaXphciBUYXJlZmEnIG5vIGJvdMOjbyBkaXJlaXRvIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IlBlcm1pdGUgZW5jZXJyYXIgcHJvY2Vzc29zIG7Do28gcmVzcG9uc2l2b3MgZGlyZXRhbWVudGUgcGVsbyBib3TDo28gZGlyZWl0byBuYSBiYXJyYSBkZSB0YXJlZmFzLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtDbGFzc2ljQ29udGV4dE1lbnUiIENvbnRlbnQ9Ik1lbnUgZGUgY29udGV4dG8gY2zDoXNzaWNvIChlc3RpbG8gV2luZG93cyAxMCkiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iRXhpYmUgdG9kYXMgYXMgb3DDp8O1ZXMgZG8gbWVudSBkZSBjb250ZXh0byBkaXJldGFtZW50ZSwgc2VtIHN1Ym1lbnVzIGFkaWNpb25haXMuIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa0xhdW5jaFRvVGhpc1BDIiBDb250ZW50PSJBYnJpciBFeHBsb3JhZG9yIGRlIEFycXVpdm9zIGVtICdFc3RlIENvbXB1dGFkb3InIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IkNvbmZpZ3VyYSBvIEV4cGxvcmFkb3IgZGUgQXJxdWl2b3MgcGFyYSBpbmljaWFyIG5hcyB1bmlkYWRlcyBkZSBkaXNjbywgcmVtb3ZlbmRvIHDDoWdpbmFzIGxlbnRhcyBkZSBJbsOtY2lvIGUgR2FsZXJpYS4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrU2hvd0V4dGVuc2lvbnNBbmRIaWRkZW4iIENvbnRlbnQ9IkV4aWJpciBleHRlbnPDtWVzIGUgYXJxdWl2b3Mgb2N1bHRvcyIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJGYWNpbGl0YSBhIHZpc3VhbGl6YcOnw6NvIGRlIGV4dGVuc8O1ZXMgZGUgYXJxdWl2b3MgKC5iYXQsIC5wczEsIC5qc29uKSBlIHBhc3RhcyBkZSBjb25maWd1cmHDp8Ojby4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrQWx3YXlzU2hvd1Njcm9sbGJhcnMiIENvbnRlbnQ9Ik1hbnRlciBiYXJyYXMgZGUgcm9sYWdlbSBzZW1wcmUgdmlzw612ZWlzIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IkV2aXRhIHF1ZSBhcyBiYXJyYXMgZGUgcm9sYWdlbSBzZWphbSBvY3VsdGFkYXMgYXV0b21hdGljYW1lbnRlIHBlbGEgaW50ZXJmYWNlLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8IS0tIENhcmQgRGVzZW1wZW5obyAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgUHJvZmlsZUNhcmR9Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IkRlc2VtcGVuaG8sIExhdMOqbmNpYSBlIEFybWF6ZW5hbWVudG8iIEZvbnRTaXplPSIxNCIgRm9udFdlaWdodD0iQm9sZCIgRm9yZWdyb3VuZD0iIzlFQ0U2QSIgTWFyZ2luPSIwLDAsMCw4IiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa09wdGltaXplTmV0d29ya0xhdGVuY3kiIENvbnRlbnQ9Ik90aW1pemFyIGxhdMOqbmNpYSBkZSByZWRlIChOZXR3b3JrVGhyb3R0bGluZykiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iRGVzYXRpdmEgYSBsaW1pdGHDp8OjbyBkZSByZWRlIGRvIFdpbmRvd3MgcGFyYSBtZW5vciBsYXTDqm5jaWEgZW0gY29uZXjDtWVzIGUgam9nb3MuIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa0Rpc2FibGVHYW1lRFZSIiBDb250ZW50PSJEZXNhdGl2YXIgR2FtZURWUiBlIGNhcHR1cmEgZW0gc2VndW5kbyBwbGFubyIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJFbGltaW5hIHNvYnJlY2FyZ2EgZGUgcHJvY2Vzc2Fkb3IgZSBwbGFjYSBkZSB2w61kZW8gZ2VyYWRhIHBvciBncmF2YcOnw7VlcyBhdXRvbcOhdGljYXMgZGUgdGVsYS4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrTGluZWFyTW91c2UiIENvbnRlbnQ9IlJlc3Bvc3RhIGxpbmVhciBkbyBwb250ZWlybyBkbyBtb3VzZSAoUHJlY2lzw6NvIDE6MSkiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iRGVzYXRpdmEgYSBhY2VsZXJhw6fDo28gYXJ0aWZpY2lhbCBkbyBwb250ZWlybyBwYXJhIGNvbnNpc3TDqm5jaWEgZGUgbW92aW1lbnRvLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtEaXNhYmxlU3RpY2t5S2V5cyIgQ29udGVudD0iRGVzYXRpdmFyIGF0YWxobyBkZSBUZWNsYXMgZGUgQWRlcsOqbmNpYSIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJJbXBlZGUgYSBleGliacOnw6NvIGRvIGRpw6Fsb2dvIGRlIGNvbmZpcm1hw6fDo28gYW8gcHJlc3Npb25hciBhIHRlY2xhIFNoaWZ0IGNvbnNlY3V0aXZhbWVudGUuIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa0luc3RhbnRNZW51RGVsYXkiIENvbnRlbnQ9IlJlbW92ZXIgYXRyYXNvIG5hIGFiZXJ0dXJhIGRlIG1lbnVzICgwIG1zKSIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJSZWR1eiBvIHRlbXBvIGRlIGVzcGVyYSBuYSBhYmVydHVyYSBkZSBzdWJtZW51cyBzdXNwZW5zb3MgcGFyYSByZXNwb3N0YSBpbWVkaWF0YS4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrT3B0aW1pemVTc2RBY2Nlc3MiIENvbnRlbnQ9Ik90aW1pemFyIGdyYXZhw6fDtWVzIGVtIFNTRCAoRGlzYWJsZUxhc3RBY2Nlc3MpIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IkRlc2F0aXZhIGEgZ3JhdmHDp8OjbyBjb250w61udWEgZGUgZGF0YSBkZSDDumx0aW1vIGFjZXNzbywgcmVkdXppbmRvIGVzY3JpdGFzIGUgcHJlc2VydmFuZG8gbyBTU0QuIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa0NsZWFuVGVtcEZpbGVzIiBDb250ZW50PSJMaW1wYXIgYXJxdWl2b3MgdGVtcG9yw6FyaW9zIGRvIHNpc3RlbWEiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iRXN2YXppYSBjYWNoZXMgZSBhcnF1aXZvcyB0ZW1wb3LDoXJpb3MgbsOjbyB1dGlsaXphZG9zIHBlbG8gc2lzdGVtYSBvcGVyYWNpb25hbC4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0JvcmRlcj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8IS0tIENvbHVuYSAyOiBQcml2YWNpZGFkZSwgRGVibG9hdCBlIFNpc3RlbWEgLS0+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbCBHcmlkLkNvbHVtbj0iMSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPCEtLSBDYXJkIFByaXZhY2lkYWRlICYgRGVibG9hdCAtLT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgUHJvZmlsZUNhcmR9Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IlByaXZhY2lkYWRlLCBUZWxlbWV0cmlhIGUgQXBsaWNhdGl2b3MgUGFkcsOjbyIgRm9udFNpemU9IjE0IiBGb250V2VpZ2h0PSJCb2xkIiBGb3JlZ3JvdW5kPSIjQkI5QUY3IiBNYXJnaW49IjAsMCwwLDgiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrRGlzYWJsZVRlbGVtZXRyeSIgQ29udGVudD0iRGVzYXRpdmFyIHRlbGVtZXRyaWEgZSBzZXJ2acOnb3MgZGUgZGlhZ27Ds3N0aWNvIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IkRlc2F0aXZhIG8gc2VydmnDp28gRGlhZ1RyYWNrIGUgbyBlbnZpbyBkZSBkYWRvcyBkaWFnbsOzc3RpY29zIHBhcmEgc2Vydmlkb3JlcyBleHRlcm5vcy4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrRGlzYWJsZUNlaXBUYXNrcyIgQ29udGVudD0iRGVzYXRpdmFyIHRhcmVmYXMgYWdlbmRhZGFzIGRlIGRpYWduw7NzdGljbyAoQ0VJUCkiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iRGVzYXRpdmEgcm90aW5hcyBhZ2VuZGFkYXMgZGUgdGVsZW1ldHJpYSBleGVjdXRhZGFzIGR1cmFudGUgcGVyw61vZG9zIGRlIG9jaW9zaWRhZGUuIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImNoa0Rpc2FibGVDb3BpbG90UmVjYWxsIiBDb250ZW50PSJEZXNhdGl2YXIgV2luZG93cyBDb3BpbG90IGUgcmVjdXJzb3MgZGUgSUEgUmVjYWxsIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IkRlc2F0aXZhIG8gYXNzaXN0ZW50ZSBDb3BpbG90IGUgcm90aW5hcyBkZSBhbsOhbGlzZSBjb250w61udWEgZGUgdGVsYSBlbSBzZWd1bmRvIHBsYW5vLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtEaXNhYmxlQmluZ1NlYXJjaCIgQ29udGVudD0iRGVzYXRpdmFyIHJlc3VsdGFkb3MgZG8gQmluZyBubyBtZW51IEluaWNpYXIiIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iTWFudMOpbSBhIGJ1c2NhIGRvIG1lbnUgSW5pY2lhciBlc3RyaXRhbWVudGUgbG9jYWwgcGFyYSByZXNwb3N0YXMgaW1lZGlhdGFzLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtEZWJsb2F0RWRnZSIgQ29udGVudD0iT3RpbWl6YXIgdGVsZW1ldHJpYSBkbyBNaWNyb3NvZnQgRWRnZSIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJEZXNhdGl2YSBvIGVudmlvIGRlIG3DqXRyaWNhcyBkZSBuYXZlZ2HDp8OjbyBlIGFzc2lzdGVudGVzIGRlIGNvbXByYSwgcHJlc2VydmFuZG8gbyBXZWJWaWV3Mi4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrUmVtb3ZlVXdwQmxvYXQiIENvbnRlbnQ9IlJlbW92ZXIgYXBsaWNhdGl2b3MgcHLDqS1pbnN0YWxhZG9zIGRlc25lY2Vzc8OhcmlvcyIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJSZW1vdmUgcGFjb3RlcyBwcm9tb2Npb25haXMgcHLDqS1pbnN0YWxhZG9zIGRlIGVudHJldGVuaW1lbnRvIGUgcmVkZXMgc29jaWFpcy4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0JvcmRlcj4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPCEtLSBDYXJkIFNpc3RlbWEgJiBFbmVyZ2lhIC0tPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgU3R5bGU9IntTdGF0aWNSZXNvdXJjZSBQcm9maWxlQ2FyZH0iPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgVGV4dD0iU2lzdGVtYSwgR3LDoWZpY29zIGUgR2VyZW5jaWFtZW50byBkZSBFbmVyZ2lhIiBGb250U2l6ZT0iMTQiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvcmVncm91bmQ9IiNFMEFGNjgiIE1hcmdpbj0iMCwwLDAsOCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtDYWxpYnJhdGVHcHUiIENvbnRlbnQ9IkNhbGlicmFyIHRvbGVyw6JuY2lhIGRlIGRyaXZlciBncsOhZmljbyAoVGRyRGVsYXkgZSBIQUdTKSIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJBdW1lbnRhIGEgdG9sZXLDom5jaWEgcGFyYSByZWN1cGVyYcOnw6NvIGRvIGRyaXZlciBncsOhZmljbyBlIGF0aXZhIG8gYWdlbmRhbWVudG8gZGUgR1BVIHBvciBoYXJkd2FyZS4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrU21hcnRIaWJlcm5hdGlvbiIgQ29udGVudD0iR2VyZW5jaWFtZW50byBpbnRlbGlnZW50ZSBkZSBoaWJlcm5hw6fDo28iIElzQ2hlY2tlZD0iVHJ1ZSIgVG9vbFRpcD0iRGVzYXRpdmEgYSBoaWJlcm5hw6fDo28gZW0gY29tcHV0YWRvcmVzIGRlIG1lc2EgcGFyYSByZWN1cGVyYXIgZXNwYcOnbyBlbSBkaXNjbyBTU0Qgb3UgY29uZmlndXJhIG1vZG8gY29tcGFjdG8gZW0gbm90ZWJvb2tzLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtEaXNhYmxlUmVzZXJ2ZWRTdG9yYWdlIiBDb250ZW50PSJEZXNhdGl2YXIgQXJtYXplbmFtZW50byBSZXNlcnZhZG8gZG8gV2luZG93cyIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJMaWJlcmEgYXByb3hpbWFkYW1lbnRlIDcgR0IgZGUgZXNwYcOnbyBlbSBkaXNjbyBhbnRlcmlvcm1lbnRlIHJldGlkb3MgcGVsbyBzaXN0ZW1hIG9wZXJhY2lvbmFsLiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJjaGtPcHRpbWl6ZVN2Y0hvc3QiIENvbnRlbnQ9IkNhbGlicmFyIGRpdmlzw6NvIGRlIHByb2Nlc3NvcyBkZSBzZXJ2acOnb3MgKFN2Y0hvc3QpIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IkFqdXN0YSBvIGlzb2xhbWVudG8gZGUgc2VydmnDp29zIGRlIGFjb3JkbyBjb20gYSBxdWFudGlkYWRlIHRvdGFsIGRlIG1lbcOzcmlhIFJBTS4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrRW5hYmxlTG9uZ1BhdGhzIiBDb250ZW50PSJIYWJpbGl0YXIgc3Vwb3J0ZSBhIGNhbWluaG9zIGxvbmdvcyBkZSBhcnF1aXZvcyIgSXNDaGVja2VkPSJUcnVlIiBUb29sVGlwPSJSZW1vdmUgYSBsaW1pdGHDp8OjbyBsZWdhZGEgZGUgMjYwIGNhcmFjdGVyZXMgKE1BWF9QQVRIKSBlbSBjYW1pbmhvcyBkZSBhcnF1aXZvcyBlIHBhc3Rhcy4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrRGlzYWJsZUxvY2tTY3JlZW4iIENvbnRlbnQ9IlB1bGFyIHRlbGEgZGUgYmxvcXVlaW8gZXN0w6F0aWNhIiBJc0NoZWNrZWQ9IlRydWUiIFRvb2xUaXA9IkFwcmVzZW50YSBvIGNhbXBvIGRlIGF1dGVudGljYcOnw6NvIGRpcmV0YW1lbnRlIGFvIGxpZ2FyIG91IGRlc2Jsb3F1ZWFyIG8gY29tcHV0YWRvci4iIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iY2hrSXNEZXYiIENvbnRlbnQ9IkNvbmZpZ3VyYcOnw7VlcyBwYXJhIGRlc2Vudm9sdmVkb3JlcyAoUmVsw7NnaW8gVVRDIGUgRGlhZ27Ds3N0aWNvcykiIElzQ2hlY2tlZD0iRmFsc2UiIFRvb2xUaXA9IkNvbmZpZ3VyYSBvIHJlbMOzZ2lvIGRhIHBsYWNhLW3Do2UgZW0gVVRDIHBhcmEgc2luY3Jvbml6YcOnw6NvIGNvbSBMaW51eCBlIGhhYmlsaXRhIG1lbnNhZ2VucyBkZXRhbGhhZGFzIGRlIGJvb3QuIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1N0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9Cb3JkZXI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1N0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvR3JpZD4KCiAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQm90YW8gSW5kZXBlbmRlbnRlIGRlIEFwbGljYWNhbyBkYXMgT3RpbWl6YWNvZXMgLS0+CiAgICAgICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgQmFja2dyb3VuZD0iIzFBMUIyNiIgQm9yZGVyQnJ1c2g9IiMyRjM1NEYiIEJvcmRlclRoaWNrbmVzcz0iMSIgQ29ybmVyUmFkaXVzPSI4IiBQYWRkaW5nPSIxNCIgTWFyZ2luPSI2LDEwLDYsNiI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8R3JpZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8R3JpZC5Db2x1bW5EZWZpbml0aW9ucz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENvbHVtbkRlZmluaXRpb24gV2lkdGg9IioiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSJBdXRvIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvR3JpZC5Db2x1bW5EZWZpbml0aW9ucz4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJBcyBjb25maWd1cmHDp8O1ZXMgc8OjbyBhcGxpY2FkYXMgbm8gUmVnaXN0cm8gZSBub3Mgc2VydmnDp29zIGRvIHNpc3RlbWEgY29tIHJlaW5pY2lhbGl6YcOnw6NvIGxpbXBhIGRvIEV4cGxvcmFkb3IgZGUgQXJxdWl2b3MuIiBGb250U2l6ZT0iMTIiIEZvcmVncm91bmQ9IiM3OTgyQTkiIFZlcnRpY2FsQWxpZ25tZW50PSJDZW50ZXIiIC8+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuQXBwbHlPcHRpbWl6YXRpb25zIiBHcmlkLkNvbHVtbj0iMSIgQ29udGVudD0iQXBsaWNhciBPdGltaXphw6fDtWVzIFNlbGVjaW9uYWRhcyIgQmFja2dyb3VuZD0iIzE2QTM0QSIgQm9yZGVyQnJ1c2g9IiMyMkM1NUUiIEZvcmVncm91bmQ9IldoaXRlIiBGb250V2VpZ2h0PSJCb2xkIiBGb250U2l6ZT0iMTMiIFBhZGRpbmc9IjIwLDEwIiBDdXJzb3I9IkhhbmQiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uLlJlc291cmNlcz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTdHlsZSBUYXJnZXRUeXBlPSJCb3JkZXIiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTZXR0ZXIgUHJvcGVydHk9IkNvcm5lclJhZGl1cyIgVmFsdWU9IjgiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1N0eWxlPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbi5SZXNvdXJjZXM+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9CdXR0b24+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0dyaWQ+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgogICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KICAgICAgICAgICAgICAgIDwvU2Nyb2xsVmlld2VyPgogICAgICAgICAgICA8L1RhYkl0ZW0+CgogICAgICAgICAgICA8IS0tID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09IC0tPgogICAgICAgICAgICA8IS0tIEFCQSAzOiBSRUNVUlNPUyBPUENJT05BSVMgRE8gV0lORE9XUyAoRElTTSkgICAgICAgICAgICAgIC0tPgogICAgICAgICAgICA8IS0tID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09IC0tPgogICAgICAgICAgICA8VGFiSXRlbSBOYW1lPSJ0YWJJdGVtRmVhdHVyZXMiIEhlYWRlcj0iIFJlY3Vyc29zIE9wY2lvbmFpcyBkbyBXaW5kb3dzICI+CiAgICAgICAgICAgICAgICA8U2Nyb2xsVmlld2VyIFZlcnRpY2FsU2Nyb2xsQmFyVmlzaWJpbGl0eT0iQXV0byIgTWFyZ2luPSIxMCI+CiAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWw+CiAgICAgICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgQmFja2dyb3VuZD0iIzFBMUIyNiIgQm9yZGVyQnJ1c2g9IiMyRjM1NEYiIEJvcmRlclRoaWNrbmVzcz0iMSIgQ29ybmVyUmFkaXVzPSI4IiBQYWRkaW5nPSIxNCIgTWFyZ2luPSI2LDAsNiwxMCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IlJlY3Vyc29zIG9wY2lvbmFpcyBkbyBXaW5kb3dzIGdlcmVuY2lhZG9zIG5hdGl2YW1lbnRlIHZpYSBESVNNOiIgRm9udFNpemU9IjE1IiBGb250V2VpZ2h0PSJTZW1pQm9sZCIgRm9yZWdyb3VuZD0iI0M4RDNGNSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgPC9Cb3JkZXI+CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICA8Qm9yZGVyIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgUHJvZmlsZUNhcmR9Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgVGV4dD0iQ29tcG9uZW50ZXMgZSBSZWN1cnNvcyBkbyBTaXN0ZW1hIiBGb250U2l6ZT0iMTQiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvcmVncm91bmQ9IiM3RENGRkYiIE1hcmdpbj0iMCwwLDAsOCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iZmVhdE5ldEZ4MyIgQ29udGVudD0iLk5FVCBGcmFtZXdvcmsgMy41IChDb21wYXRpYmlsaWRhZGUgbGVnYWRhIGNvbSB2ZXJzw7VlcyAyLjAgZSAzLjApIiBJc0NoZWNrZWQ9IlRydWUiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImZlYXRXc2wiIENvbnRlbnQ9IlN1YnNpc3RlbWEgZG8gV2luZG93cyBwYXJhIExpbnV4IChXU0wyKSIgSXNDaGVja2VkPSJGYWxzZSIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tCb3ggTmFtZT0iZmVhdFZtUGxhdGZvcm0iIENvbnRlbnQ9IlBsYXRhZm9ybWEgZGUgTcOhcXVpbmEgVmlydHVhbCAoUHLDqS1yZXF1aXNpdG8gZG8gV1NMMikiIElzQ2hlY2tlZD0iRmFsc2UiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQm94IE5hbWU9ImZlYXRIeXBlclYiIENvbnRlbnQ9Ikh5cGVyLVYgKFZpcnR1YWxpemHDp8OjbyBuYXRpdmEgcGFyYSBtw6FxdWluYXMgdmlydHVhaXMgZSBEb2NrZXIpIiBJc0NoZWNrZWQ9IkZhbHNlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0JveCBOYW1lPSJmZWF0U2FuZGJveCIgQ29udGVudD0iV2luZG93cyBTYW5kYm94IChBbWJpZW50ZSBpc29sYWRvIHBhcmEgdGVzdGVzIHNlZ3Vyb3MpIiBJc0NoZWNrZWQ9IkZhbHNlIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgICAgICAgICA8L0JvcmRlcj4KCiAgICAgICAgICAgICAgICAgICAgICAgIDwhLS0gQm90YW8gSW5kZXBlbmRlbnRlIGRlIFJlY3Vyc29zIERJU00gLS0+CiAgICAgICAgICAgICAgICAgICAgICAgIDxCb3JkZXIgQmFja2dyb3VuZD0iIzFBMUIyNiIgQm9yZGVyQnJ1c2g9IiMyRjM1NEYiIEJvcmRlclRoaWNrbmVzcz0iMSIgQ29ybmVyUmFkaXVzPSI4IiBQYWRkaW5nPSIxNCIgTWFyZ2luPSI2LDEwLDYsNiI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8R3JpZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8R3JpZC5Db2x1bW5EZWZpbml0aW9ucz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENvbHVtbkRlZmluaXRpb24gV2lkdGg9IioiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDb2x1bW5EZWZpbml0aW9uIFdpZHRoPSJBdXRvIiAvPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvR3JpZC5Db2x1bW5EZWZpbml0aW9ucz4KCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCbG9jayBUZXh0PSJSZXF1ZXIgY29uZXjDo28gY29tIGEgaW50ZXJuZXQgcGFyYSBiYWl4YXIgYXJxdWl2b3MgZGUgY29tcG9uZW50ZXMgYWRpY2lvbmFpcyBkYSBNaWNyb3NvZnQuIiBGb250U2l6ZT0iMTIiIEZvcmVncm91bmQ9IiM3OTgyQTkiIFZlcnRpY2FsQWxpZ25tZW50PSJDZW50ZXIiIC8+CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuRW5hYmxlRmVhdHVyZXMiIEdyaWQuQ29sdW1uPSIxIiBDb250ZW50PSJIYWJpbGl0YXIgUmVjdXJzb3MgU2VsZWNpb25hZG9zIiBCYWNrZ3JvdW5kPSIjN0MzQUVEIiBCb3JkZXJCcnVzaD0iIzhCNUNGNiIgRm9yZWdyb3VuZD0iV2hpdGUiIEZvbnRXZWlnaHQ9IkJvbGQiIEZvbnRTaXplPSIxMyIgUGFkZGluZz0iMjAsMTAiIEN1cnNvcj0iSGFuZCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24uUmVzb3VyY2VzPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFN0eWxlIFRhcmdldFR5cGU9IkJvcmRlciI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFNldHRlciBQcm9wZXJ0eT0iQ29ybmVyUmFkaXVzIiBWYWx1ZT0iOCIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvU3R5bGU+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvQnV0dG9uLlJlc291cmNlcz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvR3JpZD4KICAgICAgICAgICAgICAgICAgICAgICAgPC9Cb3JkZXI+CiAgICAgICAgICAgICAgICAgICAgPC9TdGFja1BhbmVsPgogICAgICAgICAgICAgICAgPC9TY3JvbGxWaWV3ZXI+CiAgICAgICAgICAgIDwvVGFiSXRlbT4KCiAgICAgICAgICAgIDwhLS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gLS0+CiAgICAgICAgICAgIDwhLS0gQUJBIDQ6IFJFR0lTVFJPIEUgTE9HUyBFTSBURU1QTyBSRUFMICAgICAgICAgICAgICAgICAgICAgLS0+CiAgICAgICAgICAgIDwhLS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gLS0+CiAgICAgICAgICAgIDxUYWJJdGVtIE5hbWU9InRhYkl0ZW1Mb2ciIEhlYWRlcj0iIFJlZ2lzdHJvIGUgTG9ncyAiPgogICAgICAgICAgICAgICAgPEdyaWQgTWFyZ2luPSIxMCI+CiAgICAgICAgICAgICAgICAgICAgPEdyaWQuUm93RGVmaW5pdGlvbnM+CiAgICAgICAgICAgICAgICAgICAgICAgIDxSb3dEZWZpbml0aW9uIEhlaWdodD0iQXV0byIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgPFJvd0RlZmluaXRpb24gSGVpZ2h0PSIqIiAvPgogICAgICAgICAgICAgICAgICAgIDwvR3JpZC5Sb3dEZWZpbml0aW9ucz4KCiAgICAgICAgICAgICAgICAgICAgPFN0YWNrUGFuZWwgR3JpZC5Sb3c9IjAiIE9yaWVudGF0aW9uPSJIb3Jpem9udGFsIiBNYXJnaW49IjAsMCwwLDgiPgogICAgICAgICAgICAgICAgICAgICAgICA8VGV4dEJsb2NrIFRleHQ9IkFjb21wYW5oYW1lbnRvIGVtIHRlbXBvIHJlYWwgZGEgZXhlY3XDp8OjbyBlIGF1ZGl0b3JpYSBkZSBzaXN0ZW1hOiIgRm9udFNpemU9IjEzIiBGb3JlZ3JvdW5kPSIjNzk4MkE5IiBWZXJ0aWNhbEFsaWdubWVudD0iQ2VudGVyIiAvPgogICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIE5hbWU9ImJ0bk9wZW5Mb2dGb2xkZXIiIENvbnRlbnQ9IkFicmlyIFBhc3RhIGRlIExvZ3MiIFN0eWxlPSJ7U3RhdGljUmVzb3VyY2UgU2Vjb25kYXJ5QnV0dG9ufSIgTWFyZ2luPSIxMiwwLDAsMCIgUGFkZGluZz0iOCwzIiBGb250U2l6ZT0iMTEiIC8+CiAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gTmFtZT0iYnRuQ2xlYXJMb2dDb25zb2xlIiBDb250ZW50PSJMaW1wYXIgQ29uc29sZSIgU3R5bGU9IntTdGF0aWNSZXNvdXJjZSBTZWNvbmRhcnlCdXR0b259IiBNYXJnaW49IjgsMCwwLDAiIFBhZGRpbmc9IjgsMyIgRm9udFNpemU9IjExIiAvPgogICAgICAgICAgICAgICAgICAgIDwvU3RhY2tQYW5lbD4KCiAgICAgICAgICAgICAgICAgICAgPEJvcmRlciBHcmlkLlJvdz0iMSIgQmFja2dyb3VuZD0iIzBBMEIxMCIgQm9yZGVyQnJ1c2g9IiMyRjM1NEYiIEJvcmRlclRoaWNrbmVzcz0iMSIgQ29ybmVyUmFkaXVzPSI4IiBQYWRkaW5nPSI4Ij4KICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRCb3ggTmFtZT0idHh0Q29uc29sZUxvZyIgQmFja2dyb3VuZD0iVHJhbnNwYXJlbnQiIEZvcmVncm91bmQ9IiM5RUNFNkEiIEZvbnRGYW1pbHk9IkNvbnNvbGFzLCBDYXNjYWRpYSBDb2RlLCBDb3VyaWVyIE5ldyIgRm9udFNpemU9IjEyIiBJc1JlYWRPbmx5PSJUcnVlIiBCb3JkZXJUaGlja25lc3M9IjAiIFRleHRXcmFwcGluZz0iV3JhcCIgVmVydGljYWxTY3JvbGxCYXJWaXNpYmlsaXR5PSJBdXRvIiBUZXh0PSJERVdJTiBCb29zdGVyIHByb250by4gU2VsZWNpb25lIHByb2dyYW1hcyBvdSBvdGltaXphw6fDtWVzIHBhcmEgY29tZcOnYXIuIiAvPgogICAgICAgICAgICAgICAgICAgIDwvQm9yZGVyPgogICAgICAgICAgICAgICAgPC9HcmlkPgogICAgICAgICAgICA8L1RhYkl0ZW0+CgogICAgICAgIDwvVGFiQ29udHJvbD4KCiAgICAgICAgPCEtLSAzLiBST0RBUEUgR0xPQkFMIERFIFNUQVRVUyAmIFBST0dSRVNTTyAtLT4KICAgICAgICA8Qm9yZGVyIEdyaWQuUm93PSIyIiBCYWNrZ3JvdW5kPSIjMUExQjI2IiBCb3JkZXJCcnVzaD0iIzJGMzU0RiIgQm9yZGVyVGhpY2tuZXNzPSIxIiBDb3JuZXJSYWRpdXM9IjEwIiBQYWRkaW5nPSIxNCwxMCIgTWFyZ2luPSIwLDEyLDAsMCI+CiAgICAgICAgICAgIDxHcmlkPgogICAgICAgICAgICAgICAgPEdyaWQuUm93RGVmaW5pdGlvbnM+CiAgICAgICAgICAgICAgICAgICAgPFJvd0RlZmluaXRpb24gSGVpZ2h0PSJBdXRvIiAvPgogICAgICAgICAgICAgICAgICAgIDxSb3dEZWZpbml0aW9uIEhlaWdodD0iQXV0byIgLz4KICAgICAgICAgICAgICAgIDwvR3JpZC5Sb3dEZWZpbml0aW9ucz4KCiAgICAgICAgICAgICAgICA8IS0tIEJhcnJhIGRlIFByb2dyZXNzbyBlIFN0YXR1cyAtLT4KICAgICAgICAgICAgICAgIDxHcmlkIEdyaWQuUm93PSIwIiBNYXJnaW49IjAsMCwwLDgiPgogICAgICAgICAgICAgICAgICAgIDxHcmlkLkNvbHVtbkRlZmluaXRpb25zPgogICAgICAgICAgICAgICAgICAgICAgICA8Q29sdW1uRGVmaW5pdGlvbiBXaWR0aD0iKiIgLz4KICAgICAgICAgICAgICAgICAgICAgICAgPENvbHVtbkRlZmluaXRpb24gV2lkdGg9IkF1dG8iIC8+CiAgICAgICAgICAgICAgICAgICAgPC9HcmlkLkNvbHVtbkRlZmluaXRpb25zPgogICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgTmFtZT0ibGJsUHJvZ3Jlc3NTdGF0dXMiIFRleHQ9IlByb250by4gU2VsZWNpb25lIGFzIGNvbmZpZ3VyYcOnw7VlcyBkZXNlamFkYXMgbmFzIGFiYXMgYWNpbWEuIiBGb250U2l6ZT0iMTMiIEZvbnRXZWlnaHQ9IlNlbWlCb2xkIiBGb3JlZ3JvdW5kPSIjQzhEM0Y1IiBWZXJ0aWNhbEFsaWdubWVudD0iQ2VudGVyIiAvPgogICAgICAgICAgICAgICAgICAgIDxUZXh0QmxvY2sgTmFtZT0ibGJsUHJvZ3Jlc3NQZXJjZW50IiBHcmlkLkNvbHVtbj0iMSIgVGV4dD0iMCUiIEZvbnRTaXplPSIxMyIgRm9udFdlaWdodD0iQm9sZCIgRm9yZWdyb3VuZD0iIzdEQ0ZGRiIgVmVydGljYWxBbGlnbm1lbnQ9IkNlbnRlciIgLz4KICAgICAgICAgICAgICAgIDwvR3JpZD4KICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgPFByb2dyZXNzQmFyIE5hbWU9InBiRXhlY3V0aW9uIiBHcmlkLlJvdz0iMSIgSGVpZ2h0PSIxMCIgTWluaW11bT0iMCIgTWF4aW11bT0iMTAwIiBCYWNrZ3JvdW5kPSIjMjQyODNCIiBGb3JlZ3JvdW5kPSIjN0RDRkZGIiBCb3JkZXJUaGlja25lc3M9IjAiIFZhbHVlPSIwIiAvPgogICAgICAgICAgICA8L0dyaWQ+CiAgICAgICAgPC9Cb3JkZXI+CgogICAgPC9HcmlkPgo8L1dpbmRvdz4K
+'@))
 
 # ==============================================================================
 # DEWIN Entrypoint Principal
@@ -1960,7 +1511,7 @@ try {
     $hw = Get-DewinHardwareInfo
 
     if ($Profile -ne 'GUI' -or $Silent) {
-        # Execucao em Modo Linha de Comando (Headless / Silencioso)
+        # Execução em Modo Linha de Comando (Headless / Silencioso)
         $chosenPreset = if ($Profile -eq 'GUI') { $hw.RecommendedProfile } else { $Profile }
         Write-Host "Iniciando DEWIN Booster em modo CLI com perfil: $chosenPreset" -ForegroundColor Cyan
         $presetData = Get-DewinPreset -Name $chosenPreset
@@ -1970,12 +1521,12 @@ try {
             if ($r -match '^[sSyY]') { Restart-Computer }
         }
     } else {
-        # Execucao em Modo Interface Grafica (WPF)
+        # Execução em Modo Interface Gráfica (WPF)
         Start-DewinGui -XamlString $global:DewinXaml -Hardware $hw
     }
 } catch {
     Write-Host ""
-    Write-Host "[!] Erro fatal durante a execucao do DEWIN:" -ForegroundColor Red
+    Write-Host "[!] Erro fatal durante a execução do DEWIN:" -ForegroundColor Red
     Write-Host $_.Exception.ToString() -ForegroundColor Red
     Write-Host ""
     Write-Host "Pressione Enter para fechar..." -ForegroundColor Yellow

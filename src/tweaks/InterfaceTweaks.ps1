@@ -27,7 +27,7 @@ function Invoke-DewinInterfaceTweaks {
         [switch]$AlwaysShowScrollbars = $true
     )
 
-    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizacoes de interface e barra de tarefas...'
+    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizações de interface e barra de tarefas...'
     $advExplorer = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
 
     # Barra de tarefas: Ocultar caixa de pesquisa

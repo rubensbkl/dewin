@@ -12,7 +12,7 @@ function Get-DewinHardwareInfo {
         Model            = 'Desconhecido'
         Processor        = 'Processador'
         RamTotalGB       = 0
-        GpuNames         = 'Nao detectada'
+        GpuNames         = 'Não detectada'
         WinVersion       = 'Windows 11'
         WinBuild         = 0
         IsLaptop         = $false

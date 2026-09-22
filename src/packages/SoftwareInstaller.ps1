@@ -9,7 +9,7 @@ function Get-DewinSoftwareCatalog {
     return @(
         @{ Id = 'Microsoft.VCRedist.2015+.x64'; Name = 'Visual C++ 2015-2022 (x64)'; Category = 'Essenciais'; Default = $true },
         @{ Id = 'Microsoft.VCRedist.2015+.x86'; Name = 'Visual C++ 2015-2022 (x86)'; Category = 'Essenciais'; Default = $true },
-        @{ Id = '7zip.7zip';                   Name = '7-Zip (Compactador Ultra-Rápido)'; Category = 'Essenciais'; Default = $true },
+        @{ Id = '7zip.7zip';                   Name = '7-Zip (Compactador de Arquivos)'; Category = 'Essenciais'; Default = $true },
         @{ Id = 'Google.Chrome';               Name = 'Google Chrome'; Category = 'Navegadores'; Default = $true },
         @{ Id = 'Microsoft.VisualStudioCode';  Name = 'Visual Studio Code'; Category = 'Desenvolvimento'; Default = $false },
         @{ Id = 'Git.Git';                     Name = 'Git for Windows'; Category = 'Desenvolvimento'; Default = $false },
@@ -29,7 +29,7 @@ function Install-DewinSoftware {
 
     if (-not $AppIds -or $AppIds.Count -eq 0) { return }
 
-    Write-DewinLog -Level STEP -Message "[*] Iniciando instalacao de $($AppIds.Count) pacotes via Winget..."
+    Write-DewinLog -Level STEP -Message "[*] Iniciando instalação de $($AppIds.Count) pacotes via Winget..."
 
     $hasInternet = $false
     try {
@@ -37,7 +37,7 @@ function Install-DewinSoftware {
     } catch {}
 
     if (-not $hasInternet) {
-        Write-DewinLog -Level WARN -Message '  [!] Sem conexao com a internet. Instalacao de pacotes ignorada.'
+        Write-DewinLog -Level WARN -Message '  [!] Sem conexão com a internet. Instalação de pacotes ignorada.'
         return
     }
 
@@ -61,7 +61,7 @@ function Install-DewinSoftware {
             if ($wingetProc.ExitCode -eq 0) {
                 Write-DewinLog -Level SUCCESS -Message "  [+] $appName instalado com sucesso."
             } else {
-                Write-DewinLog -Level INFO -Message "  [i] Winget $appName finalizou com codigo $($wingetProc.ExitCode)" -NoConsole
+                Write-DewinLog -Level INFO -Message "  [i] Winget $appName finalizou com código $($wingetProc.ExitCode)" -NoConsole
             }
         } catch {
             Write-DewinLog -Level WARN -Message "  [!] Falha ao instalar ${appName}: $($_.Exception.Message)"

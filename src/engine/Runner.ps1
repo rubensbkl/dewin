@@ -22,7 +22,7 @@ function Invoke-DewinTweaksOnly {
         if ($OnProgress) { try { & $OnProgress $Percent $Status } catch {} }
     }
 
-    & $updateProgress 5 "Inicializando auditoria e configuracoes de sistema..."
+    & $updateProgress 5 "Inicializando auditoria e configurações de sistema..."
 
     # 1. Cabecalho de Auditoria
     Write-DewinLog -Level RAW -Message '=================================================================='
@@ -30,13 +30,13 @@ function Invoke-DewinTweaksOnly {
     Write-DewinLog -Level RAW -Message "Data e Hora: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Write-DewinLog -Level RAW -Message "Sistema Operacional: $($Hardware.WinVersion) (Build $($Hardware.WinBuild))"
     Write-DewinLog -Level RAW -Message "Dispositivo: $($Hardware.Manufacturer) $($Hardware.Model) ($($Hardware.DeviceTypeStr))"
-    Write-DewinLog -Level RAW -Message "Memoria RAM: $($Hardware.RamTotalGB) GB"
+    Write-DewinLog -Level RAW -Message "Memória RAM: $($Hardware.RamTotalGB) GB"
     Write-DewinLog -Level RAW -Message "GPU(s): $($Hardware.GpuNames)"
-    Write-DewinLog -Level RAW -Message "Usuario Administrador: $($Hardware.IsAdmin)"
+    Write-DewinLog -Level RAW -Message "Usuário Administrador: $($Hardware.IsAdmin)"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
     # 2. Calibrações de Sistema, GPU e Energia
-    & $updateProgress 15 "Calibrando GPU, energia e servicos de sistema..."
+    & $updateProgress 15 "Configurando tolerâncias gráficas, energia e serviços..."
     Invoke-DewinSystemTweaks -IsLaptop ([bool]$Tweaks['IsLaptop']) `
                             -IsDev ([bool]$Tweaks['IsDev']) `
                             -RamGB ([int]$Hardware.RamTotalGB) `
@@ -56,12 +56,12 @@ function Invoke-DewinTweaksOnly {
                              -DebloatEdge:([bool]$Tweaks['DebloatEdge'])
 
     if ([bool]$Tweaks['RemoveUwpBloat']) {
-        & $updateProgress 50 "Removendo bloatwares UWP de terceiros..."
+        & $updateProgress 50 "Removendo aplicativos pré-instalados desnecessários..."
         Invoke-DewinDebloat
     }
 
     # 4. Interface e Barra de Tarefas
-    & $updateProgress 65 "Otimizando interface, barra de tarefas e Explorer..."
+    & $updateProgress 65 "Otimizando interface, barra de tarefas e Explorador de Arquivos..."
     Invoke-DewinInterfaceTweaks -HideSearch:([bool]$Tweaks['HideSearch']) `
                                -HideTaskView:([bool]$Tweaks['HideTaskView']) `
                                -CenterTaskbar:([bool]$Tweaks['CenterTaskbar']) `
@@ -72,7 +72,7 @@ function Invoke-DewinTweaksOnly {
                                -AlwaysShowScrollbars:([bool]$Tweaks['AlwaysShowScrollbars'])
 
     # 5. Desempenho e Latência
-    & $updateProgress 80 "Calibrando latencia de rede, GameDVR e SSD..."
+    & $updateProgress 80 "Otimizando latência de rede, gravação de jogos e SSD..."
     Invoke-DewinPerformanceTweaks -OptimizeNetworkLatency:([bool]$Tweaks['OptimizeNetworkLatency']) `
                                  -DisableGameDVR:([bool]$Tweaks['DisableGameDVR']) `
                                  -LinearMouse:([bool]$Tweaks['LinearMouse']) `
@@ -82,7 +82,7 @@ function Invoke-DewinTweaksOnly {
                                  -CleanTempFiles:([bool]$Tweaks['CleanTempFiles'])
 
     # 6. Reiniciar Explorer
-    & $updateProgress 95 "Atualizando o Windows Explorer..."
+    & $updateProgress 95 "Reiniciando o Windows Explorer..."
     Restart-DewinExplorer
 
     # 7. Conclusão e Sumário
@@ -90,14 +90,14 @@ function Invoke-DewinTweaksOnly {
     Write-DewinLog -Level RAW -Message '=================================================================='
     Write-DewinLog -Level RAW -Message "OTIMIZAÇÕES APLICADAS COM SUCESSO"
     Write-DewinLog -Level RAW -Message "Tempo Total: $elapsedSec segundos"
-    Write-DewinLog -Level RAW -Message "Estatisticas: Sucessos=$($global:DewinStats.Success), Avisos=$($global:DewinStats.Warnings), Erros=$($global:DewinStats.Errors)"
+    Write-DewinLog -Level RAW -Message "Estatísticas: Sucessos=$($global:DewinStats.Success), Avisos=$($global:DewinStats.Warnings), Erros=$($global:DewinStats.Errors)"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
     try {
         Copy-Item -Path $global:DewinLogPath -Destination $global:DewinLatestLog -Force -ErrorAction SilentlyContinue
     } catch {}
 
-    & $updateProgress 100 "Otimizações finalizadas com sucesso em $elapsedSec s!"
+    & $updateProgress 100 "Otimizações aplicadas com sucesso em $elapsedSec s."
 }
 
 function Invoke-DewinSoftwaresOnly {
@@ -119,12 +119,12 @@ function Invoke-DewinSoftwaresOnly {
 
     & $updateProgress 5 "Inicializando gerenciador de pacotes Winget..."
     Write-DewinLog -Level RAW -Message '=================================================================='
-    Write-DewinLog -Level RAW -Message "DEWIN BOOSTER - INSTALACAO DE SOFTWARES"
+    Write-DewinLog -Level RAW -Message "DEWIN BOOSTER - INSTALAÇÃO DE SOFTWARES"
     Write-DewinLog -Level RAW -Message "Data e Hora: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Write-DewinLog -Level RAW -Message "Quantidade de Softwares Selecionados: $($Apps.Count)"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
-    & $updateProgress 10 "Instalando $($Apps.Count) softwares selecionados via Winget..."
+    & $updateProgress 10 "Instalando $($Apps.Count) programas selecionados via Winget..."
     Install-DewinSoftware -AppIds $Apps -OnProgress {
         param($pct, $msg)
         & $updateProgress $pct $msg
@@ -132,7 +132,7 @@ function Invoke-DewinSoftwaresOnly {
 
     $elapsedSec = if ($global:DewinTimer) { [math]::Round($global:DewinTimer.Elapsed.TotalSeconds, 1) } else { 0 }
     Write-DewinLog -Level RAW -Message '=================================================================='
-    Write-DewinLog -Level RAW -Message "INSTALACAO DE SOFTWARES FINALIZADA"
+    Write-DewinLog -Level RAW -Message "INSTALAÇÃO DE SOFTWARES FINALIZADA"
     Write-DewinLog -Level RAW -Message "Tempo Total: $elapsedSec segundos"
     Write-DewinLog -Level RAW -Message '=================================================================='
 
@@ -140,7 +140,7 @@ function Invoke-DewinSoftwaresOnly {
         Copy-Item -Path $global:DewinLogPath -Destination $global:DewinLatestLog -Force -ErrorAction SilentlyContinue
     } catch {}
 
-    & $updateProgress 100 "Instalação de programas finalizada em $elapsedSec s!"
+    & $updateProgress 100 "Instalação de programas finalizada em $elapsedSec s."
 }
 
 function Invoke-DewinFeaturesOnly {
@@ -160,7 +160,7 @@ function Invoke-DewinFeaturesOnly {
         if ($OnProgress) { try { & $OnProgress $Percent $Status } catch {} }
     }
 
-    & $updateProgress 5 "Inicializando modulo DISM do Windows..."
+    & $updateProgress 5 "Inicializando módulo DISM do Windows..."
     Write-DewinLog -Level RAW -Message '=================================================================='
     Write-DewinLog -Level RAW -Message "DEWIN BOOSTER - RECURSOS OPCIONAIS DO WINDOWS"
     Write-DewinLog -Level RAW -Message "Data e Hora: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -182,7 +182,7 @@ function Invoke-DewinFeaturesOnly {
         Copy-Item -Path $global:DewinLogPath -Destination $global:DewinLatestLog -Force -ErrorAction SilentlyContinue
     } catch {}
 
-    & $updateProgress 100 "Recursos do Windows configurados em $elapsedSec s!"
+    & $updateProgress 100 "Recursos opcionais configurados com sucesso em $elapsedSec s."
 }
 
 function Invoke-DewinExecution {

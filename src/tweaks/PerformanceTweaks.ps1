@@ -14,7 +14,7 @@ function Invoke-DewinPerformanceTweaks {
         [switch]$CleanTempFiles = $true
     )
 
-    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizacoes de desempenho, latencia e SSD...'
+    Write-DewinLog -Level STEP -Message '[*] Aplicando otimizações de desempenho, latência e SSD...'
 
     # Latência de Rede e Priorização Multimídia/Jogos
     if ($OptimizeNetworkLatency) {
@@ -31,7 +31,7 @@ function Invoke-DewinPerformanceTweaks {
         Set-DewinReg -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Name 'HistoricalCaptureEnabled' -Value 0
     }
 
-    # Resposta Linear do Mouse (1:1 sem aceleracao)
+    # Resposta Linear do Mouse (1:1 sem aceleração)
     if ($LinearMouse) {
         Set-DewinReg -Path 'HKCU:\Control Panel\Mouse' -Name 'MouseSpeed' -Value '0' -Type 'String'
         Set-DewinReg -Path 'HKCU:\Control Panel\Mouse' -Name 'MouseThreshold1' -Value '0' -Type 'String'
@@ -61,5 +61,5 @@ function Invoke-DewinPerformanceTweaks {
         Remove-Item -Path "$Env:SystemRoot\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    Write-DewinLog -Level SUCCESS -Message '  [+] Desempenho, latencia de rede, GameDVR e SSD calibrados.'
+    Write-DewinLog -Level SUCCESS -Message '  [+] Desempenho, latência de rede, GameDVR e SSD calibrados.'
 }

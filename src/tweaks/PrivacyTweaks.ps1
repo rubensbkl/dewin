@@ -102,5 +102,5 @@ function Invoke-DewinDebloat {
         } catch {}
     }
 
-    Write-DewinLog -Level SUCCESS -Message "  [+] Limpeza de $removedCount bloatwares concluida."
+    Write-DewinLog -Level SUCCESS -Message "  [+] Limpeza de $removedCount bloatwares concluída."
 }

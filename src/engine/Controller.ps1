@@ -62,9 +62,9 @@ function Start-DewinGui {
     $gui['txtDeviceType'].Text = "$($Hardware.DeviceTypeStr) Detectado"
 
     $recText = if ($Hardware.IsLaptop) {
-        "💡 Notebook identificado! Recomendamos o Perfil [3] Notebook Dev (se for programador) ou [4] Notebook Geral (para máxima autonomia de bateria e jogos)."
+        "Notebook identificado. Perfil recomendado: 'Notebook - Desenvolvimento' (para desenvolvedores) ou 'Notebook - Geral e Autonomia' (para máxima duração de bateria e jogos)."
     } else {
-        "💡 Desktop identificado! Recomendamos o Perfil [1] Desktop Dev (se for programador) ou [2] Desktop Geral / Jogos (para máxima taxa de FPS e menor latência)."
+        "Desktop identificado. Perfil recomendado: 'Desktop - Desenvolvimento' (para desenvolvedores) ou 'Desktop - Geral e Jogos' (para máxima taxa de FPS e menor latência)."
     }
     $gui['txtRecommendation'].Text = $recText
 
@@ -301,7 +301,7 @@ function Start-DewinGui {
             return
         }
 
-        $gui['btnInstallSoftwares'].Content = "⏳ INSTALANDO PROGRAMAS..."
+        $gui['btnInstallSoftwares'].Content = "Instalando programas..."
 
         & $runDewinAsync "Instalação de Softwares via Winget" {
             param($AppsArg)
@@ -318,11 +318,11 @@ function Start-DewinGui {
             }
         } @(,$selectedApps) {
             param($s)
-            $gui['btnInstallSoftwares'].Content = "$([char]::ConvertFromUtf32(0x1F4E5)) BAIXAR / INSTALAR PROGRAMAS SELECIONADOS"
+            $gui['btnInstallSoftwares'].Content = "Instalar Programas Selecionados"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "⚠️ Falha ao instalar softwares: $($s.Error)"
+                $gui['lblProgressStatus'].Text = "Falha na instalação de programas: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
-                    "Ocorreu um erro ao instalar os softwares:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro & Log.",
+                    "Ocorreu um erro ao instalar os programas selecionados:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
@@ -330,9 +330,9 @@ function Start-DewinGui {
             } else {
                 $gui['pbExecution'].Value = 100
                 $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Softwares instalados/atualizados com sucesso!"
+                $gui['lblProgressStatus'].Text = "Programas instalados e atualizados com sucesso."
                 [System.Windows.MessageBox]::Show(
-                    "Os softwares selecionados foram instalados ou atualizados com sucesso via Winget!",
+                    "Os programas selecionados foram instalados ou atualizados com sucesso via Winget.",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Information
@@ -350,7 +350,7 @@ function Start-DewinGui {
         }
         $selectedTweaks['IsLaptop'] = [bool]$Hardware.IsLaptop
 
-        $gui['btnApplyOptimizations'].Content = "⏳ APLICANDO OTIMIZAÇÕES..."
+        $gui['btnApplyOptimizations'].Content = "Aplicando otimizações..."
 
         & $runDewinAsync "Otimizações do Sistema" {
             param($TweaksArg, $HwArg)
@@ -367,11 +367,11 @@ function Start-DewinGui {
             }
         } @($selectedTweaks, $Hardware) {
             param($s)
-            $gui['btnApplyOptimizations'].Content = "⚡ APLICAR OTIMIZAÇÕES SELECIONADAS"
+            $gui['btnApplyOptimizations'].Content = "Aplicar Otimizações Selecionadas"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "⚠️ Falha nas otimizações: $($s.Error)"
+                $gui['lblProgressStatus'].Text = "Falha na aplicação de otimizações: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
-                    "Ocorreu um erro durante as otimizações:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro & Log.",
+                    "Ocorreu um erro durante as otimizações:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
@@ -379,9 +379,9 @@ function Start-DewinGui {
             } else {
                 $gui['pbExecution'].Value = 100
                 $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Otimizações finalizadas com sucesso!"
+                $gui['lblProgressStatus'].Text = "Otimizações aplicadas com sucesso."
                 $res = [System.Windows.MessageBox]::Show(
-                    "Otimizações aplicadas com sucesso!`r`n`r`nRecomenda-se reiniciar o computador para que todas as alterações de kernel e serviços entrem em vigor.`r`nDeseja reiniciar agora?",
+                    "Otimizações aplicadas com sucesso.`r`n`r`nRecomenda-se reiniciar o computador para que todas as alterações entrem em vigor.`r`nDeseja reiniciar agora?",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::YesNo,
                     [System.Windows.MessageBoxImage]::Information
@@ -410,7 +410,7 @@ function Start-DewinGui {
             return
         }
 
-        $gui['btnEnableFeatures'].Content = "⏳ HABILITANDO RECURSOS..."
+        $gui['btnEnableFeatures'].Content = "Habilitando recursos..."
 
         & $runDewinAsync "Recursos Opcionais do Windows (DISM)" {
             param($FeatsArg)
@@ -427,11 +427,11 @@ function Start-DewinGui {
             }
         } @(,$selectedFeats) {
             param($s)
-            $gui['btnEnableFeatures'].Content = "⚙️ HABILITAR RECURSOS SELECIONADOS"
+            $gui['btnEnableFeatures'].Content = "Habilitar Recursos Selecionados"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "⚠️ Falha nos recursos DISM: $($s.Error)"
+                $gui['lblProgressStatus'].Text = "Falha na habilitação de recursos DISM: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
-                    "Ocorreu um erro ao configurar os recursos:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro & Log.",
+                    "Ocorreu um erro ao configurar os recursos:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
@@ -439,9 +439,9 @@ function Start-DewinGui {
             } else {
                 $gui['pbExecution'].Value = 100
                 $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Recursos opcionais habilitados com sucesso!"
+                $gui['lblProgressStatus'].Text = "Recursos opcionais habilitados com sucesso."
                 [System.Windows.MessageBox]::Show(
-                    "Recursos opcionais habilitados com sucesso via DISM!",
+                    "Recursos opcionais habilitados com sucesso via DISM.",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Information

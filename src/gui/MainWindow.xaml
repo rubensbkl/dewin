@@ -1,6 +1,6 @@
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DEWIN Booster - Otimizador &amp; Debloater do Windows"
+        Title="DEWIN Booster - Otimizador e Gerenciador do Windows"
         Height="800" Width="1100" MinHeight="700" MinWidth="980"
         WindowStartupLocation="CenterScreen"
         Background="#0F111A" Foreground="#C8D3F5"
@@ -84,9 +84,9 @@
 
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="⚡ DEWIN BOOSTER" FontSize="20" FontWeight="Bold" Foreground="#7DCFFF" VerticalAlignment="Center" />
+                        <TextBlock Text="DEWIN BOOSTER" FontSize="20" FontWeight="Bold" Foreground="#7DCFFF" VerticalAlignment="Center" />
                         <Border Background="#24283B" CornerRadius="5" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="100% Nativo &amp; Open-Source" FontSize="11" Foreground="#9ECE6A" FontWeight="SemiBold" />
+                            <TextBlock Text="Nativo e de Código Aberto" FontSize="11" Foreground="#9ECE6A" FontWeight="SemiBold" />
                         </Border>
                     </StackPanel>
                     <TextBlock Name="txtHardwareBanner" Text="Detectando componentes de hardware..." FontSize="12" Foreground="#7982A9" Margin="0,5,0,0" />
@@ -104,9 +104,9 @@
         <TabControl Name="mainTabControl" Grid.Row="1" Background="#13141F" BorderBrush="#2F354F">
             
             <!-- ======================================================== -->
-            <!-- ABA 1: PROGRAMAS & SOFTWARES (TELA INICIAL)             -->
+            <!-- ABA 1: PROGRAMAS & APLICATIVOS (TELA INICIAL)            -->
             <!-- ======================================================== -->
-            <TabItem Name="tabItemSoftwares" Header=" 📦 Programas &amp; Softwares ">
+            <TabItem Name="tabItemSoftwares" Header=" Programas e Aplicativos ">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
                     <StackPanel>
                         <!-- Cabecalho e Acoes Rapidas -->
@@ -118,14 +118,14 @@
                                 </Grid.ColumnDefinitions>
                                 
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock Text="Instalação e Atualização Oficial via Winget" FontSize="16" FontWeight="Bold" Foreground="#7DCFFF" />
-                                    <TextBlock Text="Selecione os softwares que deseja instalar silenciosamente no computador:" FontSize="12" Foreground="#7982A9" Margin="0,3,0,0" />
+                                    <TextBlock Text="Instalação e Atualização de Softwares via Winget" FontSize="16" FontWeight="Bold" Foreground="#7DCFFF" />
+                                    <TextBlock Text="Selecione os programas que deseja instalar silenciosamente no computador:" FontSize="12" Foreground="#7982A9" Margin="0,3,0,0" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button Name="btnSelectEssentialApps" Content="⭐ Essenciais" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" ToolTip="Seleciona VC++, 7-Zip e Chrome" />
-                                    <Button Name="btnSelectAllApps" Content="✓ Marcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
-                                    <Button Name="btnDeselectAllApps" Content="✗ Desmarcar Todos" Style="{StaticResource SecondaryButton}" />
+                                    <Button Name="btnSelectEssentialApps" Content="Essenciais" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" ToolTip="Seleciona Visual C++, 7-Zip e Google Chrome" />
+                                    <Button Name="btnSelectAllApps" Content="Marcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
+                                    <Button Name="btnDeselectAllApps" Content="Desmarcar Todos" Style="{StaticResource SecondaryButton}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -141,17 +141,17 @@
                             <StackPanel Grid.Column="0">
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="🛠️ Runtimes &amp; Utilitários Essenciais" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                        <CheckBox Name="appVcRedist64" Content="Visual C++ 2015-2022 (x64) - Essencial para Jogos e Softwares" IsChecked="True" />
-                                        <CheckBox Name="appVcRedist86" Content="Visual C++ 2015-2022 (x86) - Compatibilidade de Jogos 32-bit" IsChecked="True" />
-                                        <CheckBox Name="app7zip" Content="7-Zip - Compactador e Descompactador Ultra-Rápido" IsChecked="True" />
+                                        <TextBlock Text="Runtimes e Utilitários Essenciais" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
+                                        <CheckBox Name="appVcRedist64" Content="Visual C++ 2015-2022 (x64) - Pré-requisito para jogos e programas" IsChecked="True" />
+                                        <CheckBox Name="appVcRedist86" Content="Visual C++ 2015-2022 (x86) - Compatibilidade de aplicativos 32-bit" IsChecked="True" />
+                                        <CheckBox Name="app7zip" Content="7-Zip - Compactador e descompactador de alta performance" IsChecked="True" />
                                     </StackPanel>
                                 </Border>
 
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="🌐 Navegadores Web" FontSize="14" FontWeight="Bold" Foreground="#9ECE6A" Margin="0,0,0,8" />
-                                        <CheckBox Name="appChrome" Content="Google Chrome - Navegador Web Rápido e Seguro" IsChecked="True" />
+                                        <TextBlock Text="Navegadores Web" FontSize="14" FontWeight="Bold" Foreground="#9ECE6A" Margin="0,0,0,8" />
+                                        <CheckBox Name="appChrome" Content="Google Chrome - Navegador web moderno e seguro" IsChecked="True" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -160,19 +160,19 @@
                             <StackPanel Grid.Column="1">
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="💻 Ferramentas de Desenvolvimento" FontSize="14" FontWeight="Bold" Foreground="#BB9AF7" Margin="0,0,0,8" />
-                                        <CheckBox Name="appVsCode" Content="Visual Studio Code - Editor de Código da Microsoft" IsChecked="False" />
-                                        <CheckBox Name="appGit" Content="Git for Windows - Sistema de Controle de Versão" IsChecked="False" />
+                                        <TextBlock Text="Ferramentas de Desenvolvimento" FontSize="14" FontWeight="Bold" Foreground="#BB9AF7" Margin="0,0,0,8" />
+                                        <CheckBox Name="appVsCode" Content="Visual Studio Code - Editor de código da Microsoft" IsChecked="False" />
+                                        <CheckBox Name="appGit" Content="Git for Windows - Sistema distribuído de controle de versão" IsChecked="False" />
                                     </StackPanel>
                                 </Border>
 
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="🎮 Jogos, Áudio &amp; Comunicação" FontSize="14" FontWeight="Bold" Foreground="#E0AF68" Margin="0,0,0,8" />
-                                        <CheckBox Name="appDiscord" Content="Discord - Comunicação por Voz, Vídeo e Chat" IsChecked="False" />
-                                        <CheckBox Name="appSteam" Content="Steam - Plataforma de Jogos e Comunidade" IsChecked="False" />
-                                        <CheckBox Name="appVlc" Content="VLC Media Player - Reprodutor de Áudio e Vídeo Universal" IsChecked="False" />
-                                        <CheckBox Name="appSpotify" Content="Spotify - Música e Podcasts em Streaming" IsChecked="False" />
+                                        <TextBlock Text="Comunicação, Mídia e Jogos" FontSize="14" FontWeight="Bold" Foreground="#E0AF68" Margin="0,0,0,8" />
+                                        <CheckBox Name="appDiscord" Content="Discord - Comunicação por voz, vídeo e texto" IsChecked="False" />
+                                        <CheckBox Name="appSteam" Content="Steam - Plataforma de jogos e comunidade digital" IsChecked="False" />
+                                        <CheckBox Name="appVlc" Content="VLC Media Player - Reprodutor de áudio e vídeo universal" IsChecked="False" />
+                                        <CheckBox Name="appSpotify" Content="Spotify - Streaming de música e podcasts" IsChecked="False" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -186,9 +186,9 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="💡 A instalação é feita em segundo plano via Winget oficial sem interromper suas atividades." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
+                                <TextBlock Text="A instalação é realizada em segundo plano via Winget oficial, sem interromper as atividades em execução." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
                                 
-                                <Button Name="btnInstallSoftwares" Grid.Column="1" Content="📥 BAIXAR / INSTALAR PROGRAMAS SELECIONADOS" Background="#2563EB" BorderBrush="#3B82F6" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
+                                <Button Name="btnInstallSoftwares" Grid.Column="1" Content="Instalar Programas Selecionados" Background="#2563EB" BorderBrush="#3B82F6" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
                                     <Button.Resources>
                                         <Style TargetType="Border">
                                             <Setter Property="CornerRadius" Value="8" />
@@ -202,9 +202,9 @@
             </TabItem>
 
             <!-- ======================================================== -->
-            <!-- ABA 2: OTIMIZACOES, PERFIS & TWEAKS                      -->
+            <!-- ABA 2: OTIMIZACOES DO SISTEMA E PERFIS                   -->
             <!-- ======================================================== -->
-            <TabItem Name="tabItemTweaks" Header=" ⚡ Otimizações &amp; Perfis ">
+            <TabItem Name="tabItemTweaks" Header=" Otimizações do Sistema ">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
                     <StackPanel>
                         <!-- Notificacao de Recomendacao de Hardware -->
@@ -213,45 +213,45 @@
                         </Border>
 
                         <!-- Seção dos 4 Perfis Rápidos de 1 Clique -->
-                        <TextBlock Text="⚡ Perfis Rápidos Prontos (Clique para configurar automaticamente os tweaks):" FontSize="14" FontWeight="SemiBold" Foreground="#C8D3F5" Margin="8,4,8,8" />
+                        <TextBlock Text="Perfis Recomendados de Configuração:" FontSize="14" FontWeight="SemiBold" Foreground="#C8D3F5" Margin="8,4,8,8" />
                         <UniformGrid Columns="2" Margin="0,0,0,10">
                             <!-- Card Desktop Dev -->
                             <Border Style="{StaticResource ProfileCard}">
                                 <StackPanel>
-                                    <TextBlock Text="🚀 Desktop - Dev &amp; Workstation" FontSize="15" FontWeight="Bold" Foreground="#7DCFFF" />
-                                    <TextBlock Text="Foco em desenvolvimento, compilação de código e máxima resposta do processador." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Sem hibernação (recupera espaço SSD igual à RAM)&#x0a;• Menor latência de rede e CPU sem amarras&#x0a;• Telemetria desativada e Explorer limpo" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetDesktopDev" Content="Selecionar Perfil Dev Desktop" Style="{StaticResource SecondaryButton}" Background="#2563EB" BorderBrush="#3B82F6" Foreground="White" />
+                                    <TextBlock Text="Desktop - Desenvolvimento" FontSize="15" FontWeight="Bold" Foreground="#7DCFFF" />
+                                    <TextBlock Text="Otimizado para compilação, contêineres e resposta ágil de processamento." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Sem hibernação (recupera espaço em disco SSD igual à RAM)&#x0a;• Menor latência de rede e sem limitação de processador&#x0a;• Telemetria desativada e Explorador de Arquivos limpo" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetDesktopDev" Content="Selecionar Perfil Desktop Desenvolvimento" Style="{StaticResource SecondaryButton}" Background="#2563EB" BorderBrush="#3B82F6" Foreground="White" />
                                 </StackPanel>
                             </Border>
 
                             <!-- Card Desktop Geral -->
                             <Border Style="{StaticResource ProfileCard}">
                                 <StackPanel>
-                                    <TextBlock Text="🎮 Desktop - Geral &amp; Jogos" FontSize="15" FontWeight="Bold" Foreground="#9ECE6A" />
-                                    <TextBlock Text="Foco em leveza extrema, menores latências de entrada (input lag) e mais FPS." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Máxima leveza (zero serviços pesados)&#x0a;• GameDVR e captura desativados&#x0a;• Resposta linear de mouse 1:1 e SSD calibrado" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetDesktopGeral" Content="Selecionar Perfil Jogos Desktop" Style="{StaticResource SecondaryButton}" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" />
+                                    <TextBlock Text="Desktop - Geral e Jogos" FontSize="15" FontWeight="Bold" Foreground="#9ECE6A" />
+                                    <TextBlock Text="Foco em taxa de quadros (FPS), menor latência de entrada e máxima responsividade." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Serviços secundários desnecessários desativados&#x0a;• GameDVR e captura de tela desativados&#x0a;• Resposta de mouse linear 1:1 e gravação SSD calibrada" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetDesktopGeral" Content="Selecionar Perfil Desktop Geral e Jogos" Style="{StaticResource SecondaryButton}" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" />
                                 </StackPanel>
                             </Border>
 
                             <!-- Card Notebook Dev -->
                             <Border Style="{StaticResource ProfileCard}">
                                 <StackPanel>
-                                    <TextBlock Text="💻 Notebook - Dev &amp; Workstation" FontSize="15" FontWeight="Bold" Foreground="#BB9AF7" />
-                                    <TextBlock Text="Ambiente de desenvolvimento móvel sem esgotar o SSD e a bateria." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Hibernação segura compacta (~3 GB)&#x0a;• Sem perda de trabalho ao fechar a tampa&#x0a;• Proteção térmica e driver GPU calibrado" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetLaptopDev" Content="Selecionar Perfil Dev Notebook" Style="{StaticResource SecondaryButton}" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" />
+                                    <TextBlock Text="Notebook - Desenvolvimento" FontSize="15" FontWeight="Bold" Foreground="#BB9AF7" />
+                                    <TextBlock Text="Ambiente de desenvolvimento móvel com preservação de bateria e armazenamento." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Hibernação segura compacta com preservação de estado&#x0a;• Prevenção contra perda de dados ao fechar a tampa&#x0a;• Calibração de resposta térmica e estabilidade gráfica" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetLaptopDev" Content="Selecionar Perfil Notebook Desenvolvimento" Style="{StaticResource SecondaryButton}" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" />
                                 </StackPanel>
                             </Border>
 
                             <!-- Card Notebook Geral -->
                             <Border Style="{StaticResource ProfileCard}">
                                 <StackPanel>
-                                    <TextBlock Text="🔋 Notebook - Geral &amp; Autonomia" FontSize="15" FontWeight="Bold" Foreground="#E0AF68" />
-                                    <TextBlock Text="Máxima duração de bateria no uso diário, fluidez e alta performance em jogos." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Máxima autonomia de bateria&#x0a;• Hibernação segura compacta&#x0a;• Zero telemetria consumindo energia" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetLaptopGeral" Content="Selecionar Perfil Geral Notebook" Style="{StaticResource SecondaryButton}" Background="#D97706" BorderBrush="#F59E0B" Foreground="White" />
+                                    <TextBlock Text="Notebook - Geral e Autonomia" FontSize="15" FontWeight="Bold" Foreground="#E0AF68" />
+                                    <TextBlock Text="Máxima eficiência energética no uso diário, fluidez e estabilidade em jogos." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Otimização para maior autonomia da bateria&#x0a;• Hibernação compacta com baixo consumo em repouso&#x0a;• Eliminação de rotinas em segundo plano que consomem energia" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetLaptopGeral" Content="Selecionar Perfil Notebook Geral e Autonomia" Style="{StaticResource SecondaryButton}" Background="#D97706" BorderBrush="#F59E0B" Foreground="White" />
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
@@ -264,12 +264,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="Customização Fina das Otimizações do Sistema:" FontSize="14" FontWeight="Bold" Foreground="#C8D3F5" VerticalAlignment="Center" />
+                                <TextBlock Text="Seleção Personalizada de Otimizações:" FontSize="14" FontWeight="Bold" Foreground="#C8D3F5" VerticalAlignment="Center" />
 
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <Button Name="btnSelectAll" Content="✓ Marcar Todos os Tweaks" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
-                                    <Button Name="btnDeselectAll" Content="✗ Desmarcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
-                                    <Button Name="btnResetRecommended" Content="🔄 Restaurar Recomendados" Style="{StaticResource SecondaryButton}" />
+                                    <Button Name="btnSelectAll" Content="Marcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
+                                    <Button Name="btnDeselectAll" Content="Desmarcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
+                                    <Button Name="btnResetRecommended" Content="Restaurar Recomendados" Style="{StaticResource SecondaryButton}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -286,29 +286,29 @@
                                 <!-- Card Interface -->
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="🖥️ Interface &amp; Barra de Tarefas" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkHideSearch" Content="Ocultar Caixa de Pesquisa na Barra" IsChecked="True" ToolTip="Remove o botão/caixa de busca; o Iniciar continua buscando ao digitar." />
-                                        <CheckBox Name="chkHideTaskView" Content="Ocultar Botão Multitarefa (Task View)" IsChecked="True" ToolTip="Remove o ícone da barra; o atalho Win+Tab continua ativo." />
-                                        <CheckBox Name="chkCenterTaskbar" Content="Barra de Tarefas Centralizada (Padrão Win 11)" IsChecked="True" ToolTip="Mantém o visual moderno centralizado do Windows 11." />
-                                        <CheckBox Name="chkTaskbarEndTask" Content="Ativar 'Finalizar Tarefa' no Botão Direito" IsChecked="True" ToolTip="Permite fechar apps travados direto na barra de tarefas." />
-                                        <CheckBox Name="chkClassicContextMenu" Content="Menu de Contexto Clássico (Windows 10)" IsChecked="True" ToolTip="Acesso direto a todas as opções sem submenus lentos." />
-                                        <CheckBox Name="chkLaunchToThisPC" Content="Abrir Explorer em 'Este Computador'" IsChecked="True" ToolTip="Abre os discos locais e remove Início e Galeria pesados." />
-                                        <CheckBox Name="chkShowExtensionsAndHidden" Content="Exibir Extensões e Arquivos Ocultos" IsChecked="True" ToolTip="Essencial para inspecionar .bat, .json, .ps1 e AppData." />
-                                        <CheckBox Name="chkAlwaysShowScrollbars" Content="Barras de Rolagem Sempre Visíveis" IsChecked="True" ToolTip="Evita barras de rolagem sumindo automaticamente." />
+                                        <TextBlock Text="Interface e Barra de Tarefas" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
+                                        <CheckBox Name="chkHideSearch" Content="Ocultar caixa de pesquisa na barra de tarefas" IsChecked="True" ToolTip="Oculta a barra de pesquisa; a busca do menu Iniciar permanece disponível ao digitar." />
+                                        <CheckBox Name="chkHideTaskView" Content="Ocultar botão de Visão de Tarefas (Task View)" IsChecked="True" ToolTip="Oculta o ícone da barra; o atalho Win+Tab permanece totalmente funcional." />
+                                        <CheckBox Name="chkCenterTaskbar" Content="Alinhamento centralizado da barra de tarefas" IsChecked="True" ToolTip="Mantém a barra de tarefas centralizada no padrão moderno do Windows 11." />
+                                        <CheckBox Name="chkTaskbarEndTask" Content="Ativar opção 'Finalizar Tarefa' no botão direito" IsChecked="True" ToolTip="Permite encerrar processos não responsivos diretamente pelo botão direito na barra de tarefas." />
+                                        <CheckBox Name="chkClassicContextMenu" Content="Menu de contexto clássico (estilo Windows 10)" IsChecked="True" ToolTip="Exibe todas as opções do menu de contexto diretamente, sem submenus adicionais." />
+                                        <CheckBox Name="chkLaunchToThisPC" Content="Abrir Explorador de Arquivos em 'Este Computador'" IsChecked="True" ToolTip="Configura o Explorador de Arquivos para iniciar nas unidades de disco, removendo páginas lentas de Início e Galeria." />
+                                        <CheckBox Name="chkShowExtensionsAndHidden" Content="Exibir extensões e arquivos ocultos" IsChecked="True" ToolTip="Facilita a visualização de extensões de arquivos (.bat, .ps1, .json) e pastas de configuração." />
+                                        <CheckBox Name="chkAlwaysShowScrollbars" Content="Manter barras de rolagem sempre visíveis" IsChecked="True" ToolTip="Evita que as barras de rolagem sejam ocultadas automaticamente pela interface." />
                                     </StackPanel>
                                 </Border>
 
                                 <!-- Card Desempenho -->
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="⚡ Desempenho, Latência &amp; SSD" FontSize="14" FontWeight="Bold" Foreground="#9ECE6A" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkOptimizeNetworkLatency" Content="Otimizar Latência de Rede (NetworkThrottling)" IsChecked="True" ToolTip="Desativa a limitação de tráfego de rede para menor ping e latência." />
-                                        <CheckBox Name="chkDisableGameDVR" Content="Desativar GameDVR e Captura em Segundo Plano" IsChecked="True" ToolTip="Evita perda de FPS e uso de CPU em jogos gravando tela à toa." />
-                                        <CheckBox Name="chkLinearMouse" Content="Resposta Linear do Mouse 1:1" IsChecked="True" ToolTip="Desativa aceleração artificial de ponteiro do Windows." />
-                                        <CheckBox Name="chkDisableStickyKeys" Content="Desativar Popup Teclas de Aderência" IsChecked="True" ToolTip="Elimina o aviso irritante ao pressionar Shift repetidamente." />
-                                        <CheckBox Name="chkInstantMenuDelay" Content="Eliminar Atraso de Menus (Instantâneo 0ms)" IsChecked="True" ToolTip="Remove o atraso de 400ms na abertura de submenus." />
-                                        <CheckBox Name="chkOptimizeSsdAccess" Content="Otimizar Gravações SSD (DisableLastAccess)" IsChecked="True" ToolTip="Reduz gravações desnecessárias aumentando vida útil do SSD." />
-                                        <CheckBox Name="chkCleanTempFiles" Content="Limpar Arquivos Temporários de Sistema" IsChecked="True" ToolTip="Esvazia caches e arquivos temp desnecessários." />
+                                        <TextBlock Text="Desempenho, Latência e Armazenamento" FontSize="14" FontWeight="Bold" Foreground="#9ECE6A" Margin="0,0,0,8" />
+                                        <CheckBox Name="chkOptimizeNetworkLatency" Content="Otimizar latência de rede (NetworkThrottling)" IsChecked="True" ToolTip="Desativa a limitação de rede do Windows para menor latência em conexões e jogos." />
+                                        <CheckBox Name="chkDisableGameDVR" Content="Desativar GameDVR e captura em segundo plano" IsChecked="True" ToolTip="Elimina sobrecarga de processador e placa de vídeo gerada por gravações automáticas de tela." />
+                                        <CheckBox Name="chkLinearMouse" Content="Resposta linear do ponteiro do mouse (Precisão 1:1)" IsChecked="True" ToolTip="Desativa a aceleração artificial do ponteiro para consistência de movimento." />
+                                        <CheckBox Name="chkDisableStickyKeys" Content="Desativar atalho de Teclas de Aderência" IsChecked="True" ToolTip="Impede a exibição do diálogo de confirmação ao pressionar a tecla Shift consecutivamente." />
+                                        <CheckBox Name="chkInstantMenuDelay" Content="Remover atraso na abertura de menus (0 ms)" IsChecked="True" ToolTip="Reduz o tempo de espera na abertura de submenus suspensos para resposta imediata." />
+                                        <CheckBox Name="chkOptimizeSsdAccess" Content="Otimizar gravações em SSD (DisableLastAccess)" IsChecked="True" ToolTip="Desativa a gravação contínua de data de último acesso, reduzindo escritas e preservando o SSD." />
+                                        <CheckBox Name="chkCleanTempFiles" Content="Limpar arquivos temporários do sistema" IsChecked="True" ToolTip="Esvazia caches e arquivos temporários não utilizados pelo sistema operacional." />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -318,27 +318,27 @@
                                 <!-- Card Privacidade & Debloat -->
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="🛡️ Privacidade, Telemetria &amp; Debloat" FontSize="14" FontWeight="Bold" Foreground="#BB9AF7" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkDisableTelemetry" Content="Desativar Telemetria &amp; Serviços de Diagnóstico" IsChecked="True" ToolTip="Desativa DiagTrack e coleta invasiva de dados." />
-                                        <CheckBox Name="chkDisableCeipTasks" Content="Desativar Tarefas Agendadas Ociosas (CEIP)" IsChecked="True" ToolTip="Impede tarefas pesadas rodando quando o PC está ocioso." />
-                                        <CheckBox Name="chkDisableCopilotRecall" Content="Desativar Copilot &amp; IA Recall" IsChecked="True" ToolTip="Elimina botões e análises de IA em segundo plano." />
-                                        <CheckBox Name="chkDisableBingSearch" Content="Desativar Bing e Sugestões na Busca do Iniciar" IsChecked="True" ToolTip="Pesquisa local instantânea sem resultados lentos da web." />
-                                        <CheckBox Name="chkDebloatEdge" Content="Debloat do Microsoft Edge (Mantém WebView2)" IsChecked="True" ToolTip="Remove telemetria, assistentes e cupons mantendo compatibilidade." />
-                                        <CheckBox Name="chkRemoveUwpBloat" Content="Remover 28 Bloatwares UWP de Terceiros" IsChecked="True" ToolTip="Remove TikTok, Spotify, Jogos e feeds patrocinados." />
+                                        <TextBlock Text="Privacidade, Telemetria e Aplicativos Padrão" FontSize="14" FontWeight="Bold" Foreground="#BB9AF7" Margin="0,0,0,8" />
+                                        <CheckBox Name="chkDisableTelemetry" Content="Desativar telemetria e serviços de diagnóstico" IsChecked="True" ToolTip="Desativa o serviço DiagTrack e o envio de dados diagnósticos para servidores externos." />
+                                        <CheckBox Name="chkDisableCeipTasks" Content="Desativar tarefas agendadas de diagnóstico (CEIP)" IsChecked="True" ToolTip="Desativa rotinas agendadas de telemetria executadas durante períodos de ociosidade." />
+                                        <CheckBox Name="chkDisableCopilotRecall" Content="Desativar Windows Copilot e recursos de IA Recall" IsChecked="True" ToolTip="Desativa o assistente Copilot e rotinas de análise contínua de tela em segundo plano." />
+                                        <CheckBox Name="chkDisableBingSearch" Content="Desativar resultados do Bing no menu Iniciar" IsChecked="True" ToolTip="Mantém a busca do menu Iniciar estritamente local para respostas imediatas." />
+                                        <CheckBox Name="chkDebloatEdge" Content="Otimizar telemetria do Microsoft Edge" IsChecked="True" ToolTip="Desativa o envio de métricas de navegação e assistentes de compra, preservando o WebView2." />
+                                        <CheckBox Name="chkRemoveUwpBloat" Content="Remover aplicativos pré-instalados desnecessários" IsChecked="True" ToolTip="Remove pacotes promocionais pré-instalados de entretenimento e redes sociais." />
                                     </StackPanel>
                                 </Border>
 
                                 <!-- Card Sistema & Energia -->
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
-                                        <TextBlock Text="⚙️ Sistema, GPU &amp; Energia" FontSize="14" FontWeight="Bold" Foreground="#E0AF68" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkCalibrateGpu" Content="Calibração de GPU (TdrDelay = 8s + HAGS)" IsChecked="True" ToolTip="Evita quedas de driver de vídeo em cargas pesadas." />
-                                        <CheckBox Name="chkSmartHibernation" Content="Hibernação Inteligente (Off Desktop / Compacta Laptop)" IsChecked="True" ToolTip="Recupera até 32 GB de SSD em desktops; mantém sono seguro em notebooks." />
-                                        <CheckBox Name="chkDisableReservedStorage" Content="Desativar Armazenamento Reservado (~7 GB)" IsChecked="True" ToolTip="Libera espaço em disco bloqueado pelo Windows." />
-                                        <CheckBox Name="chkOptimizeSvcHost" Content="Calibrar Memória de Serviços (SvcHost)" IsChecked="True" ToolTip="Ajusta limite de memória por processo de acordo com a RAM." />
-                                        <CheckBox Name="chkEnableLongPaths" Content="Habilitar Caminhos Longos no Sistema de Arquivos" IsChecked="True" ToolTip="Remove o limite de 260 caracteres em caminhos de arquivos." />
-                                        <CheckBox Name="chkDisableLockScreen" Content="Pular Tela de Bloqueio Estática" IsChecked="True" ToolTip="Vai direto para o campo de senha/PIN ao ligar o PC." />
-                                        <CheckBox Name="chkIsDev" Content="Configurações Dev (Relógio UTC, RDP e Boot Detalhado)" IsChecked="False" ToolTip="Otimizações adicionais para programadores e dual-boot Linux." />
+                                        <TextBlock Text="Sistema, Gráficos e Gerenciamento de Energia" FontSize="14" FontWeight="Bold" Foreground="#E0AF68" Margin="0,0,0,8" />
+                                        <CheckBox Name="chkCalibrateGpu" Content="Calibrar tolerância de driver gráfico (TdrDelay e HAGS)" IsChecked="True" ToolTip="Aumenta a tolerância para recuperação do driver gráfico e ativa o agendamento de GPU por hardware." />
+                                        <CheckBox Name="chkSmartHibernation" Content="Gerenciamento inteligente de hibernação" IsChecked="True" ToolTip="Desativa a hibernação em computadores de mesa para recuperar espaço em disco SSD ou configura modo compacto em notebooks." />
+                                        <CheckBox Name="chkDisableReservedStorage" Content="Desativar Armazenamento Reservado do Windows" IsChecked="True" ToolTip="Libera aproximadamente 7 GB de espaço em disco anteriormente retidos pelo sistema operacional." />
+                                        <CheckBox Name="chkOptimizeSvcHost" Content="Calibrar divisão de processos de serviços (SvcHost)" IsChecked="True" ToolTip="Ajusta o isolamento de serviços de acordo com a quantidade total de memória RAM." />
+                                        <CheckBox Name="chkEnableLongPaths" Content="Habilitar suporte a caminhos longos de arquivos" IsChecked="True" ToolTip="Remove a limitação legada de 260 caracteres (MAX_PATH) em caminhos de arquivos e pastas." />
+                                        <CheckBox Name="chkDisableLockScreen" Content="Pular tela de bloqueio estática" IsChecked="True" ToolTip="Apresenta o campo de autenticação diretamente ao ligar ou desbloquear o computador." />
+                                        <CheckBox Name="chkIsDev" Content="Configurações para desenvolvedores (Relógio UTC e Diagnósticos)" IsChecked="False" ToolTip="Configura o relógio da placa-mãe em UTC para sincronização com Linux e habilita mensagens detalhadas de boot." />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -352,9 +352,9 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="💡 As otimizações são aplicadas cirurgicamente e o Windows Explorer é reiniciado de forma suave." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
+                                <TextBlock Text="As configurações são aplicadas no Registro e nos serviços do sistema com reinicialização limpa do Explorador de Arquivos." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
 
-                                <Button Name="btnApplyOptimizations" Grid.Column="1" Content="⚡ APLICAR OTIMIZAÇÕES SELECIONADAS" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
+                                <Button Name="btnApplyOptimizations" Grid.Column="1" Content="Aplicar Otimizações Selecionadas" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
                                     <Button.Resources>
                                         <Style TargetType="Border">
                                             <Setter Property="CornerRadius" Value="8" />
@@ -368,9 +368,9 @@
             </TabItem>
 
             <!-- ======================================================== -->
-            <!-- ABA 3: RECURSOS DO WINDOWS (DISM)                       -->
+            <!-- ABA 3: RECURSOS OPCIONAIS DO WINDOWS (DISM)              -->
             <!-- ======================================================== -->
-            <TabItem Name="tabItemFeatures" Header=" 🧩 Recursos do Windows ">
+            <TabItem Name="tabItemFeatures" Header=" Recursos Opcionais do Windows ">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
                     <StackPanel>
                         <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="14" Margin="6,0,6,10">
@@ -379,12 +379,12 @@
                         
                         <Border Style="{StaticResource ProfileCard}">
                             <StackPanel>
-                                <TextBlock Text="⚙️ Recursos de Compatibilidade e Virtualização" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                <CheckBox Name="featNetFx3" Content=".NET Framework 3.5 (.NET 2.0 e 3.0 para softwares legados)" IsChecked="True" />
+                                <TextBlock Text="Componentes e Recursos do Sistema" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
+                                <CheckBox Name="featNetFx3" Content=".NET Framework 3.5 (Compatibilidade legada com versões 2.0 e 3.0)" IsChecked="True" />
                                 <CheckBox Name="featWsl" Content="Subsistema do Windows para Linux (WSL2)" IsChecked="False" />
                                 <CheckBox Name="featVmPlatform" Content="Plataforma de Máquina Virtual (Pré-requisito do WSL2)" IsChecked="False" />
-                                <CheckBox Name="featHyperV" Content="Hyper-V (Virtualização Nativa para VMs e Docker)" IsChecked="False" />
-                                <CheckBox Name="featSandbox" Content="Windows Sandbox (Área Restrita Segura e Descartável)" IsChecked="False" />
+                                <CheckBox Name="featHyperV" Content="Hyper-V (Virtualização nativa para máquinas virtuais e Docker)" IsChecked="False" />
+                                <CheckBox Name="featSandbox" Content="Windows Sandbox (Ambiente isolado para testes seguros)" IsChecked="False" />
                             </StackPanel>
                         </Border>
 
@@ -396,9 +396,9 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="💡 Requer conexão com a internet para baixar arquivos de componentes adicionais da Microsoft." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
+                                <TextBlock Text="Requer conexão com a internet para baixar arquivos de componentes adicionais da Microsoft." FontSize="12" Foreground="#7982A9" VerticalAlignment="Center" />
 
-                                <Button Name="btnEnableFeatures" Grid.Column="1" Content="⚙️ HABILITAR RECURSOS SELECIONADOS" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
+                                <Button Name="btnEnableFeatures" Grid.Column="1" Content="Habilitar Recursos Selecionados" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" FontWeight="Bold" FontSize="13" Padding="20,10" Cursor="Hand">
                                     <Button.Resources>
                                         <Style TargetType="Border">
                                             <Setter Property="CornerRadius" Value="8" />
@@ -412,9 +412,9 @@
             </TabItem>
 
             <!-- ======================================================== -->
-            <!-- ABA 4: LOG & AUDITORIA EM TEMPO REAL                     -->
+            <!-- ABA 4: REGISTRO E LOGS EM TEMPO REAL                     -->
             <!-- ======================================================== -->
-            <TabItem Name="tabItemLog" Header=" 📜 Registro &amp; Log ">
+            <TabItem Name="tabItemLog" Header=" Registro e Logs ">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -422,9 +422,9 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="Acompanhamento em tempo real da execução e auditoria:" FontSize="13" Foreground="#7982A9" VerticalAlignment="Center" />
-                        <Button Name="btnOpenLogFolder" Content="📁 Abrir Pasta de Logs" Style="{StaticResource SecondaryButton}" Margin="12,0,0,0" Padding="8,3" FontSize="11" />
-                        <Button Name="btnClearLogConsole" Content="🧹 Limpar Console" Style="{StaticResource SecondaryButton}" Margin="8,0,0,0" Padding="8,3" FontSize="11" />
+                        <TextBlock Text="Acompanhamento em tempo real da execução e auditoria de sistema:" FontSize="13" Foreground="#7982A9" VerticalAlignment="Center" />
+                        <Button Name="btnOpenLogFolder" Content="Abrir Pasta de Logs" Style="{StaticResource SecondaryButton}" Margin="12,0,0,0" Padding="8,3" FontSize="11" />
+                        <Button Name="btnClearLogConsole" Content="Limpar Console" Style="{StaticResource SecondaryButton}" Margin="8,0,0,0" Padding="8,3" FontSize="11" />
                     </StackPanel>
 
                     <Border Grid.Row="1" Background="#0A0B10" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="8">
@@ -449,7 +449,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Name="lblProgressStatus" Text="Pronto. Escolha uma ação nas abas acima." FontSize="13" FontWeight="SemiBold" Foreground="#C8D3F5" VerticalAlignment="Center" />
+                    <TextBlock Name="lblProgressStatus" Text="Pronto. Selecione as configurações desejadas nas abas acima." FontSize="13" FontWeight="SemiBold" Foreground="#C8D3F5" VerticalAlignment="Center" />
                     <TextBlock Name="lblProgressPercent" Grid.Column="1" Text="0%" FontSize="13" FontWeight="Bold" Foreground="#7DCFFF" VerticalAlignment="Center" />
                 </Grid>
                 

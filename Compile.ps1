@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Compilador do DEWIN Booster (Universal Single-Script Builder)
 .DESCRIPTION
@@ -14,6 +14,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    $OutputEncoding = [System.Text.Encoding]::UTF8
+} catch {}
 $rootDir = $PSScriptRoot
 if (-not $rootDir) { $rootDir = (Get-Location).Path }
 
@@ -22,7 +26,7 @@ Write-Host '[*] Compilando DEWIN Booster...' -ForegroundColor Cyan
 $header = @'
 # ==============================================================================
 # DEWIN Booster - Universal Windows Optimizer & Debloater (Single-Script Edition)
-# Execucao via terminal:
+# Execução via terminal:
 # irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex
 # ==============================================================================
 
@@ -34,16 +38,28 @@ param(
     [switch]$NoRestart
 )
 
-# 0. Codificacao UTF-8 para Console
+# 0. Auto-correção de codificação para execução direta via powershell.exe -File
+if ($PSCommandPath -and (Test-Path -LiteralPath $PSCommandPath)) {
+    if ('ç'.Length -ne 1) {
+        $scriptBytes = [System.IO.File]::ReadAllBytes($PSCommandPath)
+        $scriptText = [System.Text.Encoding]::UTF8.GetString($scriptBytes)
+        $scriptBlock = [ScriptBlock]::Create($scriptText)
+        $boundParams = $PSBoundParameters
+        & $scriptBlock @boundParams
+        return
+    }
+}
+
+# 1. Codificação UTF-8 para Console
 try {
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
     $OutputEncoding = [System.Text.Encoding]::UTF8
 } catch {}
 
-# 1. Auto-Elevacao Administrativa (UAC)
+# 2. Auto-Elevação Administrativa (UAC)
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Write-Host '[*] Privilegios de Administrador necessarios. Elevando via UAC...' -ForegroundColor Cyan
+    Write-Host '[*] Privilégios de Administrador necessários. Elevando via UAC...' -ForegroundColor Cyan
     $tempLauncher = Join-Path -Path $env:TEMP -ChildPath 'dewin-elevated.ps1'
     try {
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
@@ -70,9 +86,9 @@ if (-not $isAdmin) {
     } catch {
         Write-Host ''
         Write-Host '==================================================================' -ForegroundColor Yellow
-        Write-Host ' [!] PRIVILEGIOS DE ADMINISTRADOR NECESSARIOS' -ForegroundColor Yellow
+        Write-Host ' [!] PRIVILÉGIOS DE ADMINISTRADOR NECESSÁRIOS' -ForegroundColor Yellow
         Write-Host ' O DEWIN precisa ser executado em um terminal com privilégios de Administrador.' -ForegroundColor Yellow
-        Write-Host ' Clique com o botao direito no Iniciar -> Terminal (Administrador)' -ForegroundColor Cyan
+        Write-Host ' Clique com o botão direito no Iniciar -> Terminal (Administrador)' -ForegroundColor Cyan
         Write-Host ' e execute novamente:' -ForegroundColor Cyan
         Write-Host ' irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex' -ForegroundColor White
         Write-Host '==================================================================' -ForegroundColor Yellow
@@ -104,28 +120,29 @@ $body = [System.Text.StringBuilder]::new()
 foreach ($relPath in $modulesOrder) {
     $fullPath = Join-Path -Path $rootDir -ChildPath $relPath
     if (Test-Path $fullPath) {
-        Write-Host "  [+] Adicionando modulo: $relPath" -ForegroundColor Gray
+        Write-Host "  [+] Adicionando módulo: $relPath" -ForegroundColor Gray
         $content = Get-Content -LiteralPath $fullPath -Raw -Encoding UTF8
-        [void]$body.AppendLine("# --- Modulo: $relPath ---")
+        [void]$body.AppendLine("# --- Módulo: $relPath ---")
         [void]$body.AppendLine($content)
         [void]$body.AppendLine()
     } else {
-        Write-Warning "Modulo nao encontrado: $fullPath"
+        Write-Warning "Módulo não encontrado: $fullPath"
     }
 }
 
-# 3. Embutir o XAML da Interface Gráfica
+# 3. Embutir o XAML da Interface Gráfica (Base64 UTF-8 seguro contra distorções de codificação)
 $xamlPath = Join-Path -Path $rootDir -ChildPath 'src\gui\MainWindow.xaml'
 if (Test-Path $xamlPath) {
-    Write-Host "  [+] Embutindo Interface Grafica XAML..." -ForegroundColor Gray
-    $xamlContent = Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8
-    [void]$body.AppendLine("# --- Interface Grafica XAML ---")
-    [void]$body.AppendLine('$global:DewinXaml = @''')
-    [void]$body.AppendLine($xamlContent)
-    [void]$body.AppendLine('''@')
+    Write-Host "  [+] Embutindo Interface Gráfica XAML (Base64 UTF-8)..." -ForegroundColor Gray
+    $xamlBytes = [System.IO.File]::ReadAllBytes($xamlPath)
+    $xamlBase64 = [System.Convert]::ToBase64String($xamlBytes)
+    [void]$body.AppendLine("# --- Interface Gráfica XAML ---")
+    [void]$body.AppendLine('$global:DewinXaml = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(@''')
+    [void]$body.AppendLine($xamlBase64)
+    [void]$body.AppendLine('''@))')
     [void]$body.AppendLine()
 } else {
-    Write-Warning "XAML nao encontrado: $xamlPath"
+    Write-Warning "XAML não encontrado: $xamlPath"
 }
 
 # 4. Entrypoint Principal
@@ -139,7 +156,7 @@ try {
     $hw = Get-DewinHardwareInfo
 
     if ($Profile -ne 'GUI' -or $Silent) {
-        # Execucao em Modo Linha de Comando (Headless / Silencioso)
+        # Execução em Modo Linha de Comando (Headless / Silencioso)
         $chosenPreset = if ($Profile -eq 'GUI') { $hw.RecommendedProfile } else { $Profile }
         Write-Host "Iniciando DEWIN Booster em modo CLI com perfil: $chosenPreset" -ForegroundColor Cyan
         $presetData = Get-DewinPreset -Name $chosenPreset
@@ -149,12 +166,12 @@ try {
             if ($r -match '^[sSyY]') { Restart-Computer }
         }
     } else {
-        # Execucao em Modo Interface Grafica (WPF)
+        # Execução em Modo Interface Gráfica (WPF)
         Start-DewinGui -XamlString $global:DewinXaml -Hardware $hw
     }
 } catch {
     Write-Host ""
-    Write-Host "[!] Erro fatal durante a execucao do DEWIN:" -ForegroundColor Red
+    Write-Host "[!] Erro fatal durante a execução do DEWIN:" -ForegroundColor Red
     Write-Host $_.Exception.ToString() -ForegroundColor Red
     Write-Host ""
     Write-Host "Pressione Enter para fechar..." -ForegroundColor Yellow
@@ -165,7 +182,7 @@ try {
 
 [void]$body.AppendLine($entrypoint)
 
-# 5. Gravacao do Arquivo Final dewin.ps1 (UTF-8 SEM BOM para compatibilidade com irm | iex)
+# 5. Gravação do Arquivo Final dewin.ps1 (UTF-8 SEM BOM para compatibilidade com irm | iex)
 $outputFile = Join-Path -Path $rootDir -ChildPath 'dewin.ps1'
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 [System.IO.File]::WriteAllText($outputFile, $body.ToString(), $utf8NoBom)
@@ -173,10 +190,10 @@ $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $fileSizeKB = [math]::Round((Get-Item $outputFile).Length / 1KB, 1)
 Write-Host "==================================================================" -ForegroundColor Green
 Write-Host " [OK] dewin.ps1 compilado com sucesso! ($fileSizeKB KB)" -ForegroundColor Green
-Write-Host " Localizacao: $outputFile" -ForegroundColor Cyan
+Write-Host " Localização: $outputFile" -ForegroundColor Cyan
 Write-Host "==================================================================" -ForegroundColor Green
 
 if ($Run) {
-    Write-Host "[*] Iniciando interface grafica de teste..." -ForegroundColor Yellow
+    Write-Host "[*] Iniciando interface gráfica de teste..." -ForegroundColor Yellow
     Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$outputFile`""
 }

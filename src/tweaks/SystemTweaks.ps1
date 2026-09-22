@@ -16,7 +16,7 @@ function Invoke-DewinSystemTweaks {
         [switch]$DisableLockScreen = $true
     )
 
-    Write-DewinLog -Level STEP -Message '[*] Aplicando calibracoes de sistema, GPU e energia...'
+    Write-DewinLog -Level STEP -Message '[*] Aplicando calibrações de sistema, GPU e energia...'
 
     # Calibração de GPU (TdrDelay = 8s, TdrDdiDelay = 8s, HAGS = 2)
     if ($CalibrateGpu) {
@@ -29,13 +29,13 @@ function Invoke-DewinSystemTweaks {
     # Gerenciamento Inteligente de Hibernação e Energia
     if ($SmartHibernation) {
         if ($IsLaptop) {
-            Write-DewinLog -Level STEP -Message '  [*] Configurando hibernacao segura compacta para Notebook...'
+            Write-DewinLog -Level STEP -Message '  [*] Configurando hibernação segura compacta para Notebook...'
             try {
                 powercfg.exe /hibernate on 2>$null | Out-Null
                 powercfg.exe /h /type reduced 2>$null | Out-Null
             } catch {}
         } else {
-            Write-DewinLog -Level STEP -Message '  [*] Desativando hibernacao para Desktop (recuperando espaco SSD)...'
+            Write-DewinLog -Level STEP -Message '  [*] Desativando hibernação para Desktop (recuperando espaço em disco SSD)...'
             try { powercfg.exe /hibernate off 2>$null | Out-Null } catch {}
         }
     }
@@ -74,5 +74,5 @@ function Invoke-DewinSystemTweaks {
         Set-DewinReg -Path 'HKCU:\SOFTWARE\Microsoft\Terminal Server Client' -Name 'RdpLaunchConsentAccepted' -Value 1
     }
 
-    Write-DewinLog -Level SUCCESS -Message '  [+] Calibracoes de sistema, GPU e energia aplicadas com sucesso.'
+    Write-DewinLog -Level SUCCESS -Message '  [+] Calibrações de sistema, GPU e energia aplicadas com sucesso.'
 }
