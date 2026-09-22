@@ -43,21 +43,31 @@ try {
 # 1. Auto-Elevacao Administrativa (UAC)
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Write-Host '[!] Privilegios de Administrador necessarios. Elevando via UAC...' -ForegroundColor Yellow
-    $argsToPass = @('-NoProfile', '-ExecutionPolicy', 'Bypass')
-    if ($PSCommandPath) {
-        $argsToPass += @('-File', $PSCommandPath, '-Profile', $Profile)
-        if ($Silent) { $argsToPass += '-Silent' }
-        if ($NoRestart) { $argsToPass += '-NoRestart' }
-    } else {
-        $rawUrl = 'https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1'
-        $argsToPass += @('-Command', "irm $rawUrl | iex")
-    }
+    Write-Host '[*] Privilegios de Administrador necessarios. Elevando via UAC...' -ForegroundColor Cyan
+    $tempLauncher = Join-Path -Path $env:TEMP -ChildPath 'dewin-elevated.ps1'
     try {
-        Start-Process powershell.exe -ArgumentList $argsToPass -Verb RunAs
+        if ($PSCommandPath -and (Test-Path $PSCommandPath)) {
+            Copy-Item -LiteralPath $PSCommandPath -Destination $tempLauncher -Force
+        } else {
+            $webClient = New-Object System.Net.WebClient
+            $webClient.Headers.Add('User-Agent', 'DEWIN-Installer')
+            $webClient.DownloadFile('https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1', $tempLauncher)
+        }
+        $elevArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $tempLauncher)
+        if ($Profile) { $elevArgs += @('-Profile', $Profile) }
+        if ($Silent) { $elevArgs += '-Silent' }
+        if ($NoRestart) { $elevArgs += '-NoRestart' }
+        Start-Process powershell.exe -ArgumentList $elevArgs -Verb RunAs
         exit 0
     } catch {
-        Write-Host "Falha ao elevar privilegios: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host ''
+        Write-Host '==================================================================' -ForegroundColor Yellow
+        Write-Host ' [!] PRIVILEGIOS DE ADMINISTRADOR NECESSARIOS' -ForegroundColor Yellow
+        Write-Host ' O DEWIN precisa ser executado em um terminal com privilégios de Administrador.' -ForegroundColor Yellow
+        Write-Host ' Clique com o botao direito no Iniciar -> Terminal (Administrador)' -ForegroundColor Cyan
+        Write-Host ' e execute novamente:' -ForegroundColor Cyan
+        Write-Host ' irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex' -ForegroundColor White
+        Write-Host '==================================================================' -ForegroundColor Yellow
         exit 1
     }
 }
