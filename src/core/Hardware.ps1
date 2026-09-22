@@ -60,7 +60,7 @@ function Get-DewinHardwareInfo {
     }
 
     $info.DeviceTypeStr = if ($info.IsLaptop) { 'Notebook' } else { 'Desktop' }
-    $info.RecommendedProfile = if ($info.IsLaptop) { 'LaptopGeral' } else { 'DesktopGeral' }
+    $info.RecommendedProfile = 'Medium'
 
     return [PSCustomObject]$info
 }

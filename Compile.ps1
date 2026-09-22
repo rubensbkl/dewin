@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Compilador do DEWIN Booster (Universal Single-Script Builder)
 .DESCRIPTION
@@ -32,7 +32,7 @@ $header = @'
 
 [CmdletBinding()]
 param(
-    [ValidateSet('DesktopDev', 'DesktopGeral', 'LaptopDev', 'LaptopGeral', 'GUI')]
+    [ValidateSet('Light', 'Medium', 'Aggressive', 'Dev', 'DesktopDev', 'DesktopGeral', 'LaptopDev', 'LaptopGeral', 'GUI')]
     [string]$Profile = 'GUI',
     [switch]$Silent,
     [switch]$NoRestart

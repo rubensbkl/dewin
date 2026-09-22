@@ -62,9 +62,9 @@ function Start-DewinGui {
     $gui['txtDeviceType'].Text = "$($Hardware.DeviceTypeStr) Detectado"
 
     $recText = if ($Hardware.IsLaptop) {
-        "Notebook identificado. Perfil recomendado: 'Notebook - Desenvolvimento' (para desenvolvedores) ou 'Notebook - Geral e Autonomia' (para máxima duração de bateria e jogos)."
+        "Notebook identificado ($($Hardware.Manufacturer) $($Hardware.Model)). O gerenciamento inteligente ativará hibernação compacta para preservar energia e autonomia ao fechar a tampa."
     } else {
-        "Desktop identificado. Perfil recomendado: 'Desktop - Desenvolvimento' (para desenvolvedores) ou 'Desktop - Geral e Jogos' (para máxima taxa de FPS e menor latência)."
+        "Desktop identificado ($($Hardware.Manufacturer) $($Hardware.Model)). O gerenciamento inteligente desativará a hibernação para liberar espaço em disco SSD equivalente à memória RAM."
     }
     $gui['txtRecommendation'].Text = $recText
 
@@ -110,10 +110,10 @@ function Start-DewinGui {
         'featSandbox'     = 'Containers-DisposableClientVM'
     }
 
-    # 3. Funcao de Aplicacao de Perfil
-    $applyPresetToGui = {
-        param([string]$PresetName)
-        $preset = Get-DewinPreset -Name $PresetName
+    # 3. Funções de Aplicação de Perfis Separadas por Aba
+    $applyTweakPresetToGui = {
+        param([string]$Level)
+        $preset = Get-DewinTweakPreset -Level $Level
 
         foreach ($chkName in $allTweakChecks) {
             $tweakKey = $chkName.Substring(3)
@@ -122,22 +122,26 @@ function Start-DewinGui {
             }
         }
 
-        foreach ($k in $appMap.Keys) {
-            if ($gui[$k]) { $gui[$k].IsChecked = ($preset.Apps -contains $appMap[$k]) }
-        }
-
-        foreach ($k in $featMap.Keys) {
-            if ($gui[$k]) { $gui[$k].IsChecked = ($preset.Features -contains $featMap[$k]) }
-        }
-
-        $gui['lblProgressStatus'].Text = "Perfil '$PresetName' selecionado nas abas de otimizações e softwares."
+        $gui['lblProgressStatus'].Text = "Perfil de otimização '$($preset.Level)' aplicado na aba de configurações."
     }
 
-    # 4. Vinculação dos Botões de Perfis Rápidos (Aba 2: Otimizações)
-    $gui['btnPresetDesktopDev'].Add_Click({ & $applyPresetToGui 'DesktopDev' })
-    $gui['btnPresetDesktopGeral'].Add_Click({ & $applyPresetToGui 'DesktopGeral' })
-    $gui['btnPresetLaptopDev'].Add_Click({ & $applyPresetToGui 'LaptopDev' })
-    $gui['btnPresetLaptopGeral'].Add_Click({ & $applyPresetToGui 'LaptopGeral' })
+    $applyFeaturePresetToGui = {
+        param([string]$ProfileName)
+        $featPreset = Get-DewinFeaturePreset -Profile $ProfileName
+
+        foreach ($k in $featMap.Keys) {
+            if ($gui[$k]) {
+                $gui[$k].IsChecked = ($featPreset.Features -contains $featMap[$k])
+            }
+        }
+
+        $gui['lblProgressStatus'].Text = "Perfil de recursos '$($featPreset.Profile)' aplicado na aba de extras."
+    }
+
+    # 4. Vinculação dos Botões de Níveis Rápidos (Aba 2: Otimizações)
+    $gui['btnPresetTweakLight'].Add_Click({ & $applyTweakPresetToGui 'Light' })
+    $gui['btnPresetTweakMedium'].Add_Click({ & $applyTweakPresetToGui 'Medium' })
+    $gui['btnPresetTweakAggressive'].Add_Click({ & $applyTweakPresetToGui 'Aggressive' })
 
     # Botões de Seleção de Tweaks (Aba 2)
     $gui['btnSelectAll'].Add_Click({
@@ -147,16 +151,26 @@ function Start-DewinGui {
         foreach ($c in $allTweakChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
     })
     $gui['btnResetRecommended'].Add_Click({
-        & $applyPresetToGui $Hardware.RecommendedProfile
+        & $applyTweakPresetToGui 'Medium'
     })
 
-    # Botões de Seleção de Softwares (Aba 1)
+    # Botões de Perfis Rápidos e Seleção de Recursos (Aba 3: Extras / DISM)
+    $gui['btnPresetFeatGeneral'].Add_Click({ & $applyFeaturePresetToGui 'General' })
+    $gui['btnPresetFeatDev'].Add_Click({ & $applyFeaturePresetToGui 'Dev' })
+    $gui['btnSelectAllFeat'].Add_Click({
+        foreach ($c in $allFeatChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $true } }
+    })
+    $gui['btnDeselectAllFeat'].Add_Click({
+        foreach ($c in $allFeatChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
+    })
+
+    # Botões de Seleção de Softwares (Aba 1: Aplicativos - 100% Manual)
     $gui['btnSelectEssentialApps'].Add_Click({
         $essentialIds = @('appVcRedist64', 'appVcRedist86', 'app7zip', 'appChrome')
         foreach ($c in $allAppChecks) {
             if ($gui[$c]) { $gui[$c].IsChecked = ($essentialIds -contains $c) }
         }
-        $gui['lblProgressStatus'].Text = "Softwares essenciais (VC++, 7-Zip, Chrome) selecionados."
+        $gui['lblProgressStatus'].Text = "Softwares essenciais (VC++, 7-Zip, Chrome) selecionados manualmente."
     })
     $gui['btnSelectAllApps'].Add_Click({
         foreach ($c in $allAppChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $true } }
@@ -184,15 +198,21 @@ function Start-DewinGui {
         $gui['txtConsoleLog'].Text = "[$(Get-Date -Format 'HH:mm:ss')] Console de logs limpo."
     })
 
-    # Inicializa com o perfil recomendado pré-marcado
-    & $applyPresetToGui $Hardware.RecommendedProfile
+    # Inicialização da interface:
+    # 1. Aplicativos iniciam todos desmarcados
+    foreach ($c in $allAppChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
+    # 2. Otimizações iniciam com perfil Médio (Recomendado)
+    & $applyTweakPresetToGui 'Medium'
+    # 3. Recursos opcionais iniciam com perfil Geral (.NET 3.5 apenas)
+    & $applyFeaturePresetToGui 'General'
 
     # 5. Executador Assíncrono com UI Responsiva (Thread-Safe)
     $allActionButtons = @(
         'btnInstallSoftwares', 'btnApplyOptimizations', 'btnEnableFeatures',
         'btnSelectEssentialApps', 'btnSelectAllApps', 'btnDeselectAllApps',
         'btnSelectAll', 'btnDeselectAll', 'btnResetRecommended',
-        'btnPresetDesktopDev', 'btnPresetDesktopGeral', 'btnPresetLaptopDev', 'btnPresetLaptopGeral'
+        'btnPresetTweakLight', 'btnPresetTweakMedium', 'btnPresetTweakAggressive',
+        'btnPresetFeatGeneral', 'btnPresetFeatDev', 'btnSelectAllFeat', 'btnDeselectAllFeat'
     )
 
     $runDewinAsync = {

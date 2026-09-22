@@ -142,16 +142,16 @@
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
                                         <TextBlock Text="Runtimes e Utilitários Essenciais" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                        <CheckBox Name="appVcRedist64" Content="Visual C++ 2015-2022 (x64) - Pré-requisito para jogos e programas" IsChecked="True" />
-                                        <CheckBox Name="appVcRedist86" Content="Visual C++ 2015-2022 (x86) - Compatibilidade de aplicativos 32-bit" IsChecked="True" />
-                                        <CheckBox Name="app7zip" Content="7-Zip - Compactador e descompactador de alta performance" IsChecked="True" />
+                                        <CheckBox Name="appVcRedist64" Content="Visual C++ 2015-2022 (x64) - Pré-requisito para jogos e programas" IsChecked="False" />
+                                        <CheckBox Name="appVcRedist86" Content="Visual C++ 2015-2022 (x86) - Compatibilidade de aplicativos 32-bit" IsChecked="False" />
+                                        <CheckBox Name="app7zip" Content="7-Zip - Compactador e descompactador de alta performance" IsChecked="False" />
                                     </StackPanel>
                                 </Border>
 
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
                                         <TextBlock Text="Navegadores Web" FontSize="14" FontWeight="Bold" Foreground="#9ECE6A" Margin="0,0,0,8" />
-                                        <CheckBox Name="appChrome" Content="Google Chrome - Navegador web moderno e seguro" IsChecked="True" />
+                                        <CheckBox Name="appChrome" Content="Google Chrome - Navegador web moderno e seguro" IsChecked="False" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -212,46 +212,36 @@
                             <TextBlock Name="txtRecommendation" Text="Calculando melhor perfil para sua máquina..." FontSize="13" Foreground="#93C5FD" TextWrapping="Wrap" />
                         </Border>
 
-                        <!-- Seção dos 4 Perfis Rápidos de 1 Clique -->
-                        <TextBlock Text="Perfis Recomendados de Configuração:" FontSize="14" FontWeight="SemiBold" Foreground="#C8D3F5" Margin="8,4,8,8" />
-                        <UniformGrid Columns="2" Margin="0,0,0,10">
-                            <!-- Card Desktop Dev -->
+                        <!-- Seção dos 3 Níveis Rápidos de Otimização -->
+                        <TextBlock Text="Níveis Rápidos de Otimização:" FontSize="14" FontWeight="SemiBold" Foreground="#C8D3F5" Margin="8,4,8,8" />
+                        <UniformGrid Columns="3" Margin="0,0,0,10">
+                            <!-- Card Pouco Otimizado -->
                             <Border Style="{StaticResource ProfileCard}">
                                 <StackPanel>
-                                    <TextBlock Text="Desktop - Desenvolvimento" FontSize="15" FontWeight="Bold" Foreground="#7DCFFF" />
-                                    <TextBlock Text="Otimizado para compilação, contêineres e resposta ágil de processamento." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Sem hibernação (recupera espaço em disco SSD igual à RAM)&#x0a;• Menor latência de rede e sem limitação de processador&#x0a;• Telemetria desativada e Explorador de Arquivos limpo" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetDesktopDev" Content="Selecionar Perfil Desktop Desenvolvimento" Style="{StaticResource SecondaryButton}" Background="#2563EB" BorderBrush="#3B82F6" Foreground="White" />
+                                    <TextBlock Text="Pouco Otimizado" FontSize="15" FontWeight="Bold" Foreground="#38BDF8" />
+                                    <TextBlock Text="Otimizações essenciais e seguras, mantendo a experiência clássica do Windows 11 intacta." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Limpeza de arquivos temporários e SSD&#x0a;• Desativação de telemetria básica e Bing&#x0a;• Menus rápidos e suporte a caminhos longos" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetTweakLight" Content="Selecionar Pouco Otimizado" Style="{StaticResource SecondaryButton}" Background="#0284C7" BorderBrush="#38BDF8" Foreground="White" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Card Desktop Geral -->
+                            <!-- Card Médio (Recomendado) -->
                             <Border Style="{StaticResource ProfileCard}">
                                 <StackPanel>
-                                    <TextBlock Text="Desktop - Geral e Jogos" FontSize="15" FontWeight="Bold" Foreground="#9ECE6A" />
-                                    <TextBlock Text="Foco em taxa de quadros (FPS), menor latência de entrada e máxima responsividade." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Serviços secundários desnecessários desativados&#x0a;• GameDVR e captura de tela desativados&#x0a;• Resposta de mouse linear 1:1 e gravação SSD calibrada" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetDesktopGeral" Content="Selecionar Perfil Desktop Geral e Jogos" Style="{StaticResource SecondaryButton}" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" />
+                                    <TextBlock Text="Médio (Recomendado)" FontSize="15" FontWeight="Bold" Foreground="#4ADE80" />
+                                    <TextBlock Text="Equilíbrio ideal entre desempenho, privacidade, remoção de bloat e fluidez do sistema." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Remoção de 28 bloatwares e telemetria&#x0a;• Baixa latência de rede e sem GameDVR&#x0a;• Menu clássico e hibernação inteligente" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetTweakMedium" Content="Selecionar Médio (Recomendado)" Style="{StaticResource SecondaryButton}" Background="#16A34A" BorderBrush="#22C55E" Foreground="White" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Card Notebook Dev -->
+                            <!-- Card 100% Otimizado -->
                             <Border Style="{StaticResource ProfileCard}">
                                 <StackPanel>
-                                    <TextBlock Text="Notebook - Desenvolvimento" FontSize="15" FontWeight="Bold" Foreground="#BB9AF7" />
-                                    <TextBlock Text="Ambiente de desenvolvimento móvel com preservação de bateria e armazenamento." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Hibernação segura compacta com preservação de estado&#x0a;• Prevenção contra perda de dados ao fechar a tampa&#x0a;• Calibração de resposta térmica e estabilidade gráfica" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetLaptopDev" Content="Selecionar Perfil Notebook Desenvolvimento" Style="{StaticResource SecondaryButton}" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" />
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Card Notebook Geral -->
-                            <Border Style="{StaticResource ProfileCard}">
-                                <StackPanel>
-                                    <TextBlock Text="Notebook - Geral e Autonomia" FontSize="15" FontWeight="Bold" Foreground="#E0AF68" />
-                                    <TextBlock Text="Máxima eficiência energética no uso diário, fluidez e estabilidade em jogos." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
-                                    <TextBlock Text="• Otimização para maior autonomia da bateria&#x0a;• Hibernação compacta com baixo consumo em repouso&#x0a;• Eliminação de rotinas em segundo plano que consomem energia" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
-                                    <Button Name="btnPresetLaptopGeral" Content="Selecionar Perfil Notebook Geral e Autonomia" Style="{StaticResource SecondaryButton}" Background="#D97706" BorderBrush="#F59E0B" Foreground="White" />
+                                    <TextBlock Text="100% Otimizado" FontSize="15" FontWeight="Bold" Foreground="#BB9AF7" />
+                                    <TextBlock Text="Máximo desempenho absoluto para jogadores, criadores e desenvolvedores exigentes." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Todas as 28 otimizações ativadas&#x0a;• Calibração de GPU, CPU e memória&#x0a;• Relógio UTC e inicialização limpa" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetTweakAggressive" Content="Selecionar 100% Otimizado" Style="{StaticResource SecondaryButton}" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" />
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
@@ -370,11 +360,53 @@
             <!-- ======================================================== -->
             <!-- ABA 3: RECURSOS OPCIONAIS DO WINDOWS (DISM)              -->
             <!-- ======================================================== -->
-            <TabItem Name="tabItemFeatures" Header=" Recursos Opcionais do Windows ">
+            <TabItem Name="tabItemFeatures" Header=" Recursos Opcionais / Extras ">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
                     <StackPanel>
+                        <!-- Notificacao de Recursos -->
                         <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="14" Margin="6,0,6,10">
                             <TextBlock Text="Recursos opcionais do Windows gerenciados nativamente via DISM:" FontSize="15" FontWeight="SemiBold" Foreground="#C8D3F5" />
+                        </Border>
+
+                        <!-- Perfis Rápidos de Recursos -->
+                        <TextBlock Text="Perfis Rápidos de Recursos:" FontSize="14" FontWeight="SemiBold" Foreground="#C8D3F5" Margin="8,4,8,8" />
+                        <UniformGrid Columns="2" Margin="0,0,0,10">
+                            <!-- Card Perfil Geral -->
+                            <Border Style="{StaticResource ProfileCard}">
+                                <StackPanel>
+                                    <TextBlock Text="Perfil Geral" FontSize="15" FontWeight="Bold" Foreground="#38BDF8" />
+                                    <TextBlock Text="Compatibilidade essencial com jogos e programas legados sem consumo extra de recursos." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Habilita apenas o .NET Framework 3.5 (2.0/3.0)&#x0a;• Mantém recursos de virtualização desativados" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetFeatGeneral" Content="Selecionar Perfil Geral (.NET apenas)" Style="{StaticResource SecondaryButton}" Background="#0284C7" BorderBrush="#38BDF8" Foreground="White" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card Perfil Dev -->
+                            <Border Style="{StaticResource ProfileCard}">
+                                <StackPanel>
+                                    <TextBlock Text="Perfil Desenvolvedor (Dev)" FontSize="15" FontWeight="Bold" Foreground="#BB9AF7" />
+                                    <TextBlock Text="Ambiente completo de desenvolvimento, contêineres e testes seguros isolados." FontSize="12" Foreground="#7982A9" Margin="0,3,0,6" TextWrapping="Wrap" />
+                                    <TextBlock Text="• Habilita todos os 5 recursos opcionais&#x0a;• .NET 3.5, WSL2, Hyper-V, Sandbox e Plataforma VM" FontSize="11" Foreground="#C8D3F5" Margin="0,2,0,10" />
+                                    <Button Name="btnPresetFeatDev" Content="Selecionar Perfil Desenvolvedor (Tudo)" Style="{StaticResource SecondaryButton}" Background="#7C3AED" BorderBrush="#8B5CF6" Foreground="White" />
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- Barra de Ferramentas de Seleção de Recursos -->
+                        <Border Background="#1A1B26" BorderBrush="#2F354F" BorderThickness="1" CornerRadius="8" Padding="12" Margin="6,0,6,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Seleção Personalizada de Recursos:" FontSize="14" FontWeight="Bold" Foreground="#C8D3F5" VerticalAlignment="Center" />
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Name="btnSelectAllFeat" Content="Marcar Todos" Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" />
+                                    <Button Name="btnDeselectAllFeat" Content="Desmarcar Todos" Style="{StaticResource SecondaryButton}" />
+                                </StackPanel>
+                            </Grid>
                         </Border>
                         
                         <Border Style="{StaticResource ProfileCard}">
