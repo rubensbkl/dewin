@@ -3,3 +3,5 @@ build/*
 *.wim
 *.esd
 *.swm
+logs/
+*.log

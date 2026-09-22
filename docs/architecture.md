@@ -8,8 +8,7 @@ O projeto **DEWIN** é um ecossistema modular e estruturado para entregar o máx
 
 1. **ISO 100% Oficial**: Nunca utilizar ISOs modificadas de terceiros (Tiny11, ReviOS, AtlasOS, Ghost Spectre). Modificações externas inserem binários opacos e quebram recursos de segurança e estabilidade.
 2. **Modelo Híbrido de Dois Fluxos de Usuário**:
-   * **Fluxo A (Instalação Limpa via Pendrive)**: Instalação autônoma via `unattend/autounattend.xml` que entrega o sistema já limpo desde o Windows PE, sem conta Microsoft e com tweaks de GPU/Kernel pré-logon.
-   * **Fluxo B (Booster em Máquina Viva / Sem Formatar)**: Para computadores em produção onde o usuário não pode formatar, o `scripts/apply-dewin.ps1` atua como um *Booster autossuficiente*, aplicando a calibração de GPU, o debloat cirúrgico dos 28 apps nativos e disparando o WinUtil com o perfil calibrado.
+   * **Fluxo A (Instalação Limpa via Pendrive)**: Instalação autônoma via `unattend/autounattend.xml` que entrega o sistema já limpo desde o Windows PE, sem conta Microsoft e com tweaks de GPU/Ke    * **Fluxo B (Booster em Máquina Viva / Sem Formatar)**: Para computadores em produção onde o usuário não pode formatar, o `scripts/apply-dewin.ps1` atua como um *Booster autossuficiente e 100% autônomo*, aplicando nativamente a calibração de GPU, o debloat cirúrgico dos 28 apps, os tweaks de interface (incluindo remoção dos botões de pesquisa e multitarefa), telemetria, kernel, DISM e softwares essenciais sem dependência externa em tempo de execução.
 3. **Não-Regressão Funcional**: Nenhuma otimização sacrifica a compatibilidade com ferramentas de produção (Unreal Engine 5, DaVinci Resolve, Adobe Creative Cloud, Docker, WSL2).
 4. **Reprodutibilidade Baseada em Código**: Todas as configurações residem em arquivos versionados (`.xml`, `.ps1`, `.json`, `.md`).
 
@@ -35,27 +34,28 @@ flowchart TD
         ExistingPC["PC Existente com Bloatware / Windows em Uso"]
     end
 
-    subgraph Execution ["Execução Unificada: run.bat / apply-dewin.ps1"]
+    subgraph Execution ["Execução Unificada: run.bat / apply-dewin.ps1 (Motor Nativo)"]
         DesktopA --> RunBat["run.bat / apply-dewin.ps1"]
         ExistingPC --> RunBat
         
-        RunBat --> CoreTweaks["Etapa 1: Calibração GPU (TdrDelay=8s), HAGS, WPBT, LongPaths"]
+        RunBat --> CoreTweaks["Etapa 1: Calibração GPU (TdrDelay=8s), HAGS, Bateria/Hibernação Inteligente"]
         RunBat --> Debloat["Etapa 2: Debloat Cirúrgico (28 apps UWP nativos)"]
-        RunBat --> WinUtilStep["Etapa 3: WinUtil Oficial com Perfil DEWIN (.json)"]
+        RunBat --> NativeTweaks["Etapa 3: Motor Nativo DEWIN (Zero Dependência Externa)"]
     end
 
-    subgraph WinUtil_Profile ["Tweaks Aplicados pelo WinUtil"]
-        WinUtilStep --> W1["Desativa Telemetria, DiagTrack & Activity"]
-        WinUtilStep --> W2["Desativa Hibernação (Libera até 24GB SSD)"]
-        WinUtilStep --> W3["Desativa Armazenamento Reservado (7GB SSD)"]
-        WinUtilStep --> W4["Menu de Contexto Clássico & TaskbarEndTask"]
-        WinUtilStep --> W5["Exibir Extensões & Arquivos Ocultos"]
-        WinUtilStep --> W6["Runtimes VC++ (x86/x64) & .NET 3.5"]
-        WinUtilStep --> W7["Virtualização (WSL2 + Hyper-V + Sandbox - Perfil Full)"]
+    subgraph Dewin_Native ["Tweaks Aplicados Nativamente pelo DEWIN"]
+        NativeTweaks --> D1["Oculta Botões de Pesquisa e Multitarefa na Barra"]
+        NativeTweaks --> D2["Menu de Contexto Clássico, TaskbarEndTask & Alinhamento à Esquerda"]
+        NativeTweaks --> D3["Desativa Telemetria, DiagTrack, Windows AI/Copilot & Edge Bloat"]
+        NativeTweaks --> D4["Hibernação Inteligente (Desktop: Off / Notebook: Reduced ~3GB)"]
+        NativeTweaks --> D5["SvcHostSplitThreshold, Dual-Boot UTC, BSoD Detalhado & LongPaths"]
+        NativeTweaks --> D6["Desativa Armazenamento Reservado (~7GB) & Limpeza DISM"]
+        NativeTweaks --> D7["Runtimes VC++ (x86/x64), 7-Zip, Chrome & .NET 3.5"]
+        NativeTweaks --> D8["Virtualização Modular (WSL2 + Hyper-V + Sandbox - Perfil Dev)"]
     end
 
     subgraph Ready ["Estação Pronta para Cargas Reais"]
-        W1 & W2 & W3 & W4 & W5 & W6 & W7 --> FinalState["Ambiente Estável, Limpo e Otimizado"]
+        D1 & D2 & D3 & D4 & D5 & D6 & D7 & D8 --> FinalState["Ambiente Estável, Limpo e Otimizado"]
         FinalState --> Workload1["Unreal Engine 5"]
         FinalState --> Workload2["DaVinci Resolve"]
         FinalState --> Workload3["Adobe Creative Cloud"]
@@ -75,12 +75,14 @@ flowchart TD
 | Bloqueio de injeção WPBT (Asus Armoury Crate) | `autounattend.xml` + `apply-dewin.ps1` | ✅ | ✅ |
 | Habilitação de Caminhos Longos (`LongPathsEnabled`) | `autounattend.xml` + `apply-dewin.ps1` | ✅ | ✅ |
 | Busca 100% Local (Sem Bing no Iniciar) | `autounattend.xml` + `apply-dewin.ps1` | ✅ | ✅ |
+| Ocultar Botões de Pesquisa e Multitarefa | `apply-dewin.ps1` (Nativo) | ✅ (Pós-logon) | ✅ |
 | Debloat Cirúrgico (28 apps UWP nativos) | `autounattend.xml` + `apply-dewin.ps1` | ✅ (Pré-logon) | ✅ (Pós-logon) |
-| Menu de Contexto Clássico do Windows 10 | `winutil/*.json` + `autounattend.xml` | ✅ | ✅ |
-| Exibir Extensões de Arquivo e Pastas Ocultas | `winutil/*.json` + `autounattend.xml` | ✅ | ✅ |
-| Desativação de Hibernação e Armazenamento Reservado | `winutil/*.json` | ✅ | ✅ |
-| Instalação de Runtimes (VC++ 2015-2022, .NET 3.5) | `winutil/*.json` | ✅ | ✅ |
-| Virtualização Modular (WSL2, Hyper-V, Sandbox) | `winutil/*.json` (Perfil Full) | ✅ | ✅ |
+| Menu de Contexto Clássico do Windows 10 | `apply-dewin.ps1` (Nativo) + `autounattend.xml` | ✅ | ✅ |
+| Exibir Extensões de Arquivo e Pastas Ocultas | `apply-dewin.ps1` (Nativo) + `autounattend.xml` | ✅ | ✅ |
+| Desativação de Armazenamento Reservado | `apply-dewin.ps1` (Nativo) | ✅ | ✅ |
+| Hibernação Inteligente (Desktop Off / Notebook Reduced) | `apply-dewin.ps1` (Nativo) | ✅ | ✅ |
+| Instalação de Runtimes (VC++ 2015-2022, .NET 3.5) | `apply-dewin.ps1` (Nativo / Winget) | ✅ | ✅ |
+| Virtualização Modular (WSL2, Hyper-V, Sandbox) | `apply-dewin.ps1` (Nativo - Perfil Dev) | ✅ | ✅ |
 
 ---
 

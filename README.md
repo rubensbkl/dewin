@@ -50,17 +50,19 @@ A escolha do perfil é orientada pela **sua carga de trabalho** (necessidade de 
 
 ```
 dewin/
+├── Compile.ps1             # Compilador modular (gera dewin.ps1)
+├── dewin.ps1               # Script autônomo compilado (pronto para irm | iex)
+├── run.bat                 # Inicializador rápido (elevação e execução com 2 cliques)
+├── src/
+│   ├── gui/                # Interface gráfica moderna em WPF (MainWindow.xaml)
+│   ├── core/               # Módulos base (Hardware, Logger, Registry)
+│   ├── tweaks/             # Tweaks cirúrgicos (Interface, Performance, Privacy, System)
+│   ├── packages/           # Instaladores Winget e recursos DISM
+│   └── engine/             # Perfis (Presets), Runner assíncrono e Controller WPF
 ├── unattend/
 │   └── autounattend.xml    # Instalação autônoma limpa (Camada 1)
-├── winutil/
-│   ├── dewin-desktop-dev.json    # Desktop Dev & Workstation
-│   ├── dewin-desktop-geral.json  # Desktop Geral & Jogos
-│   ├── dewin-laptop-dev.json     # Notebook Dev & Workstation (Nitro V 15, VivoBook, etc.)
-│   ├── dewin-laptop-geral.json   # Notebook Geral & Produtividade / Jogos (Nitro V 15, VivoBook, etc.)
-│   └── README.md                 # Guia de integração WinUtil e inventário
 ├── scripts/
-│   └── apply-dewin.ps1     # Script de automação e Booster do sistema
-├── run.bat                 # Inicializador rápido (elevação e execução com 2 cliques)
+│   └── apply-dewin.ps1     # Runner de linha de comando clássico
 ├── docs/
 │   ├── architecture.md     # Arquitetura e fluxos de uso
 │   ├── optimizations.md    # Matriz técnica de alterações
@@ -76,9 +78,21 @@ dewin/
 
 ---
 
+## ⚡ Inicialização Rápida (Comando Único)
+
+Abra o **PowerShell** do Windows e cole:
+
+```powershell
+irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex
+```
+
+> O script verifica privilégios automaticamente, auto-eleva via UAC se necessário e abre a interface gráfica interativa do DEWIN Booster.
+
+---
+
 ## 🚀 Como Usar
 
-O DEWIN foi projetado com suporte para dois perfis de uso:
+O DEWIN foi projetado com suporte para dois fluxos de uso:
 
 ### 🔹 Fluxo A: Instalação Limpa via Pendrive (Setup Novo)
 1. Grave a ISO oficial (`Win11_25H2_BrazilianPortuguese_x64_v2.iso`) em um pendrive com o Rufus (particionamento GPT / UEFI).
@@ -90,15 +104,16 @@ O DEWIN foi projetado com suporte para dois perfis de uso:
    * Microsoft Store, OpenSSH Client e .NET 3.5 offline preservados.
 4. Após o primeiro boot, execute o `run.bat` para aplicar os pacotes e runtimes finais.
 
-### 🔹 Fluxo B: Booster em Máquina Viva (Sem Formatar)
-*Se você já possui o Windows instalado e em produção, e quer apenas dar um boost máximo sem formatar:*
-1. Baixe ou clone a pasta do projeto.
-2. Dê **dois cliques** no arquivo [`run.bat`](run.bat) na raiz do repositório (ou execute `.\scripts\apply-dewin.ps1` no PowerShell como Administrador).
-3. O script aplicará automaticamente:
-   * **Calibração de GPU**: `TdrDelay = 8s`, `TdrDdiDelay = 8s` e HAGS para estabilidade em DaVinci Resolve, Unreal Engine e jogos.
-   * **Debloat Cirúrgico**: Remoção de 28 pacotes nativos de bloatware e telemetria.
-   * **Tweaks do WinUtil**: Hibernação, Armazenamento Reservado, menu clássico, extensões de arquivos, serviços e runtimes.
-4. Selecione o perfil desejado (`[1]` a `[4]` de acordo com seu dispositivo e necessidade de trabalho) e reinicie o computador ao finalizar.
+### 🔹 Fluxo B: Booster com Interface Gráfica (Em Máquina Viva)
+1. Execute pelo comando de 1 linha acima ou dê **dois cliques** no arquivo [`run.bat`](run.bat).
+2. A **Interface Gráfica do DEWIN** abrirá exibindo o resumo do seu hardware (Processador, Placa de Vídeo, RAM e tipo de chassi):
+   * **Início & Perfis Rápidos**: Escolha entre `Desktop Dev`, `Desktop Geral`, `Notebook Dev` ou `Notebook Geral`.
+   * **Otimizações & Tweaks**: Marque ou desmarque individualmente cada tweak de interface, privacidade, SSD, rede e GPU.
+   * **Softwares Essenciais**: Escolha quais softwares instalar via Winget (Chrome, VS Code, Git, 7-Zip, Discord, Steam).
+   * **Recursos do Windows**: Habilite WSL2, Hyper-V, Sandbox ou .NET 3.5 com 1 clique.
+   * **Log em Tempo Real**: Acompanhe o progresso e o log de auditoria detalhado.
+3. Clique no botão **`🚀 APLICAR OTIMIZAÇÕES`** e aguarde a barra de progresso ser concluída.
+4. Ao finalizar, reinicie o computador para aplicar todas as mudanças de kernel e serviços.
 
 ---
 
@@ -108,6 +123,5 @@ O DEWIN foi projetado com suporte para dois perfis de uso:
 * [Matriz de Otimizações](docs/optimizations.md)
 * [Inventário de Aplicativos](docs/removed-apps.md)
 * [Guia de Reversão / Rollback](docs/rollback.md)
-* [Integração com WinUtil](winutil/README.md)
 * [Guia de Contribuição](CONTRIBUTING.md)
 * [Licença MIT](LICENSE)
