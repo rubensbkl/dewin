@@ -1,13 +1,8 @@
-﻿<#
-.SYNOPSIS
-    DEWIN Booster - Universal Windows Optimizer & Debloater (Single-Script Edition)
-.DESCRIPTION
-    Script autÃ´nomo, 100% nativo em PowerShell com interface grÃ¡fica moderna em WPF.
-    Pode ser executado com 1 comando via terminal:
-    irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex
-.NOTES
-    Projeto: DEWIN (Universal Open-Source Edition)
-#>
+# ==============================================================================
+# DEWIN Booster - Universal Windows Optimizer & Debloater (Single-Script Edition)
+# Execucao via terminal:
+# irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex
+# ==============================================================================
 
 [CmdletBinding()]
 param(

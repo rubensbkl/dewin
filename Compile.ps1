@@ -19,18 +19,12 @@ if (-not $rootDir) { $rootDir = (Get-Location).Path }
 
 Write-Host '[*] Compilando DEWIN Booster...' -ForegroundColor Cyan
 
-# 1. Cabeçalho e Auto-Elevação UAC
 $header = @'
-<#
-.SYNOPSIS
-    DEWIN Booster - Universal Windows Optimizer & Debloater (Single-Script Edition)
-.DESCRIPTION
-    Script autônomo, 100% nativo em PowerShell com interface gráfica moderna em WPF.
-    Pode ser executado com 1 comando via terminal:
-    irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex
-.NOTES
-    Projeto: DEWIN (Universal Open-Source Edition)
-#>
+# ==============================================================================
+# DEWIN Booster - Universal Windows Optimizer & Debloater (Single-Script Edition)
+# Execucao via terminal:
+# irm https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1 | iex
+# ==============================================================================
 
 [CmdletBinding()]
 param(
@@ -143,9 +137,10 @@ if ($Profile -ne 'GUI' -or $Silent) {
 
 [void]$body.AppendLine($entrypoint)
 
-# 5. Gravacao do Arquivo Final dewin.ps1
+# 5. Gravacao do Arquivo Final dewin.ps1 (UTF-8 SEM BOM para compatibilidade com irm | iex)
 $outputFile = Join-Path -Path $rootDir -ChildPath 'dewin.ps1'
-[System.IO.File]::WriteAllText($outputFile, $body.ToString(), [System.Text.Encoding]::UTF8)
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+[System.IO.File]::WriteAllText($outputFile, $body.ToString(), $utf8NoBom)
 
 $fileSizeKB = [math]::Round((Get-Item $outputFile).Length / 1KB, 1)
 Write-Host "==================================================================" -ForegroundColor Green
