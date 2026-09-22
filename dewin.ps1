@@ -24,14 +24,22 @@ if (-not $isAdmin) {
     Write-Host '[*] Privilegios de Administrador necessarios. Elevando via UAC...' -ForegroundColor Cyan
     $tempLauncher = Join-Path -Path $env:TEMP -ChildPath 'dewin-elevated.ps1'
     try {
-        if ($PSCommandPath -and (Test-Path $PSCommandPath)) {
-            Copy-Item -LiteralPath $PSCommandPath -Destination $tempLauncher -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
+        $scriptBytes = if ($PSCommandPath -and (Test-Path $PSCommandPath)) {
+            [System.IO.File]::ReadAllBytes($PSCommandPath)
         } else {
             $webClient = New-Object System.Net.WebClient
             $webClient.Headers.Add('User-Agent', 'DEWIN-Installer')
-            $webClient.DownloadFile('https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1', $tempLauncher)
+            $webClient.DownloadData('https://raw.githubusercontent.com/rubensbkl/dewin/main/dewin.ps1')
         }
-        $elevArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $tempLauncher)
+        $utf8Preamble = [System.Text.Encoding]::UTF8.GetPreamble()
+        $hasBom = ($scriptBytes.Length -ge 3 -and $scriptBytes[0] -eq 0xEF -and $scriptBytes[1] -eq 0xBB -and $scriptBytes[2] -eq 0xBF)
+        if (-not $hasBom) {
+            $scriptBytes = $utf8Preamble + $scriptBytes
+        }
+        [System.IO.File]::WriteAllBytes($tempLauncher, $scriptBytes)
+
+        $elevArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$tempLauncher`"")
         if ($Profile) { $elevArgs += @('-Profile', $Profile) }
         if ($Silent) { $elevArgs += '-Silent' }
         if ($NoRestart) { $elevArgs += '-NoRestart' }
@@ -1340,7 +1348,7 @@ function Start-DewinGui {
             }
         } @(,$selectedApps) {
             param($s)
-            $gui['btnInstallSoftwares'].Content = "📥 BAIXAR / INSTALAR PROGRAMAS SELECIONADOS"
+            $gui['btnInstallSoftwares'].Content = "$([char]::ConvertFromUtf32(0x1F4E5)) BAIXAR / INSTALAR PROGRAMAS SELECIONADOS"
             if ($s.Error) {
                 $gui['lblProgressStatus'].Text = "⚠️ Falha ao instalar softwares: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
@@ -1946,21 +1954,31 @@ $global:DewinXaml = @'
 # ==============================================================================
 # DEWIN Entrypoint Principal
 # ==============================================================================
-Initialize-DewinLogging
+try {
+    Initialize-DewinLogging
 
-$hw = Get-DewinHardwareInfo
+    $hw = Get-DewinHardwareInfo
 
-if ($Profile -ne 'GUI' -or $Silent) {
-    # Execucao em Modo Linha de Comando (Headless / Silencioso)
-    $chosenPreset = if ($Profile -eq 'GUI') { $hw.RecommendedProfile } else { $Profile }
-    Write-Host "Iniciando DEWIN Booster em modo CLI com perfil: $chosenPreset" -ForegroundColor Cyan
-    $presetData = Get-DewinPreset -Name $chosenPreset
-    Invoke-DewinExecution -Tweaks $presetData.Tweaks -Apps $presetData.Apps -Features $presetData.Features -Hardware $hw
-    if (-not $NoRestart) {
-        $r = Read-Host "Deseja reiniciar o computador agora? (S/N)"
-        if ($r -match '^[sSyY]') { Restart-Computer }
+    if ($Profile -ne 'GUI' -or $Silent) {
+        # Execucao em Modo Linha de Comando (Headless / Silencioso)
+        $chosenPreset = if ($Profile -eq 'GUI') { $hw.RecommendedProfile } else { $Profile }
+        Write-Host "Iniciando DEWIN Booster em modo CLI com perfil: $chosenPreset" -ForegroundColor Cyan
+        $presetData = Get-DewinPreset -Name $chosenPreset
+        Invoke-DewinExecution -Tweaks $presetData.Tweaks -Apps $presetData.Apps -Features $presetData.Features -Hardware $hw
+        if (-not $NoRestart) {
+            $r = Read-Host "Deseja reiniciar o computador agora? (S/N)"
+            if ($r -match '^[sSyY]') { Restart-Computer }
+        }
+    } else {
+        # Execucao em Modo Interface Grafica (WPF)
+        Start-DewinGui -XamlString $global:DewinXaml -Hardware $hw
     }
-} else {
-    # Execucao em Modo Interface Grafica (WPF)
-    Start-DewinGui -XamlString $global:DewinXaml -Hardware $hw
+} catch {
+    Write-Host ""
+    Write-Host "[!] Erro fatal durante a execucao do DEWIN:" -ForegroundColor Red
+    Write-Host $_.Exception.ToString() -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Pressione Enter para fechar..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
+    exit 1
 }

@@ -318,7 +318,7 @@ function Start-DewinGui {
             }
         } @(,$selectedApps) {
             param($s)
-            $gui['btnInstallSoftwares'].Content = "📥 BAIXAR / INSTALAR PROGRAMAS SELECIONADOS"
+            $gui['btnInstallSoftwares'].Content = "$([char]::ConvertFromUtf32(0x1F4E5)) BAIXAR / INSTALAR PROGRAMAS SELECIONADOS"
             if ($s.Error) {
                 $gui['lblProgressStatus'].Text = "⚠️ Falha ao instalar softwares: $($s.Error)"
                 [System.Windows.MessageBox]::Show(
