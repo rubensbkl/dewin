@@ -296,7 +296,7 @@
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
                                         <TextBlock Text="Interface e Barra de Tarefas" FontSize="14" FontWeight="Bold" Foreground="#7DCFFF" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkHideSearch" Content="Ocultar caixa de pesquisa na barra de tarefas" IsChecked="False" ToolTip="Oculta a barra de pesquisa; a busca do menu Iniciar permanece disponível ao digitar." />
+                                        <CheckBox Name="chkHideSearch" Content="Ocultar caixa de pesquisa na barra de tarefas" IsChecked="False" ToolTip="Oculta a barra de pesquisa e desativa destaques do Bing, busca remota na nuvem e rastreamento de localização." />
                                         <CheckBox Name="chkHideTaskView" Content="Ocultar botão de Visão de Tarefas (Task View)" IsChecked="False" ToolTip="Oculta o ícone da barra; o atalho Win+Tab permanece totalmente funcional." />
                                         <CheckBox Name="chkCenterTaskbar" Content="Alinhamento centralizado da barra de tarefas" IsChecked="False" ToolTip="Mantém a barra de tarefas centralizada no padrão moderno do Windows 11." />
                                         <CheckBox Name="chkTaskbarEndTask" Content="Ativar opção 'Finalizar Tarefa' no botão direito" IsChecked="False" ToolTip="Permite encerrar processos não responsivos diretamente pelo botão direito na barra de tarefas." />
@@ -328,11 +328,11 @@
                                 <Border Style="{StaticResource ProfileCard}">
                                     <StackPanel>
                                         <TextBlock Text="Privacidade, Telemetria e Aplicativos Padrão" FontSize="14" FontWeight="Bold" Foreground="#BB9AF7" Margin="0,0,0,8" />
-                                        <CheckBox Name="chkDisableTelemetry" Content="Desativar telemetria e serviços de diagnóstico" IsChecked="False" ToolTip="Desativa o serviço DiagTrack e o envio de dados diagnósticos para servidores externos." />
+                                        <CheckBox Name="chkDisableTelemetry" Content="Desativar telemetria e serviços de diagnóstico" IsChecked="False" ToolTip="Desativa DiagTrack, telemetria de apps, coletor de inventário, relatórios WER de travamentos e propagandas/dicas de nuvem no Iniciar." />
                                         <CheckBox Name="chkDisableCeipTasks" Content="Desativar tarefas agendadas de diagnóstico (CEIP)" IsChecked="False" ToolTip="Desativa rotinas agendadas de telemetria executadas durante períodos de ociosidade." />
-                                        <CheckBox Name="chkDisableCopilotRecall" Content="Desativar Windows Copilot e recursos de IA Recall" IsChecked="False" ToolTip="Desativa o assistente Copilot e rotinas de análise contínua de tela em segundo plano." />
+                                        <CheckBox Name="chkDisableCopilotRecall" Content="Desativar Windows Copilot e recursos de IA Recall" IsChecked="False" ToolTip="Desativa o assistente Copilot, Cortana e rotinas de análise contínua de tela em segundo plano." />
                                         <CheckBox Name="chkDisableBingSearch" Content="Desativar resultados do Bing no menu Iniciar" IsChecked="False" ToolTip="Mantém a busca do menu Iniciar estritamente local para respostas imediatas." />
-                                        <CheckBox Name="chkDebloatEdge" Content="Otimizar telemetria do Microsoft Edge" IsChecked="False" ToolTip="Desativa o envio de métricas de navegação e assistentes de compra, preservando o WebView2." />
+                                        <CheckBox Name="chkDebloatEdge" Content="Otimizar telemetria do Microsoft Edge" IsChecked="False" ToolTip="Desativa métricas de navegação, assistentes de compra, persistência de processos ao fechar e pré-carregamento." />
                                         <CheckBox Name="chkRemoveUwpBloat" Content="Remover aplicativos pré-instalados desnecessários" IsChecked="False" ToolTip="Remove pacotes promocionais pré-instalados de entretenimento e redes sociais." />
                                     </StackPanel>
                                 </Border>
@@ -342,7 +342,7 @@
                                     <StackPanel>
                                         <TextBlock Text="Sistema, Gráficos e Gerenciamento de Energia" FontSize="14" FontWeight="Bold" Foreground="#E0AF68" Margin="0,0,0,8" />
                                         <CheckBox Name="chkCalibrateGpu" Content="Calibrar tolerância de driver gráfico (TdrDelay e HAGS)" IsChecked="False" ToolTip="Aumenta a tolerância para recuperação do driver gráfico e ativa o agendamento de GPU por hardware." />
-                                        <CheckBox Name="chkSmartHibernation" Content="Gerenciamento inteligente de hibernação" IsChecked="False" ToolTip="Desativa a hibernação em computadores de mesa para recuperar espaço em disco SSD ou configura modo compacto em notebooks." />
+                                        <CheckBox Name="chkSmartHibernation" Content="Gerenciamento inteligente de hibernação" IsChecked="False" ToolTip="Desativa hibernação em desktop (recupera espaço SSD) ou ativa hibernação compacta e suspende indexação na bateria em notebooks." />
                                         <CheckBox Name="chkDisableReservedStorage" Content="Desativar Armazenamento Reservado do Windows" IsChecked="False" ToolTip="Libera aproximadamente 7 GB de espaço em disco anteriormente retidos pelo sistema operacional." />
                                         <CheckBox Name="chkOptimizeSvcHost" Content="Calibrar divisão de processos de serviços (SvcHost)" IsChecked="False" ToolTip="Ajusta o isolamento de serviços de acordo com a quantidade total de memória RAM." />
                                         <CheckBox Name="chkEnableLongPaths" Content="Habilitar suporte a caminhos longos de arquivos" IsChecked="False" ToolTip="Remove a limitação legada de 260 caracteres (MAX_PATH) em caminhos de arquivos e pastas." />

@@ -26,6 +26,40 @@ function Invoke-DewinPrivacyTweaks {
                 Set-Service -Name $_ -StartupType Disabled -ErrorAction SilentlyContinue | Out-Null
             } catch {}
         }
+
+        # Telemetria de Aplicativos e Coletor de Inventário
+        $appCompatPol = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat'
+        Set-DewinReg -Path $appCompatPol -Name 'AITEnable' -Value 0
+        Set-DewinReg -Path $appCompatPol -Name 'DisableInventory' -Value 1
+
+        # Conteúdo de Nuvem, Dicas do Windows e Bloqueio de Apps Patrocinados
+        $cloudPol = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent'
+        Set-DewinReg -Path $cloudPol -Name 'DisableCloudOptimizedContent' -Value 1
+        Set-DewinReg -Path $cloudPol -Name 'DisableConsumerAccountStateContent' -Value 1
+        Set-DewinReg -Path $cloudPol -Name 'DisableSoftLanding' -Value 1
+        Set-DewinReg -Path $cloudPol -Name 'DisableWindowsConsumerFeatures' -Value 1
+
+        $cdmPath = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'
+        Set-DewinReg -Path $cdmPath -Name 'SubscribedContent-338389Enabled' -Value 0
+        Set-DewinReg -Path $cdmPath -Name 'SubscribedContent-310093Enabled' -Value 0
+        Set-DewinReg -Path $cdmPath -Name 'SystemPaneSuggestionsEnabled' -Value 0
+
+        # Coleta de Dados de Fala e Escrita na Nuvem
+        $speechPol = 'HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization'
+        Set-DewinReg -Path $speechPol -Name 'AllowSpeechModelUpdate' -Value 0
+        Set-DewinReg -Path $speechPol -Name 'RestrictImplicitInkCollection' -Value 1
+        Set-DewinReg -Path $speechPol -Name 'RestrictImplicitTextCollection' -Value 1
+
+        # Relatório de Erros do Windows (WER) e Despejo de Logs de Falhas
+        $werPol = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'
+        Set-DewinReg -Path $werPol -Name 'Disabled' -Value 1
+        Set-DewinReg -Path $werPol -Name 'LoggingDisabled' -Value 1
+        Set-DewinReg -Path $werPol -Name 'DoReport' -Value 0
+
+        # Sincronização de Configurações na Nuvem
+        $syncPol = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\SettingSync'
+        Set-DewinReg -Path $syncPol -Name 'DisableSettingSync' -Value 1
+        Set-DewinReg -Path $syncPol -Name 'DisableSettingSyncUserOverride' -Value 1
     }
 
     # Desativação de Tarefas Agendadas Ociosas de Telemetria (CEIP)
@@ -42,12 +76,13 @@ function Invoke-DewinPrivacyTweaks {
         }
     }
 
-    # Desativação de Copilot e IA Recall
+    # Desativação de Copilot, IA Recall e Cortana
     if ($DisableCopilotRecall) {
         Set-DewinReg -Path 'HKCU:\Software\Policies\Microsoft\Windows\WindowsCopilot' -Name 'TurnOffWindowsCopilot' -Value 1
         Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot' -Name 'TurnOffWindowsCopilot' -Value 1
         Set-DewinReg -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowCopilotButton' -Value 0
         Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsAI' -Name 'DisableAIDataAnalysis' -Value 1
+        Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search' -Name 'AllowCortana' -Value 0
     }
 
     # Desativação do Bing e Sugestões na Pesquisa do Iniciar
@@ -64,6 +99,10 @@ function Invoke-DewinPrivacyTweaks {
         Set-DewinReg -Path $edgePol -Name 'ShowHomeButton' -Value 0
         Set-DewinReg -Path $edgePol -Name 'HideFirstRunExperience' -Value 1
         Set-DewinReg -Path $edgePol -Name 'StartupBoostEnabled' -Value 0
+        Set-DewinReg -Path $edgePol -Name 'BackgroundModeEnabled' -Value 0
+        Set-DewinReg -Path $edgePol -Name 'PreventPreheating' -Value 1
+        Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Main' -Name 'AllowPrelaunch' -Value 0
+        Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\MicrosoftEdge\TabPreloader' -Name 'AllowTabPreloading' -Value 0
     }
 
     Write-DewinLog -Level SUCCESS -Message '  [+] Telemetria, CEIP, Copilot, Bing e Edge otimizados.'

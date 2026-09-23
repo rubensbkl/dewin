@@ -30,16 +30,25 @@ function Invoke-DewinSystemTweaks {
     # Gerenciamento Inteligente de Hibernação e Energia
     if ($SmartHibernation) {
         if ($IsLaptop) {
-            Write-DewinLog -Level STEP -Message '  [*] Configurando hibernação segura compacta para Notebook...'
+            Write-DewinLog -Level STEP -Message '  [*] Configurando hibernação segura compacta e economia de bateria para Notebook...'
             try {
                 powercfg.exe /hibernate on 2>$null | Out-Null
                 powercfg.exe /h /type reduced 2>$null | Out-Null
             } catch {}
+
+            # Otimização de bateria: suspende indexação pesada quando desconectado da tomada
+            Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search' -Name 'PreventIndexingOnBattery' -Value 1
         } else {
             Write-DewinLog -Level STEP -Message '  [*] Desativando hibernação para Desktop (recuperando espaço em disco SSD)...'
             try { powercfg.exe /hibernate off 2>$null | Out-Null } catch {}
+
+            # Desktop: desativa checagens de sensores inexistentes (luminosidade/giroscópio)
+            Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors' -Name 'DisableSensors' -Value 1
         }
     }
+
+    # Desativação do Popup Invasivo do Assistente de Compatibilidade de Programas (PCA)
+    Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat' -Name 'DisablePCA' -Value 1
 
     # Desativação de Armazenamento Reservado (~7 GB liberados de SSD)
     if ($DisableReservedStorage) {

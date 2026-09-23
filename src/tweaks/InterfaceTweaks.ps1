@@ -35,6 +35,13 @@ function Invoke-DewinInterfaceTweaks {
         Set-DewinReg -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Value 0
     }
 
+    # Desativação de Destaques de Pesquisa (desenhos/notícias do Bing), Pesquisa na Nuvem e Localização na Busca
+    $searchPol = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search'
+    Set-DewinReg -Path $searchPol -Name 'EnableDynamicContentInWSB' -Value 0
+    Set-DewinReg -Path $searchPol -Name 'AllowCloudSearch' -Value 0
+    Set-DewinReg -Path $searchPol -Name 'AllowSearchToUseLocation' -Value 0
+    Set-DewinReg -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\SearchSettings' -Name 'IsDynamicSearchBoxEnabled' -Value 0
+
     # Barra de tarefas: Ocultar botão de multitarefa (Task View)
     if ($HideTaskView) {
         Set-DewinReg -Path $advExplorer -Name 'ShowTaskViewButton' -Value 0
