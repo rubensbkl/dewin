@@ -32,7 +32,7 @@ function Enable-DewinFeatures {
     foreach ($feat in $FeatureNames) {
         $current++
         if ($OnProgress) {
-            $pct = 85 + [int](($current / $total) * 5)
+            $pct = [int](10 + (($current / $total) * 85))
             try { & $OnProgress $pct "Habilitando ($current/$total): recurso $feat..." } catch {}
         }
         Write-DewinLog -Level STEP -Message "  [*] Habilitando recurso: $feat..."

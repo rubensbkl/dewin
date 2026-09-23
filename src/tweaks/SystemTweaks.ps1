@@ -13,7 +13,8 @@ function Invoke-DewinSystemTweaks {
         [switch]$DisableReservedStorage = $true,
         [switch]$OptimizeSvcHost = $true,
         [switch]$EnableLongPaths = $true,
-        [switch]$DisableLockScreen = $true
+        [switch]$DisableLockScreen = $true,
+        [switch]$DualBootUtc = $false
     )
 
     Write-DewinLog -Level STEP -Message '[*] Aplicando calibrações de sistema, GPU e energia...'
@@ -65,13 +66,27 @@ function Invoke-DewinSystemTweaks {
 
     # Tweaks Exclusivos para Perfil Desenvolvedor
     if ($IsDev) {
-        # Relógio da Placa-Mãe em UTC (sincronização perfeita com Dual-Boot Linux)
-        Set-DewinReg -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation' -Name 'RealTimeIsUniversal' -Value 1
         # Mensagens detalhadas de inicialização e desligamento
         Set-DewinReg -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'verbosestatus' -Value 1
         # Desativação de aviso repetitivo de RDP não assinado
         Set-DewinReg -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client' -Name 'RedirectionWarningDialogVersion' -Value 1
         Set-DewinReg -Path 'HKCU:\SOFTWARE\Microsoft\Terminal Server Client' -Name 'RdpLaunchConsentAccepted' -Value 1
+    }
+
+    # Sincronização de Relógio UTC para Dual Boot (Linux / Fedora)
+    if ($DualBootUtc) {
+        Write-DewinLog -Level STEP -Message '[*] Configurando relógio da placa-mãe em UTC para Dual Boot Linux...'
+        Set-DewinReg -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation' -Name 'RealTimeIsUniversal' -Value 1 -Type 'QWord'
+        try {
+            Set-Service w32time -StartupType Automatic -ErrorAction SilentlyContinue
+            Start-Service w32time -ErrorAction SilentlyContinue
+            & "$env:SystemRoot\System32\w32tm.exe" /config /update | Out-Null
+            Start-Sleep -Milliseconds 1200
+            & "$env:SystemRoot\System32\w32tm.exe" /resync /force | Out-Null
+            Write-DewinLog -Level SUCCESS -Message '  [+] Relógio em UTC configurado e sincronizado com o servidor oficial NTP.'
+        } catch {
+            Write-DewinLog -Level WARN -Message "  [!] Não foi possível sincronizar o relógio automaticamente: $($_.Exception.Message)"
+        }
     }
 
     Write-DewinLog -Level SUCCESS -Message '  [+] Calibrações de sistema, GPU e energia aplicadas com sucesso.'

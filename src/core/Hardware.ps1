@@ -17,7 +17,7 @@ function Get-DewinHardwareInfo {
         WinBuild         = 0
         IsLaptop         = $false
         DeviceTypeStr    = 'Desktop'
-        RecommendedProfile = 'DesktopGeral'
+        RecommendedProfile = 'Medium'
     }
 
     try {

@@ -56,6 +56,7 @@ function Get-DewinTweakPreset {
         EnableLongPaths         = $true
         DisableLockScreen       = [bool]$isMediumOrHigher
         IsDev                   = [bool]$isAggressive
+        DualBootUtc             = [bool]$isAggressive
     }
 
     return [PSCustomObject]@{

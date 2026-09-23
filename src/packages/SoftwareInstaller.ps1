@@ -51,7 +51,7 @@ function Install-DewinSoftware {
         $appName = if ($appInfo) { $appInfo.Name } else { $id }
 
         if ($OnProgress) {
-            $pct = 90 + [int](($current / $total) * 7)
+            $pct = [int](10 + (($current / $total) * 85))
             try { & $OnProgress $pct "Instalando ($current/$total): $appName..." } catch {}
         }
 

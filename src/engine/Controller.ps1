@@ -47,6 +47,7 @@ function Start-DewinGui {
     # Carregamento do XAML
     $reader = [System.Xml.XmlReader]::Create([System.IO.StringReader]::new($XamlString))
     $window = [System.Windows.Markup.XamlReader]::Load($reader)
+    $global:DewinWindow = $window
 
     # Mapeamento dinâmico de elementos por Nome
     $global:DewinGui = @{}
@@ -77,7 +78,7 @@ function Start-DewinGui {
         'chkDisableTelemetry', 'chkDisableCeipTasks', 'chkDisableCopilotRecall', 'chkDisableBingSearch',
         'chkDebloatEdge', 'chkRemoveUwpBloat',
         'chkCalibrateGpu', 'chkSmartHibernation', 'chkDisableReservedStorage', 'chkOptimizeSvcHost',
-        'chkEnableLongPaths', 'chkDisableLockScreen', 'chkIsDev'
+        'chkEnableLongPaths', 'chkDisableLockScreen', 'chkIsDev', 'chkDualBootUtc'
     )
 
     $allAppChecks = @(
@@ -122,7 +123,16 @@ function Start-DewinGui {
             }
         }
 
-        $gui['lblProgressStatus'].Text = "Perfil de otimização '$($preset.Level)' aplicado na aba de configurações."
+        $friendlyLevel = switch ($preset.Level) {
+            'Light'      { 'Pouco Otimizado' }
+            'Medium'     { 'Médio (Recomendado)' }
+            'Aggressive' { '100% Otimizado' }
+            default      { $preset.Level }
+        }
+
+        if ($gui['lblStatusTweaks']) {
+            $gui['lblStatusTweaks'].Text = "Perfil '$friendlyLevel' selecionado. Clique ao lado para aplicar."
+        }
     }
 
     $applyFeaturePresetToGui = {
@@ -135,7 +145,15 @@ function Start-DewinGui {
             }
         }
 
-        $gui['lblProgressStatus'].Text = "Perfil de recursos '$($featPreset.Profile)' aplicado na aba de extras."
+        $friendlyProfile = switch ($featPreset.Profile) {
+            'General' { 'Geral (.NET apenas)' }
+            'Dev'     { 'Desenvolvedor (Tudo)' }
+            default   { $featPreset.Profile }
+        }
+
+        if ($gui['lblStatusFeatures']) {
+            $gui['lblStatusFeatures'].Text = "Perfil '$friendlyProfile' selecionado. Clique ao lado para habilitar."
+        }
     }
 
     # 4. Vinculação dos Botões de Níveis Rápidos (Aba 2: Otimizações)
@@ -146,12 +164,11 @@ function Start-DewinGui {
     # Botões de Seleção de Tweaks (Aba 2)
     $gui['btnSelectAll'].Add_Click({
         foreach ($c in $allTweakChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $true } }
+        if ($gui['lblStatusTweaks']) { $gui['lblStatusTweaks'].Text = "Todas as 29 otimizações foram marcadas." }
     })
     $gui['btnDeselectAll'].Add_Click({
         foreach ($c in $allTweakChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
-    })
-    $gui['btnResetRecommended'].Add_Click({
-        & $applyTweakPresetToGui 'Medium'
+        if ($gui['lblStatusTweaks']) { $gui['lblStatusTweaks'].Text = "Todas as otimizações foram desmarcadas." }
     })
 
     # Botões de Perfis Rápidos e Seleção de Recursos (Aba 3: Extras / DISM)
@@ -159,9 +176,11 @@ function Start-DewinGui {
     $gui['btnPresetFeatDev'].Add_Click({ & $applyFeaturePresetToGui 'Dev' })
     $gui['btnSelectAllFeat'].Add_Click({
         foreach ($c in $allFeatChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $true } }
+        if ($gui['lblStatusFeatures']) { $gui['lblStatusFeatures'].Text = "Todos os recursos opcionais foram marcados." }
     })
     $gui['btnDeselectAllFeat'].Add_Click({
         foreach ($c in $allFeatChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
+        if ($gui['lblStatusFeatures']) { $gui['lblStatusFeatures'].Text = "Todos os recursos opcionais foram desmarcados." }
     })
 
     # Botões de Seleção de Softwares (Aba 1: Aplicativos - 100% Manual)
@@ -170,13 +189,15 @@ function Start-DewinGui {
         foreach ($c in $allAppChecks) {
             if ($gui[$c]) { $gui[$c].IsChecked = ($essentialIds -contains $c) }
         }
-        $gui['lblProgressStatus'].Text = "Softwares essenciais (VC++, 7-Zip, Chrome) selecionados manualmente."
+        if ($gui['lblStatusSoftwares']) { $gui['lblStatusSoftwares'].Text = "Softwares essenciais (VC++, 7-Zip, Chrome) selecionados manualmente." }
     })
     $gui['btnSelectAllApps'].Add_Click({
         foreach ($c in $allAppChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $true } }
+        if ($gui['lblStatusSoftwares']) { $gui['lblStatusSoftwares'].Text = "Todos os programas foram marcados." }
     })
     $gui['btnDeselectAllApps'].Add_Click({
         foreach ($c in $allAppChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
+        if ($gui['lblStatusSoftwares']) { $gui['lblStatusSoftwares'].Text = "Todos os programas foram desmarcados." }
     })
 
     # Botões de Utilidades de Log (Aba 4)
@@ -198,39 +219,81 @@ function Start-DewinGui {
         $gui['txtConsoleLog'].Text = "[$(Get-Date -Format 'HH:mm:ss')] Console de logs limpo."
     })
 
-    # Inicialização da interface:
-    # 1. Aplicativos iniciam todos desmarcados
-    foreach ($c in $allAppChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
-    # 2. Otimizações iniciam com perfil Médio (Recomendado)
-    & $applyTweakPresetToGui 'Medium'
-    # 3. Recursos opcionais iniciam com perfil Geral (.NET 3.5 apenas)
-    & $applyFeaturePresetToGui 'General'
+    $lastOriginTab = if ($gui['tabItemSoftwares']) { $gui['tabItemSoftwares'] } else { $null }
+    if ($gui['mainTabControl']) {
+        $gui['mainTabControl'].Add_SelectionChanged({
+            if ($gui['mainTabControl'].SelectedItem -and $gui['tabItemLog'] -and $gui['mainTabControl'].SelectedItem -ne $gui['tabItemLog']) {
+                $lastOriginTab = $gui['mainTabControl'].SelectedItem
+            }
+        })
+    }
 
-    # 5. Executador Assíncrono com UI Responsiva (Thread-Safe)
-    $allActionButtons = @(
+    if ($gui['btnBackToOptions']) {
+        $gui['btnBackToOptions'].Add_Click({
+            $target = if ($lastOriginTab) { $lastOriginTab } else { $gui['tabItemTweaks'] }
+            if ($target -and $gui['mainTabControl']) {
+                $gui['mainTabControl'].SelectedItem = $target
+            }
+        })
+    }
+
+    # Inicialização da interface: todas as opções iniciam desmarcadas por padrão
+    foreach ($c in $allAppChecks)   { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
+    foreach ($c in $allTweakChecks) { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
+    foreach ($c in $allFeatChecks)  { if ($gui[$c]) { $gui[$c].IsChecked = $false } }
+
+    # 5. Executador Assíncrono com UI Responsiva (Thread-Safe e Auto-Reativação)
+    $global:DewinActionButtons = @(
         'btnInstallSoftwares', 'btnApplyOptimizations', 'btnEnableFeatures',
         'btnSelectEssentialApps', 'btnSelectAllApps', 'btnDeselectAllApps',
-        'btnSelectAll', 'btnDeselectAll', 'btnResetRecommended',
+        'btnSelectAll', 'btnDeselectAll',
         'btnPresetTweakLight', 'btnPresetTweakMedium', 'btnPresetTweakAggressive',
-        'btnPresetFeatGeneral', 'btnPresetFeatDev', 'btnSelectAllFeat', 'btnDeselectAllFeat'
+        'btnPresetFeatGeneral', 'btnPresetFeatDev', 'btnSelectAllFeat', 'btnDeselectAllFeat',
+        'btnBackToOptions', 'btnOpenLogFolder', 'btnClearLogConsole'
     )
+
+    $setDewinActionButtonsState = {
+        param([bool]$Enabled)
+        $ui = if ($global:DewinGui) { $global:DewinGui } else { $null }
+        if (-not $ui) { return }
+
+        $btns = if ($global:DewinActionButtons) { $global:DewinActionButtons } else { @() }
+        foreach ($b in $btns) {
+            if ($ui[$b] -and ($ui[$b] -is [System.Windows.Controls.Button])) {
+                $ui[$b].IsEnabled = $Enabled
+            }
+        }
+
+        if ($Enabled) {
+            foreach ($k in $ui.Keys) {
+                if ($ui[$k] -is [System.Windows.Controls.Button]) {
+                    $ui[$k].IsEnabled = $true
+                }
+            }
+        }
+    }
 
     $runDewinAsync = {
         param(
             [string]$ActionTitle,
+            [string]$TabKey, # 'Softwares', 'Tweaks', 'Features'
             [scriptblock]$TaskScriptBlock,
             [array]$TaskArgs,
             [scriptblock]$OnCompleted
         )
 
-        foreach ($btn in $allActionButtons) {
-            if ($gui[$btn]) { $gui[$btn].IsEnabled = $false }
-        }
+        $pbName = "pb$TabKey"
+        $lblStatusName = "lblStatus$TabKey"
+        $lblPercentName = "lblPercent$TabKey"
 
-        # Muda imediatamente para a aba de Log para visualização em tempo real
-        if ($gui['mainTabControl'] -and $gui['tabItemLog']) {
-            $gui['mainTabControl'].SelectedItem = $gui['tabItemLog']
-        }
+        # Inicializa o progresso na aba ativa
+        if ($gui[$pbName]) { $gui[$pbName].Value = 0 }
+        if ($gui[$lblPercentName]) { $gui[$lblPercentName].Text = "0%" }
+        if ($gui[$lblStatusName]) { $gui[$lblStatusName].Text = "Iniciando $ActionTitle..." }
+
+        & $setDewinActionButtonsState $false
+
+        # Loga no console da aba de Log em segundo plano (sem forçar troca de aba)
         $gui['txtConsoleLog'].AppendText("`r`n`r`n[$(Get-Date -Format 'HH:mm:ss')] Iniciando: $ActionTitle...")
 
         $global:DewinSync = [hashtable]::Synchronized(@{
@@ -254,54 +317,113 @@ function Start-DewinGui {
 
         $asyncResult = $psAsync.BeginInvoke()
 
-        $uiTimer = [System.Windows.Threading.DispatcherTimer]::new()
-        $uiTimer.Interval = [TimeSpan]::FromMilliseconds(100)
+        $global:DewinUiTimer = [System.Windows.Threading.DispatcherTimer]::new()
+        $global:DewinUiTimer.Interval = [TimeSpan]::FromMilliseconds(100)
+
+        # Variáveis locais capturadas pelo GetNewClosure()
+        $localSetButtonState = $setDewinActionButtonsState
+        $localPbName = $pbName
+        $localStatusName = $lblStatusName
+        $localPercentName = $lblPercentName
 
         $tickAction = {
-            $ui = if ($global:DewinGui) { $global:DewinGui } elseif ($gui) { $gui } else { $null }
-            if (-not $ui) { return }
+            try {
+                $ui = if ($global:DewinGui) { $global:DewinGui } elseif ($gui) { $gui } else { $null }
+                if (-not $ui) { return }
 
-            $s = if ($global:DewinSync) { $global:DewinSync } elseif ($sync) { $sync } else { $null }
-            if (-not $s) { return }
+                $s = if ($global:DewinSync) { $global:DewinSync } elseif ($sync) { $sync } else { $null }
+                if (-not $s) { return }
 
-            $pct = [int]$s.Percent
-            if ($pct -lt 0) { $pct = 0 }
-            if ($pct -gt 100) { $pct = 100 }
+                $pct = [int]$s.Percent
+                if ($pct -lt 0) { $pct = 0 }
+                if ($pct -gt 100) { $pct = 100 }
 
-            $ui['pbExecution'].Value = $pct
-            $ui['lblProgressPercent'].Text = "${pct}%"
-            if ($s.Status) { $ui['lblProgressStatus'].Text = [string]$s.Status }
+                if ($ui[$localPbName]) { $ui[$localPbName].Value = $pct }
+                if ($ui[$localPercentName]) { $ui[$localPercentName].Text = "${pct}%" }
+                if ($ui[$localStatusName] -and $s.Status) { $ui[$localStatusName].Text = [string]$s.Status }
 
-            if ($s.Messages.Count -gt 0) {
-                $batchBuilder = [System.Text.StringBuilder]::new()
-                while ($s.Messages.Count -gt 0) {
-                    $msg = $s.Messages[0]
-                    $s.Messages.RemoveAt(0)
-                    [void]$batchBuilder.AppendLine($msg)
-                }
-                $ui['txtConsoleLog'].AppendText($batchBuilder.ToString())
-                $ui['txtConsoleLog'].ScrollToEnd()
-            }
-
-            if ($s.IsDone) {
-                $uiTimer.Stop()
-                try { $psAsync.EndInvoke($asyncResult) | Out-Null } catch {}
-                $psAsync.Dispose()
-                $runspace.Close()
-                $runspace.Dispose()
-
-                foreach ($btn in $allActionButtons) {
-                    if ($ui[$btn]) { $ui[$btn].IsEnabled = $true }
+                $msgList = @()
+                if ($s.Messages -and $s.Messages.Count -gt 0) {
+                    [System.Threading.Monitor]::Enter($s.Messages.SyncRoot)
+                    try {
+                        $msgList = @($s.Messages)
+                        $s.Messages.Clear()
+                    } finally {
+                        [System.Threading.Monitor]::Exit($s.Messages.SyncRoot)
+                    }
                 }
 
-                if ($OnCompleted) {
-                    try { & $OnCompleted $s } catch {}
+                if ($msgList.Count -gt 0) {
+                    $batchBuilder = [System.Text.StringBuilder]::new()
+                    foreach ($m in $msgList) {
+                        [void]$batchBuilder.AppendLine($m)
+                    }
+                    $ui['txtConsoleLog'].AppendText($batchBuilder.ToString())
+                    $ui['txtConsoleLog'].ScrollToEnd()
                 }
-            }
+
+                if ($s.IsDone -or ($asyncResult -and $asyncResult.IsCompleted)) {
+                    if ($global:DewinUiTimer) {
+                        try { $global:DewinUiTimer.Stop() } catch {}
+                    }
+
+                    # 1. Reabilita TODOS os botões da interface IMEDIATAMENTE (primeira ação ao finalizar)
+                    if ($localSetButtonState) {
+                        try { & $localSetButtonState $true } catch {}
+                    }
+                    if ($global:DewinActionButtons) {
+                        foreach ($btn in $global:DewinActionButtons) {
+                            if ($ui[$btn] -and ($ui[$btn] -is [System.Windows.Controls.Button])) {
+                                $ui[$btn].IsEnabled = $true
+                            }
+                        }
+                    }
+                    foreach ($k in $ui.Keys) {
+                        if ($ui[$k] -is [System.Windows.Controls.Button]) {
+                            $ui[$k].IsEnabled = $true
+                        }
+                    }
+
+                    # 2. Restaura os títulos padrão dos botões principais
+                    if ($ui['btnApplyOptimizations']) { $ui['btnApplyOptimizations'].Content = "Aplicar Otimizações Selecionadas" }
+                    if ($ui['btnInstallSoftwares'])   { $ui['btnInstallSoftwares'].Content   = "Instalar Programas Selecionados" }
+                    if ($ui['btnEnableFeatures'])     { $ui['btnEnableFeatures'].Content     = "Habilitar Recursos Selecionados" }
+
+                    # 3. Restaura foco na janela do aplicativo (vital após reinício de Explorer)
+                    $w = if ($global:DewinWindow) { $global:DewinWindow } elseif ($window) { $window } else { $null }
+                    if ($w) {
+                        try {
+                            $w.Activate()
+                            $w.Focus()
+                        } catch {}
+                    }
+
+                    # 4. Limpeza segura de runspace
+                    try { $psAsync.EndInvoke($asyncResult) | Out-Null } catch {}
+                    try { $psAsync.Dispose() } catch {}
+                    try { $runspace.Close() } catch {}
+                    try { $runspace.Dispose() } catch {}
+
+                    # 5. Executa callback de conclusão (ex: MessageBox de confirmação)
+                    if ($OnCompleted) {
+                        try { & $OnCompleted $s } catch {}
+                    }
+
+                    # 6. Garantia final: reabilita novamente após o fechamento de eventuais caixas de diálogo
+                    if ($localSetButtonState) {
+                        try { & $localSetButtonState $true } catch {}
+                    }
+                    foreach ($k in $ui.Keys) {
+                        if ($ui[$k] -is [System.Windows.Controls.Button]) {
+                            $ui[$k].IsEnabled = $true
+                        }
+                    }
+                }
+            } catch {}
         }.GetNewClosure()
 
-        $uiTimer.Add_Tick($tickAction)
-        $uiTimer.Start()
+        $global:DewinUiTimer.Add_Tick($tickAction)
+        $global:DewinUiTimer.Start()
     }
 
     # 6. Evento de Instalação de Softwares (Aba 1: Botão Independente)
@@ -313,6 +435,7 @@ function Start-DewinGui {
 
         if ($selectedApps.Count -eq 0) {
             [System.Windows.MessageBox]::Show(
+                $window,
                 "Nenhum programa foi selecionado.`r`nPor favor, marque ao menos um software na lista para instalar.",
                 "DEWIN Booster - Selecione Softwares",
                 [System.Windows.MessageBoxButton]::OK,
@@ -323,7 +446,7 @@ function Start-DewinGui {
 
         $gui['btnInstallSoftwares'].Content = "Instalando programas..."
 
-        & $runDewinAsync "Instalação de Softwares via Winget" {
+        & $runDewinAsync "Instalação de Softwares via Winget" 'Softwares' {
             param($AppsArg)
             try {
                 Invoke-DewinSoftwaresOnly -Apps $AppsArg
@@ -340,18 +463,21 @@ function Start-DewinGui {
             param($s)
             $gui['btnInstallSoftwares'].Content = "Instalar Programas Selecionados"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "Falha na instalação de programas: $($s.Error)"
+                $gui['lblStatusSoftwares'].Text = "Falha na instalação de programas: $($s.Error)"
+                $gui['lblPercentSoftwares'].Text = "Erro"
                 [System.Windows.MessageBox]::Show(
+                    $window,
                     "Ocorreu um erro ao instalar os programas selecionados:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
                 )
             } else {
-                $gui['pbExecution'].Value = 100
-                $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Programas instalados e atualizados com sucesso."
+                $gui['pbSoftwares'].Value = 100
+                $gui['lblPercentSoftwares'].Text = "100%"
+                $gui['lblStatusSoftwares'].Text = "Programas instalados e atualizados com sucesso via Winget."
                 [System.Windows.MessageBox]::Show(
+                    $window,
                     "Os programas selecionados foram instalados ou atualizados com sucesso via Winget.",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::OK,
@@ -372,7 +498,7 @@ function Start-DewinGui {
 
         $gui['btnApplyOptimizations'].Content = "Aplicando otimizações..."
 
-        & $runDewinAsync "Otimizações do Sistema" {
+        & $runDewinAsync "Otimizações do Sistema" 'Tweaks' {
             param($TweaksArg, $HwArg)
             try {
                 Invoke-DewinTweaksOnly -Tweaks $TweaksArg -Hardware $HwArg
@@ -389,18 +515,21 @@ function Start-DewinGui {
             param($s)
             $gui['btnApplyOptimizations'].Content = "Aplicar Otimizações Selecionadas"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "Falha na aplicação de otimizações: $($s.Error)"
+                $gui['lblStatusTweaks'].Text = "Falha na aplicação de otimizações: $($s.Error)"
+                $gui['lblPercentTweaks'].Text = "Erro"
                 [System.Windows.MessageBox]::Show(
+                    $window,
                     "Ocorreu um erro durante as otimizações:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
                 )
             } else {
-                $gui['pbExecution'].Value = 100
-                $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Otimizações aplicadas com sucesso."
+                $gui['pbTweaks'].Value = 100
+                $gui['lblPercentTweaks'].Text = "100%"
+                $gui['lblStatusTweaks'].Text = "Otimizações aplicadas com sucesso no sistema."
                 $res = [System.Windows.MessageBox]::Show(
+                    $window,
                     "Otimizações aplicadas com sucesso.`r`n`r`nRecomenda-se reiniciar o computador para que todas as alterações entrem em vigor.`r`nDeseja reiniciar agora?",
                     "DEWIN Booster - Concluído",
                     [System.Windows.MessageBoxButton]::YesNo,
@@ -422,6 +551,7 @@ function Start-DewinGui {
 
         if ($selectedFeats.Count -eq 0) {
             [System.Windows.MessageBox]::Show(
+                $window,
                 "Nenhum recurso opcional foi selecionado.`r`nPor favor, marque ao menos um recurso do Windows.",
                 "DEWIN Booster - Selecione Recursos",
                 [System.Windows.MessageBoxButton]::OK,
@@ -432,7 +562,7 @@ function Start-DewinGui {
 
         $gui['btnEnableFeatures'].Content = "Habilitando recursos..."
 
-        & $runDewinAsync "Recursos Opcionais do Windows (DISM)" {
+        & $runDewinAsync "Recursos Opcionais do Windows (DISM)" 'Features' {
             param($FeatsArg)
             try {
                 Invoke-DewinFeaturesOnly -Features $FeatsArg
@@ -449,23 +579,29 @@ function Start-DewinGui {
             param($s)
             $gui['btnEnableFeatures'].Content = "Habilitar Recursos Selecionados"
             if ($s.Error) {
-                $gui['lblProgressStatus'].Text = "Falha na habilitação de recursos DISM: $($s.Error)"
+                $gui['lblStatusFeatures'].Text = "Falha na habilitação de recursos DISM: $($s.Error)"
+                $gui['lblPercentFeatures'].Text = "Erro"
                 [System.Windows.MessageBox]::Show(
+                    $window,
                     "Ocorreu um erro ao configurar os recursos:`r`n$($s.Error)`r`n`r`nConsulte a aba de Registro e Logs para detalhes.",
                     "DEWIN Booster - Erro",
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Error
                 )
             } else {
-                $gui['pbExecution'].Value = 100
-                $gui['lblProgressPercent'].Text = "100%"
-                $gui['lblProgressStatus'].Text = "Recursos opcionais habilitados com sucesso."
-                [System.Windows.MessageBox]::Show(
-                    "Recursos opcionais habilitados com sucesso via DISM.",
+                $gui['pbFeatures'].Value = 100
+                $gui['lblPercentFeatures'].Text = "100%"
+                $gui['lblStatusFeatures'].Text = "Recursos opcionais do Windows habilitados com sucesso."
+                $res = [System.Windows.MessageBox]::Show(
+                    $window,
+                    "Recursos opcionais habilitados com sucesso via DISM.`r`n`r`nÉ necessário reiniciar o computador para finalizar a instalação dos recursos.`r`nDeseja reiniciar agora?",
                     "DEWIN Booster - Concluído",
-                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxButton]::YesNo,
                     [System.Windows.MessageBoxImage]::Information
                 )
+                if ($res -eq [System.Windows.MessageBoxResult]::Yes) {
+                    Restart-Computer
+                }
             }
         }
     })

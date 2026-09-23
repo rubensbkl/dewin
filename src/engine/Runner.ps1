@@ -45,7 +45,8 @@ function Invoke-DewinTweaksOnly {
                             -DisableReservedStorage:([bool]$Tweaks['DisableReservedStorage']) `
                             -OptimizeSvcHost:([bool]$Tweaks['OptimizeSvcHost']) `
                             -EnableLongPaths:([bool]$Tweaks['EnableLongPaths']) `
-                            -DisableLockScreen:([bool]$Tweaks['DisableLockScreen'])
+                            -DisableLockScreen:([bool]$Tweaks['DisableLockScreen']) `
+                            -DualBootUtc:([bool]$Tweaks['DualBootUtc'])
 
     # 3. Privacidade e Debloat
     & $updateProgress 35 "Aplicando ajustes de privacidade e telemetria..."
@@ -81,9 +82,14 @@ function Invoke-DewinTweaksOnly {
                                  -OptimizeSsdAccess:([bool]$Tweaks['OptimizeSsdAccess']) `
                                  -CleanTempFiles:([bool]$Tweaks['CleanTempFiles'])
 
-    # 6. Reiniciar Explorer
-    & $updateProgress 95 "Reiniciando o Windows Explorer..."
-    Restart-DewinExplorer
+    # 6. Atualização do Windows Explorer (apenas se houver tweaks de interface aplicados)
+    $hasInterfaceChanges = [bool]($Tweaks['HideSearch'] -or $Tweaks['HideTaskView'] -or $Tweaks['CenterTaskbar'] -or `
+                                 $Tweaks['TaskbarEndTask'] -or $Tweaks['ClassicContextMenu'] -or $Tweaks['LaunchToThisPC'] -or `
+                                 $Tweaks['ShowExtensionsAndHidden'] -or $Tweaks['AlwaysShowScrollbars'] -or $Tweaks['InstantMenuDelay'])
+    if ($hasInterfaceChanges) {
+        & $updateProgress 95 "Recarregando interface do Windows Explorer para aplicar alterações..."
+        Restart-DewinExplorer
+    }
 
     # 7. Conclusão e Sumário
     $elapsedSec = if ($global:DewinTimer) { [math]::Round($global:DewinTimer.Elapsed.TotalSeconds, 1) } else { 0 }

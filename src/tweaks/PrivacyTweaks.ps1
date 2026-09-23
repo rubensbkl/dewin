@@ -89,6 +89,12 @@ function Invoke-DewinDebloat {
     )
 
     $removedCount = 0
+    $provisioned = @(try { Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue } catch { @() })
+    $provLookup = @{}
+    foreach ($p in $provisioned) {
+        if ($p.DisplayName) { $provLookup[$p.DisplayName] = $p.PackageName }
+    }
+
     foreach ($app in $bloatwareList) {
         try {
             $pkg = Get-AppxPackage -Name $app -AllUsers -ErrorAction SilentlyContinue
@@ -96,9 +102,9 @@ function Invoke-DewinDebloat {
                 $pkg | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Out-Null
                 $removedCount++
             }
-            Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
-                Where-Object { $_.DisplayName -eq $app } |
-                Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null
+            if ($provLookup.ContainsKey($app)) {
+                Remove-AppxProvisionedPackage -Online -PackageName $provLookup[$app] -ErrorAction SilentlyContinue | Out-Null
+            }
         } catch {}
     }
 
